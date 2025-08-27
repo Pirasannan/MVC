@@ -1,19 +1,21 @@
 <?php 
 
 class Pages extends Controller{
+    private $pagesModel;
     public function __construct() {
-        $this->pagesModel = $this->model('M_Pages');
-
         
+        $this->pagesModel = $this->model('M_Pages');
+    
     }
 
     public function index() {
     }
 
-    public function about($name, $age) {
+    public function about() {
+        $users = $this->pagesModel->getUsers();
+
         $data = [
-            'username' => $name,
-            'userage' => $age 
+            'users' => $users
         ];
         $this->view('v_about',$data);
     }

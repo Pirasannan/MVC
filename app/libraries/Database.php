@@ -12,7 +12,7 @@
         private $error;
 
         public function __construct(){
-            $dsn = "mysql:host='.$this->host.';dbname='.$this->dbname";
+            $dsn = "mysql:host=".$this->host.";dbname=".$this->dbname;
         
             $options = array(
                 PDO::ATTR_PERSISTENT => true,
@@ -31,7 +31,54 @@
             }
         }
 
+        //prepared statement
+         public function query($sql){
+            $this->statement = $this->dbh->prepare($sql);
+         }
 
+         //bind parameters
+         public function bind($param, $value, $type = NULL){
+            if(is_null($type)){
+                switch(true){
+                    case is_int($value):
+                        $type = PDO::PARAM_INT;
+                        break;
+                    case is_bool($value):
+                        $type = PDO::PARAM_BOOL;
+                        break;
+                    case is_null($value):
+                        $type = PDO::PARAM_NULL;
+                        break;
+                    default:
+                        $type = PDO::PARAM_STR;  // String
+                }
+            }
+            $this->statement->bindValue($param, $value, $type);
 
-}
+         }
+
+            //execute the prepare statment
+            public function execute(){
+                return $this ->statement->execute();
+            }
+
+            // get multiple records as results
+            public function resultSet(){
+                $this->execute();
+                return $this->statement->fetchAll(PDO::FETCH_OBJ);  //convert the results as PDO , to return it as array.
+
+            }
+
+            // get single record as result
+            public function single(){
+                $this->execute();
+                return $this->statement->fetch(PDO::FETCH_OBJ);  // we are returning the data in an array. "FETCH_ASSOC" is for array "FETCH_OBJ" is for object
+
+            }
+
+            //Check records count
+            public function rowCount(){
+                return $this->statement->rowCount();
+            }
+    }
 ?>

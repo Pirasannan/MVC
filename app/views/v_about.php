@@ -1,5 +1,5 @@
 <?php require APPROOT.'/views/inc/components/header.php'; ?>
-    <h1>USERS</h1>
+    <h1>USERS List</h1>
 
     <?php foreach($data['users'] as $user): ?>
         <p><?php echo $user->name; ?> - <?php echo $user->age; ?></p>

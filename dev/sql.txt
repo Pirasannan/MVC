@@ -1,5 +1,6 @@
 -- Virtual Consultation Platform Database Schema
 
+
 -- Users table (base table for all user types)
 CREATE TABLE Users (
     id INT AUTO_INCREMENT,
@@ -13,3 +14,7 @@ CREATE TABLE Users (
     PRIMARY KEY(id)
 );
 
+-- For role access
+
+ALTER TABLE Users 
+CHANGE COLUMN user_type role ENUM('Admin','Doctor','Patient') NOT NULL;

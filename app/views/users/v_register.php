@@ -7,7 +7,7 @@
         <div class="form_container">
             
             <div class="form:header">
-                <center><h1>User Sign up</h1></center>
+                <center><h1>Sign up</h1></center>
                 <p><b>Please fill me to register</b></p>
             </div>
             <form action="<?php echo URLROOT?>/Users/register" method="POST">

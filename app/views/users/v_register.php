@@ -4,6 +4,7 @@
 
 
         <div class="form_container">
+            
             <div class="form:header">
                 <center><h1>User Sign up</h1></center>
                 <p><b>Please fill me to register</b></p>

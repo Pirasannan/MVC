@@ -7,7 +7,8 @@
         }
         
         public function register($data){
-            $this->db->query('INSERT INTO Users(name, email, password) VALUES (:name, :email, :password)');
+            $this->db->query('INSERT INTO Users(role,name, email, password) VALUES (:role, :name, :email, :password)');
+            $this->db->bind('role', $data['role']);
             $this->db->bind(':name',$data['name']);
             $this->db->bind(':email',$data['email']);
             $this->db->bind(':password',$data['password']);

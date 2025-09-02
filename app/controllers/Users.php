@@ -14,51 +14,55 @@ class Users extends Controller {
             //validate the data
             $_POST = array_map('htmlspecialchars', $_POST);
 
-            //input data
-            $data=[
+            $role = isset($_POST['role']) ? strtolower(trim($_POST['role'])) : '';
+
+            $allowedRoles = ['doctor','patient','admin'];
+
+            $data = [
+                'role' => $role,
                 'name' => trim($_POST['name']),
                 'email' => trim($_POST['email']),
                 'password' => trim($_POST['password']),
                 'confirm_password' => trim($_POST['confirm_password']),
 
+                'role_err' => '',
                 'name_err' => '',
                 'email_err' => '',
                 'password_err' => '',
                 'confirm_password_err' => '',
-
             ];
         
                 //validating each inputs
 
-                //Name validation
-            if(empty($data['name'])){   
+                // Role validation
+                if (empty($data['role'])) {
+                    $data['role_err'] = 'Please select a role';
+                } elseif (!in_array($data['role'], $allowedRoles, true)) {
+                    $data['role_err'] = 'Invalid role selected';
+                }
+
+                // Name validation
+                if (empty($data['name'])) {
                     $data['name_err'] = 'Please enter a Name';
             }
 
-            //Email validation
-            if(empty($data['email'])){
-                $data['email_err'] = 'Please enter a valid Email';
-            }
-            else{
-                //email is registered or not
-                if($this->userModel->findUserByEmail($data['email'])){
-                    $data['email_err'] = 'Email is already taken';
+                // Email validation
+                if (empty($data['email'])) {
+                    $data['email_err'] = 'Please enter a valid Email';
+                } else {
+                    if ($this->userModel->findUserByEmail($data['email'])) {
+                        $data['email_err'] = 'Email is already taken';
+                    }
                 }
-            }
 
-            //password validation
-            if(empty($data['password'])){ // check for password entered
-                $data['password_err'] = 'Please enter the password';
-            }
-            else if(empty($data['confirm_password'])){ // check for confirm password entered
-                $data['confirm_password_err'] = 'Please confirm the password';
-            }
-            else{
-                if($data['password'] !== $data['confirm_password']){ //chekc both passwords matches
+                // Password validation
+                if (empty($data['password'])) {
+                    $data['password_err'] = 'Please enter the password';
+                } else if (empty($data['confirm_password'])) {
+                    $data['confirm_password_err'] = 'Please confirm the password';
+                } else if ($data['password'] !== $data['confirm_password']) {
                     $data['confirm_password_err'] = 'Passwords do not match';
-
                 }
-            }
         
 
             //validation completed & No errors , then register users
@@ -82,11 +86,13 @@ class Users extends Controller {
         else {
             //initial form
             $data=[
+                'role'=> '',
                 'name' => '',
                 'email' => '',
                 'password' => '',
                 'confirm_password' => '',
 
+                'role_err' =>'',
                 'name_err' => '',
                 'email_err' => '',
                 'password_err' => '',

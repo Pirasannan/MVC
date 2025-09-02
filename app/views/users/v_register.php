@@ -1,6 +1,7 @@
 <?php require APPROOT.'/views/inc/header.php'; ?>
 <!-- TOP NAVIGATION -->
     <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?>
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/css/components/dropdown_style.css">
 
 
         <div class="form_container">
@@ -10,6 +11,19 @@
                 <p><b>Please fill me to register</b></p>
             </div>
             <form action="<?php echo URLROOT?>/Users/register" method="POST">
+
+
+
+            <div class="form-input-title">Role</div>
+<select name="role" id="role" class="role">
+    <!-- <option value="">-- Select Role --</option> -->
+    <option value="doctor" <?php echo ($data['role'] == 'doctor') ? 'selected' : ''; ?>>Doctor</option>
+    <option value="patient" <?php echo ($data['role'] == 'patient') ? 'selected' : ''; ?>>Patient</option>
+    <option value="admin" <?php echo ($data['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
+</select>
+<span class="Form-Invalid"><?php echo $data['role_err']; ?></span>
+
+
                 <!-- Name -->
                 <div class="form-input-title">Name</div>
                 <input type="text" name="name" id="name" class = "name " value = "<?php echo $data['name']?> ">

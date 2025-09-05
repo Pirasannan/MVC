@@ -4,6 +4,9 @@
 @import url('./components/topnavbar_style.css');
 @import url('./components/form_style.css');
 @import url('./components/buttons_style.css');
+@import url('./components/dropdown_style.css');
+@import url('./components/dashboard-style.css');
+
 
 
 /* Fonts */
@@ -17,7 +20,7 @@
 
 body{
     margin:0;
-    font-family:Roboto-Light;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: small; 
     text-align: left;
 }

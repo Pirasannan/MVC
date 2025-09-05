@@ -178,8 +178,23 @@ class Users extends Controller {
         $_SESSION['user_id'] = $user->id;
         $_SESSION['user_name'] = $user->name;
         $_SESSION['user_email'] = $user->email;
+        $_SESSION['user_role'] = strtolower($user->role ?? '');
 
-        redirect('Pages/index');  
+        //Role based sessions
+        switch($_SESSION['user_role']){
+            case 'admin':
+                redirect('Pages/adminDashboard');
+                break;
+            case 'doctor':
+                redirect('Pages/doctorDashboard'); 
+                break;
+            case 'patient':
+                redirect('Pages/patientDashboard'); 
+                break;
+            default:
+                redirect('Pages/index');   
+
+        }
 
     }
 

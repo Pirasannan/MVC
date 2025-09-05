@@ -2,7 +2,7 @@
     <h1>USERS List</h1>
 
     <?php foreach($data['users'] as $user): ?>
-        <p><?php echo $user->name; ?> - <?php echo $user->age; ?></p>
+        <p><?php echo $user->name; ?>  <?php echo $user->age; ?></p>
 
     <?php endforeach; ?>
 

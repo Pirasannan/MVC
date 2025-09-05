@@ -1,31 +1,52 @@
 <?php require APPROOT.'/views/inc/header.php'; ?>
+
 <!-- TOP NAVIGATION -->
     <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?>
 
-
-        <div class="form_container">
-            <div class="form:header">
-                <center><h1>User Login</h1></center>
-                <p><b>Please fill correct credentials to Login</b></p>
-            </div>
-            <form action ="" method="POST">
-            
-                <!-- email -->
-                <div class="form-input-title">Email</div>
-                <input type="text" name="email" id="email" class="email" value="<?php echo $data['email']; ?>">
-                <span class="Form-Invalid"><?php echo $data['email_err']; ?></span>
-                  
-                <!-- password -->
-                <div class="form-input-title">Password</div>
-                <input type="password" name="password" id="password" class="password" value="<?php echo $data['password']; ?>">
-                <span class="Form-Invalid"><?php echo $data['password_err']; ?></span>
-
-            
-                
-                <br>
-                <input type="submit" value="Login" class="form_btn">
-            </form>
+    <div class="container">
+        <div class="logo">
+            <span class="logo-text">MediLink</span>
         </div>
+        
+        <form action="<?php echo URLROOT; ?>/Users/login" method="POST" class="form" novalidate>
+          <div class="form-group <?php echo (!empty($data['email_err'])) ? 'error' : ''; ?>">
+            <input type="email" name="email" id="email" class="form-input" value="<?php echo htmlspecialchars($data['email'] ?? ''); ?>" required>
+            <label class="form-label" for="email">Email</label>
+            <?php if(!empty($data['email_err'])): ?>
+              <span class="Form-Invalid" role="alert"><?php echo $data['email_err']; ?></span>
+            <?php endif; ?>
+          </div>
+
+          <div class="form-group <?php echo (!empty($data['password_err'])) ? 'error' : ''; ?>">
+            <input type="password" name="password" id="password" class="form-input" required>
+            <label class="form-label" for="password">Password</label>
+            <?php if(!empty($data['password_err'])): ?>
+              <span class="Form-Invalid" role="alert"><?php echo $data['password_err']; ?></span>
+            <?php endif; ?>
+          </div>
+
+          <button type="submit" class="submit-button">Login</button>
+        </form>
+    </div>
+
+
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById('toggleIcon-' + inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.src = '<?php echo URLROOT; ?>/public/img/view.png';
+                icon.alt = 'Hide Password';
+            } else {
+                input.type = 'password';
+                icon.src = '<?php echo URLROOT; ?>/public/img/eye.png';
+                icon.alt = 'Show Password';
+            }
+        }
+
+    
+    </script>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>
 

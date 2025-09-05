@@ -1,0 +1,21 @@
+/* Button base styles */
+.submit-button {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+
+.submit-button:hover {
+    background: #357abd;
+}
+
+.submit-button:active {
+    transform: translateY(1px);
+}

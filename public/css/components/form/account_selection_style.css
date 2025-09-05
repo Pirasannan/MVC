@@ -1,0 +1,32 @@
+/* Account Selection Styles */
+.account-selection-container {
+    margin: 24px 0;
+    text-align: left;
+}
+
+.account-options-compact {
+    display: flex;
+    gap: 12px;
+}
+
+.account-option-compact {
+    flex: 1;
+    padding: 12px 8px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.account-option-compact.selected {
+    border-color: #4a90e2;
+    background: #f8fbff;
+}
+
+.option-title-compact {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1a1a1a;
+}

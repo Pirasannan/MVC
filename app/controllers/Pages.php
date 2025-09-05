@@ -23,6 +23,7 @@ class Pages extends Controller{
     }
 
     public function adminDashboard() {
+        
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             return redirect('Pages/index');
         }

@@ -3,8 +3,7 @@
 
 
 
-    <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
+<div class="dashboard-container patient">        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo-section">
                 <div class="logo">

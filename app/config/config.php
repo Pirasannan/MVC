@@ -17,6 +17,10 @@
     //WEBSITENAME
     define('SITENAME','MVC');
 
-    
+    // Session configuration
+ini_set('session.cookie_lifetime', 0); // Session cookie expires when browser closes
+ini_set('session.gc_maxlifetime', 1440); // 24 minutes
+ini_set('session.cookie_httponly', 1); // Security
+ini_set('session.use_only_cookies', 1); // Security
     
 ?>

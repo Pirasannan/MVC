@@ -123,14 +123,3 @@
     padding: 6px;
 }
 
-/* small responsive tweak */
-@media (max-width: 480px) {
-    .Form-Invalid { font-size: 0.85rem; padding: 5px 6px; }
-}
-
-@media (max-width: 640px) {
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-}

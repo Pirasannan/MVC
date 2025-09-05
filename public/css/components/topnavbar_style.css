@@ -1,23 +1,140 @@
-.topnav {
-    overflow: hidden;
-    background-color: #333;
-  }
-  
-  .topnav a {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
+/* Refined topnav styles to match button/theme and look elegant */
+
+/* container */
+.topnav, .ml-topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 20px;
+    background: linear-gradient(180deg, #0e79c6 0%, #0b68b3 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(11,104,179,0.12);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    z-index: 50;
+    box-sizing: border-box;
+}
+
+/* left logo */
+.topnav .logo, .ml-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s ease, color .12s ease;
+    transform-origin: center;
+    will-change: transform, box-shadow;
+}
+.topnav .logo-text, .ml-logo-text {
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.2px;
+}
+
+/* subtle lift + glow on hover/focus, also accessible via keyboard */
+.ml-logo:hover,
+.ml-logo:focus {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 26px rgba(11,104,179,0.12);
     text-decoration: none;
-    font-size: 17px;
-  }
-  
-  .topnav a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-  
-  .topnav a.active {
-    background-color: #04AA6D;
-    color: white;
-  }
+}
+
+/* gentle color shift for the text */
+.ml-logo-text {
+    transition: color .12s ease, transform .12s ease;
+}
+.ml-logo:hover .ml-logo-text,
+.ml-logo:focus .ml-logo-text {
+    color: #eaf6ff;
+}
+
+/* visible focus ring for keyboard users */
+.ml-logo:focus {
+    outline: 3px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+}
+
+/* right actions */
+.topnav .nav-actions, .ml-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* links (default) */
+.topnav a, .ml-topnav a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.95rem;
+    line-height: 1;
+    transition: transform .08s ease, opacity .08s ease, background .12s ease, color .12s ease;
+}
+
+/* Nav link style (subtle) */
+.topnav .nav-link, .ml-nav-link {
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.95);
+    background: transparent;
+    border: 1px solid transparent;
+}
+.topnav .nav-link:hover,
+.topnav .nav-link:focus,
+.ml-nav-link:hover,
+.ml-nav-link:focus {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+/* active page indicator */
+.topnav .nav-link.active {
+    background: rgba(255,255,255,0.12);
+    box-shadow: inset 0 -2px 0 rgba(255,255,255,0.06);
+    font-weight: 600;
+}
+
+/* Nav button (primary) to match Create Account button style */
+.topnav .nav-btn, .ml-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+    background: transparent;
+}
+
+/* primary variant */
+.topnav .nav-btn.primary, .ml-nav-btn.ml-primary {
+    background: #ffffff;
+    color: #0b68b3;
+    box-shadow: 0 8px 20px rgba(11,104,179,0.12);
+    font-weight: 600;
+}
+
+/* subtle hover for primary */
+.topnav .nav-btn.primary:hover,
+.topnav .nav-btn.primary:focus,
+.ml-nav-btn.ml-primary:hover,
+.ml-nav-btn.ml-primary:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(11,104,179,0.18);
+    opacity: 0.98;
+    outline: none;
+}
+
+/* icon small buttons fallback */
+.topnav .icon-btn {
+    padding: 6px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+}
+
+/* keep styles specific and avoid unintended overrides */
+.topnav, .topnav * {
+    box-sizing: border-box;
+}

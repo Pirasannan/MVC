@@ -1,6 +1,6 @@
 /* Button base styles */
 .submit-button {
-    background: #4a90e2;
+    background: #109CF1;
     color: white;
     border: none;
     padding: 14px 32px;
@@ -8,14 +8,59 @@
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.08s ease;
     width: 100%;
+    text-align: center;
 }
 
 .submit-button:hover {
-    background: #357abd;
+    background: #109CF1cc;
 }
 
 .submit-button:active {
     transform: translateY(1px);
+}
+
+/* Simplified layout for Create Account (left) and Forgot Password (right) */
+.form-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.account-links {
+    display: flex;
+    justify-content: space-between; /* left & right alignment */
+    align-items: center;
+    margin-top: 10px;
+    width: 100%; /* make sure it stretches across */
+}
+
+.create_acc,
+.forgot_pass {
+    font-size: 13px;
+    color: #109CF1;
+    text-decoration: none;
+    padding: 8px 40px;
+    line-height: 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #109CF1;
+    text-decoration: none;
+    background: transparent;
+    transition: color .12s ease, background .12s ease, transform .08s ease;
+}
+
+
+/* hover/focus */
+.create_acc:hover,
+.create_acc:focus,
+.forgot_pass:hover,
+.forgot_pass:focus {
+    color: #109CF1cc;
+    text-decoration: none;
+    transform: translateY(-1px);
+    outline: none;
 }

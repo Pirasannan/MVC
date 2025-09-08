@@ -26,6 +26,11 @@
           </div>
 
           <button type="submit" class="submit-button">Login</button>
+          <div class="account-links">
+              <a class="create_acc" href="<?php echo URLROOT; ?>/Users/register">Create Account</a>
+              <a class="forgot_pass" href="<?php echo URLROOT; ?>/Users/forgotPassword">Forgot Password ?</a> <!-- have to link proper file and page */ -->
+          </div>
+
         </form>
     </div>
 

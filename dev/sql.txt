@@ -18,3 +18,5 @@ CREATE TABLE Users (
 
 ALTER TABLE Users 
 CHANGE COLUMN user_type role ENUM('Admin','Doctor','Patient') NOT NULL;
+
+-- added column SLMC number

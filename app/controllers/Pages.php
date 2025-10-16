@@ -37,6 +37,42 @@ class Pages extends Controller{
         $this->view('pages/v_doctor_dashboard', []);
     }
 
+    public function doctorPrescriptions() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_doctor_prescriptions', []);
+    }
+
+    Public function doctorMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_doctor_messages', []);
+    }
+
+    Public function doctorMedicalrecords() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_doctor_medicalrecords', []);
+    }
+
+    Public function doctorprofile() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_doctor_profile', []);
+    }
+
+    Public function doctorAppointments() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_doctor_appointments', []);
+    }
+
+    
     public function patientDashboard() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
             return redirect('Pages/index');

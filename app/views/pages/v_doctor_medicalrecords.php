@@ -12,10 +12,10 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item active">
+                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
                     Dashboard
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
+                <a href="#" class="nav-item">
                     Appointments
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item">
@@ -24,7 +24,7 @@
                 <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item">
                     Messages
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorMedicalrecords" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorMedicalrecords" class="nav-item active">
                     Medical Records
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorProfile" class="nav-item">

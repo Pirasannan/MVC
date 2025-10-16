@@ -12,10 +12,10 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item active">
+                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
                     Dashboard
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
+                <a href="#" class="nav-item active">
                     Appointments
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item">

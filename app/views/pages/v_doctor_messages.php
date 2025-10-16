@@ -12,16 +12,16 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item active">
+                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
                     Dashboard
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
+                <a href="#" class="nav-item">
                     Appointments
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item">
                     Prescriptions
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item active">
                     Messages
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorMedicalrecords" class="nav-item">

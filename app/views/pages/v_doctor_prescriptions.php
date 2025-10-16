@@ -12,13 +12,13 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item active">
+                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
                     Dashboard
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
+                <a href="#" class="nav-item">
                     Appointments
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item active">
                     Prescriptions
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item">
@@ -38,7 +38,7 @@
             <!-- Top Header -->
             <header class="top-header">
                 <div class="header-left">
-                    <h1 class="page-title">Doctor Dashboard</h1>
+                    <h1 class="page-title">Prescriptions</h1>
                 </div>
                 <div class="header-right">
                     <div class="user-info">
@@ -54,41 +54,17 @@
             </header>
 
             <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Stats Cards Row -->
-                <div class="stats-row">
-                    <div class="stat-card primary">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Upcoming Appointments</h3>
-                            <div class="stat-number">1</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Active Medications</h3>
-                            <div class="stat-number">3</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">$56456.00</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Medical Reports</h3>
-                            <div class="stat-number">$26456.00</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="dashboard-content">                
 
                 <!-- Content Sections Row -->
                 <div class="content-sections">
                     <!-- Appointments Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">Upcoming Appointments</h2>
+                            <h2 class="section-title">Issued ePrescriptions</h2>
+                            <div class="section-footer">
+                            <button class="action-button">Create eprescription</button>
+                        </div>
                         </div>
                         <div class="section-content">
                             <div class="appointment-item">
@@ -118,9 +94,6 @@
                                     <span class="status-badge pending">Pending</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="section-footer">
-                            <button class="action-button">Book New Appointment</button>
                         </div>
                     </div>
 

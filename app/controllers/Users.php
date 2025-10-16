@@ -1,4 +1,3 @@
-
 <?php 
 
 class Users extends Controller {
@@ -8,62 +7,67 @@ class Users extends Controller {
         $this->userModel = $this->model('M_Users');
     }
 
-    public function register(){
-        if($_SERVER['REQUEST_METHOD'] =='POST'){
-            //form is submitting
-            //validate the data
-            $_POST = array_map('htmlspecialchars', $_POST);
-
-            $role = isset($_POST['role']) ? strtolower(trim($_POST['role'])) : '';
-
-            $allowedRoles = ['doctor','patient','admin'];
-
+    public function register()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            // sanitize & collect
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             $data = [
-                'role' => $role,
-                'name' => trim($_POST['name']),
-                'email' => trim($_POST['email']),
-                'password' => trim($_POST['password']),
-                'confirm_password' => trim($_POST['confirm_password']),
-
-                'role_err' => '',
+                'name' => trim($_POST['name'] ?? ''),
+                'email' => trim($_POST['email'] ?? ''),
+                'role' => trim($_POST['role'] ?? 'doctor'),
+                'slmc' => trim($_POST['slmc'] ?? ''),
+                'password' => trim($_POST['password'] ?? ''),
+                'confirm_password' => trim($_POST['confirm_password'] ?? ''),
                 'name_err' => '',
                 'email_err' => '',
+                'slmc_err' => '',
                 'password_err' => '',
                 'confirm_password_err' => '',
+                'role_err' => ''
             ];
-        
-                //validating each inputs
 
-                // Role validation
-                if (empty($data['role'])) {
-                    $data['role_err'] = 'Please select a role';
-                } elseif (!in_array($data['role'], $allowedRoles, true)) {
-                    $data['role_err'] = 'Invalid role selected';
+            // basic validations...
+            if(empty($data['email'])){
+                $data['email_err'] = 'Please enter an email.';
+            } else {
+                // check email exists in DB (example)
+                if($this->userModel->findUserByEmail($data['email'])){
+                    $data['email_err'] = 'Email is already taken.';
                 }
-
-                // Name validation
-                if (empty($data['name'])) {
-                    $data['name_err'] = 'Please enter a Name';
             }
 
-                // Email validation
-                if (empty($data['email'])) {
-                    $data['email_err'] = 'Please enter a valid Email';
-                } else {
-                    if ($this->userModel->findUserByEmail($data['email'])) {
-                        $data['email_err'] = 'Email is already taken';
-                    }
-                }
+            if(empty($data['name'])){
+                $data['name_err'] = 'Please enter your name.';
+            }
 
-                // Password validation
-                if (empty($data['password'])) {
-                    $data['password_err'] = 'Please enter the password';
-                } else if (empty($data['confirm_password'])) {
-                    $data['confirm_password_err'] = 'Please confirm the password';
-                } else if ($data['password'] !== $data['confirm_password']) {
-                    $data['confirm_password_err'] = 'Passwords do not match';
+            if($data['role'] === 'doctor'){
+                if(empty($data['slmc'])){
+                    $data['slmc_err'] = 'Please enter your SLMC number.';
+                } elseif(!preg_match('/^[0-9]+$/', $data['slmc'])){
+                    $data['slmc_err'] = 'SLMC must be numeric.';
                 }
-        
+            }
+
+            // password validation
+            if(empty($data['password'])){
+                $data['password_err'] = 'Please enter a password.';
+            } elseif(strlen($data['password']) < 7){
+                $data['password_err'] = 'Password must be at least 7 characters.';
+            }
+
+            // confirm password validation
+            if(empty($data['confirm_password'])){
+                $data['confirm_password_err'] = 'Please confirm your password.';
+            } elseif($data['password'] !== $data['confirm_password']){
+                $data['confirm_password_err'] = 'Passwords do not match.';
+            }
+
+            // if any errors, re-render view
+            if(!empty($data['email_err']) || !empty($data['name_err']) || !empty($data['slmc_err']) || !empty($data['password_err']) || !empty($data['confirm_password_err']) || !empty($data['role_err'])){
+                $this->view('users/v_register', $data);
+                return;
+            }
 
             //validation completed & No errors , then register users
             if(empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])){

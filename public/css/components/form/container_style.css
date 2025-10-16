@@ -1,0 +1,12 @@
+/* Container styles */
+.form_container {
+    background: white;
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 400px;
+    width: 100%;
+    margin: 48px auto; /* center horizontally and add top spacing */
+    text-align: left; /* align form content to left for better layout */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+

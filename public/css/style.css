@@ -5,7 +5,11 @@
 
 /* Base Styles */
 @import url('./components/topnavbar_style.css');
-@import url('./components/form_style.css');
+@import url('./components/form/form_style.css');
+@import url('./components/form/container_style.css');
+@import url('./components/form/logo_style.css');
+@import url('./components/form/button_style.css');
+@import url('./components/form/account_selection_style.css');
 @import url('./components/buttons_style.css');
 @import url('./components/dropdown_style.css');
 
@@ -19,6 +23,8 @@
 @import url('./components/dashboard/medications.css');
 @import url('./components/dashboard/responsive.css');
 
+/* Home Page Components*/
+@import url('./components/homepage/homepage_style.css');
 
 
 
@@ -30,6 +36,7 @@
     font-family: Roboto-Light;
     src: url(fonts/Roboto-Light.ttf)
 }
+
 
 body{
     margin:0;

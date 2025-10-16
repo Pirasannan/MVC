@@ -1,11 +1,11 @@
 <?php require APPROOT.'/views/inc/header.php'; ?>
 
 <!-- TOP NAVIGATION -->
-    <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?>
+    <!-- <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?> -->
 
-    <div class="container">
+    <div class="form_container">
         <div class="logo">
-            <span class="logo-text">MediLink</span>
+            <a class="logo-text" href= "<?php echo URLROOT; ?>/Pages/index">MediLink</a>
         </div>
         
         <form action="<?php echo URLROOT; ?>/Users/login" method="POST" class="form" novalidate>

@@ -6,11 +6,11 @@ $role = (isset($data['role']) && !empty($data['role'])) ? $data['role'] : 'docto
 ?>
 
 <!-- TOP NAVIGATION -->
-    <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?>
+    <!-- <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?> -->
 
-    <div class="container">
+    <div class="form_container">
         <div class="logo">
-            <span class="logo-text">MediLink</span>
+        <a class="logo-text" href= "<?php echo URLROOT; ?>/Pages/index">MediLink</a>
         </div>
         
     <form class="form signup-form" action="<?php echo URLROOT?>/Users/register" method="POST" novalidate>
@@ -129,6 +129,11 @@ $role = (isset($data['role']) && !empty($data['role'])) ? $data['role'] : 'docto
              </div>
  
              <button type="submit" class="submit-button">Create Account</button>
+
+             <div class="single_acc_link">
+              <a class="alreadyhaveaccount" href="<?php echo URLROOT; ?>/Users/login">Already Have an Account ?</a>
+             </div>
+
          </form>
      </div>
 

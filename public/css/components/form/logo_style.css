@@ -1,10 +1,21 @@
 /* Logo and branding styles */
 .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 32px;
 }
 
 .logo-text {
     font-size: 50px;
+    text-decoration: none;
     font-weight: 600;
     color: #109CF1;
+}
+
+.logo-text:hover {
+    color: #047ecacc;
+    text-decoration: none;
+    transform: translateY(-1px);
+    outline: none;
 }

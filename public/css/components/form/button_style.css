@@ -38,8 +38,15 @@
     width: 100%; /* make sure it stretches across */
 }
 
+.single_acc_link {
+    display: flex;
+    justify-content: center; /* center for single content */
+    align-items: center;
+}
+
 .create_acc,
-.forgot_pass {
+.forgot_pass,
+.alreadyhaveaccount {
     font-size: 13px;
     color: #109CF1;
     text-decoration: none;
@@ -58,9 +65,12 @@
 .create_acc:hover,
 .create_acc:focus,
 .forgot_pass:hover,
-.forgot_pass:focus {
+.forgot_pass:focus,
+.alreadyhaveaccount:hover,
+.alreadyhaveaccount:focus {
     color: #109CF1cc;
     text-decoration: none;
     transform: translateY(-1px);
     outline: none;
 }
+

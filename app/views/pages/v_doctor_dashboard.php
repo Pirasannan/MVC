@@ -13,27 +13,21 @@
             
             <nav class="nav-menu">
                 <a href="#" class="nav-item active">
-                    <span class="nav-icon">📊</span>
                     Dashboard
                 </a>
                 <a href="#" class="nav-item">
-                    <span class="nav-icon">📅</span>
                     Appointments
                 </a>
                 <a href="#" class="nav-item">
-                    <span class="nav-icon">💊</span>
                     Prescriptions
                 </a>
                 <a href="#" class="nav-item">
-                    <span class="nav-icon">💬</span>
                     Messages
                 </a>
                 <a href="#" class="nav-item">
-                    <span class="nav-icon">📋</span>
                     Medical Records
                 </a>
                 <a href="#" class="nav-item">
-                    <span class="nav-icon">👤</span>
                     Profile
                 </a>
             </nav>

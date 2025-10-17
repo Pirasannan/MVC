@@ -1,0 +1,125 @@
+/* Form layout and structure */
+.login-form {
+    margin-top: 20px;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    will-change: opacity;
+}
+
+.form {
+    text-align: left;
+    margin-bottom: 40px;
+    min-height: 200px; /* Prevent layout shift */
+}
+
+.signup-form {
+    /* reuse same layout rules as .form */
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+    position: relative;
+    height: 56px; /* Fixed height to prevent layout shift */
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Input styling */
+.form-label {
+    position: absolute;
+    left: 12px;
+    top: -10px; /* keep above input */
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    padding: 0 6px;
+    background: white;
+    z-index: 1;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px 14px 16px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    background: white;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+.form-input:focus + .form-label {
+    color: #4a90e2;
+}
+
+/* Password input specific */
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.password-toggle img {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* Error message */
+
+/* hide by default */
+.Form-Invalid { display: none; }
+
+/* show only when parent has error */
+.form-group.error .Form-Invalid,
+.account-selection-container.error .Form-Invalid {
+  display: block;
+  color: #d93025;
+  background: rgba(217,48,37,0.05);
+  padding: 6px 8px;
+  margin-top: 6px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+
+/* Highlighting the input/label when its group has an error */
+.form-group.error .form-input {
+    border: 1.5px solid #d93025;
+    box-shadow: 0 0 0 4px rgba(217,48,37,0.06);
+}
+
+.form-group.error .form-label {
+    color: #d93025;
+}
+
+/* For compact account-selection errors */
+.account-selection-container.error .account-options-compact {
+    outline: 1.5px solid #d93025;
+    border-radius: 6px;
+    padding: 6px;
+}
+

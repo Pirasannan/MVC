@@ -1,0 +1,47 @@
+/* CSS library */
+
+
+/* Components */
+
+/* Base Styles */
+@import url('./components/topnavbar_style.css');
+@import url('./components/form/form_style.css');
+@import url('./components/form/container_style.css');
+@import url('./components/form/logo_style.css');
+@import url('./components/form/button_style.css');
+@import url('./components/form/account_selection_style.css');
+@import url('./components/buttons_style.css');
+@import url('./components/dropdown_style.css');
+
+/* Dashboard Components */
+@import url('./components/dashboard/layout.css');
+@import url('./components/dashboard/sidebar.css');
+@import url('./components/dashboard/header.css');
+@import url('./components/dashboard/stats.css');
+@import url('./components/dashboard/sections.css');
+@import url('./components/dashboard/appointments.css');
+@import url('./components/dashboard/medications.css');
+@import url('./components/dashboard/responsive.css');
+
+/* Home Page Components*/
+@import url('./components/homepage/homepage_style.css');
+
+
+
+/* Fonts */
+@font-face {
+    font-family: Roboto-Medium;
+    src: url(fonts/Roboto-Medium.ttf);
+
+    font-family: Roboto-Light;
+    src: url(fonts/Roboto-Light.ttf)
+}
+
+
+body{
+    margin:0;
+    background-color: #f5f7fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: small; 
+    text-align: left;
+}

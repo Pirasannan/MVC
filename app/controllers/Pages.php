@@ -7,7 +7,7 @@ class Pages extends Controller{
         $this->pagesModel = $this->model('M_Pages');
     
     }
-
+    
     public function index() {
         $data = [];
         $this->view('pages/v_index',$data);
@@ -22,12 +22,52 @@ class Pages extends Controller{
         $this->view('v_about',$data);
     }
 
+    public function adminProfile() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_admin_profile', []);
+    }
+
     public function adminDashboard() {
         
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             return redirect('Pages/index');
         }
         $this->view('pages/v_admin_dashboard', []);
+    }
+
+    public function adminDoctors() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_admin_doctors', []);
+    }
+
+    public function adminPatients() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_admin_patients', []);
+    }
+
+    public function adminNotifications() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_admin_notifications', []);
+    }
+
+    public function adminRecords() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+        $this->view('pages/v_admin_records', []);
     }
 
     public function doctorDashboard() {

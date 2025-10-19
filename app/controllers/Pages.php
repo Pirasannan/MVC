@@ -7,7 +7,7 @@ class Pages extends Controller{
         $this->pagesModel = $this->model('M_Pages');
     
     }
-
+    
     public function index() {
         $data = [];
         $this->view('pages/v_index',$data);

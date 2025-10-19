@@ -13,6 +13,9 @@
 @import url('./components/buttons_style.css');
 @import url('./components/dropdown_style.css');
 
+/* Home Page Components*/
+@import url('./components/homepage/homepage_style.css');
+
 /* Dashboard Components */
 @import url('./components/dashboard/layout.css');
 @import url('./components/dashboard/sidebar.css');
@@ -23,8 +26,6 @@
 @import url('./components/dashboard/medications.css');
 @import url('./components/dashboard/responsive.css');
 
-/* Home Page Components*/
-@import url('./components/homepage/homepage_style.css');
 
 
 

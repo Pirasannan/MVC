@@ -5,7 +5,6 @@
     box-shadow: var(--shadow-sm);
   }
 
-  /* Stats Row */
   .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -35,6 +34,17 @@
     margin-bottom: 8px;
     opacity: 0.8;
   }
+
+  .no-margin {
+    margin-bottom: 0px;
+  }
+
+  .stat-subtitle {
+    font-weight: 500;
+    margin-top: 0px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
   
   .stat-card.primary .stat-title {
     color: rgba(255, 255, 255, 0.9);
@@ -43,10 +53,11 @@
   .stat-number {
     font-size: 32px;
     font-weight: 700;
-    color: #1f2937;
-  }
+    }
   
   .stat-card.primary .stat-number {
     color: white;
   }
+
+  
   

@@ -43,3 +43,8 @@
     background: #fef3c7;
     color: #d97706;
   }
+
+  .status-badge.rejected {
+    background: #fcdcdc;
+    color: #a31616;
+  }

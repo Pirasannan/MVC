@@ -1,6 +1,6 @@
 <?php
 
-class Core {
+class Core {//this is the router
     //URL format ---> /controller/method/params
     protected $currentController = 'Pages';
     protected $currentMethod = 'index';

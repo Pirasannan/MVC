@@ -9,8 +9,8 @@
         <nav class="nav-menu">
             <?php 
                 $menu_items = [
-                    'Profile' => 'adminProfile',
                     'Dashboard' => 'adminDashboard',
+                    'Profile' => 'adminProfile',
                     'Doctors' => 'adminDoctors',
                     'Patients' => 'adminPatients',
                     'Notifications' => 'adminNotifications'

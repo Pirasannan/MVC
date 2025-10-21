@@ -15,7 +15,7 @@
                 <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
                     Dashboard
                 </a>
-                <a href="#" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
                     Appointments
                 </a>
                 <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item active">

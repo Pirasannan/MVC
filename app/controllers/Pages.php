@@ -80,6 +80,9 @@ class Pages extends Controller{
     }
 
     
+
+
+
     
     public function patientDashboard() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
@@ -93,7 +96,35 @@ class Pages extends Controller{
          return redirect('Pages/index');
         }
         $this->view('pages/v_patient_prescriptions', []);
-}
+    }
+    
+    public function patientMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         return redirect('Pages/index');
+        }
+        $this->view('pages/v_patient_messages', []);
+    }
+    
+    public function patientProfile() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         return redirect('Pages/index');
+        }
+        $this->view('pages/v_patient_profile', []);
+    }
+    
+    public function patientMedicalrecords() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         return redirect('Pages/index');
+        }
+        $this->view('pages/v_patient_medicalrecords', []);
+    }
+
+    public function patientAppointments() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         return redirect('Pages/index');
+        }
+        $this->view('pages/v_patient_appointments', []);
+    }
 }   
 
 ?>

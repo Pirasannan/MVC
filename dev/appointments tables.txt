@@ -1,0 +1,57 @@
+CREATE TABLE IF NOT EXISTS availability_slots (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  doctor_id     INT NOT NULL,
+  slot_start    DATETIME NOT NULL,
+  slot_end      DATETIME NOT NULL,
+  is_booked     TINYINT(1) NOT NULL DEFAULT 0,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_av_doctor FOREIGN KEY (doctor_id) REFERENCES Users(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  INDEX idx_availability_doctor_time (doctor_id, slot_start, slot_end)
+);
+
+CREATE TABLE IF NOT EXISTS appointments (
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  patient_id       INT NOT NULL,
+  doctor_id        INT NOT NULL,
+  slot_id          INT NULL, -- optional pointer to availability_slots.id (helps show exact slot picked)
+  starts_at        DATETIME NOT NULL,
+  ends_at          DATETIME NOT NULL,
+  status           ENUM('pending','approved','rejected','cancelled','completed') NOT NULL DEFAULT 'pending',
+  reason           VARCHAR(255) NULL,     
+  notes            TEXT NULL,         
+  video_room_token VARCHAR(64) NULL,  
+  created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ap_patient FOREIGN KEY (patient_id) REFERENCES Users(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_ap_doctor FOREIGN KEY (doctor_id) REFERENCES Users(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_ap_slot FOREIGN KEY (slot_id) REFERENCES availability_slots(id)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+  INDEX idx_appt_doctor_time (doctor_id, starts_at, ends_at),
+  INDEX idx_appt_patient_time (patient_id, starts_at, ends_at),
+  INDEX idx_appt_status (status)
+);
+
+DELIMITER $$
+CREATE TRIGGER trg_appt_approve_no_overlap
+BEFORE UPDATE ON appointments
+FOR EACH ROW
+BEGIN
+  IF NEW.status = 'approved' THEN
+    IF EXISTS (
+      SELECT 1 FROM appointments a
+      WHERE a.id <> NEW.id
+        AND a.doctor_id = NEW.doctor_id
+        AND a.status = 'approved'
+        AND (NEW.starts_at < a.ends_at AND NEW.ends_at > a.starts_at)
+    ) THEN
+      SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Overlap with an already approved appointment';
+    END IF;
+  END IF;
+END$$
+DELIMITER ;
+

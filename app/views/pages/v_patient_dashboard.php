@@ -12,22 +12,22 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="#" class="nav-item active">
+                <a href="<?php echo URLROOT; ?>/Pages/patientdashboard" class="nav-item active">
                     Dashboard
                 </a>
-                <a href="#" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/patientAppointments" class="nav-item ">
                     Appointments
                 </a>
-                <a href="#" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/patientPrescriptions" class="nav-item">
                     Prescriptions
                 </a>
-                <a href="#" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/patientMessages" class="nav-item">
                     Messages
                 </a>
-                <a href="#" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/patientMedicalrecords" class="nav-item">
                     Medical Records
                 </a>
-                <a href="#" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/patientProfile" class="nav-item">
                     Profile
                 </a>
             </nav>

@@ -72,6 +72,14 @@ class Pages extends Controller{
         $this->view('pages/v_doctor_appointments', []);
     }
 
+    Public function createprescription() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor'){
+            return redirect ('Pages/index');
+        }
+        $this->view('pages/v_doctor_create_prescription', []);
+    }
+
+    
     
     public function patientDashboard() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
@@ -80,6 +88,12 @@ class Pages extends Controller{
         $this->view('pages/v_patient_dashboard', []);
     }
 
+    public function patientPrescriptions() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         return redirect('Pages/index');
+        }
+        $this->view('pages/v_patient_prescriptions', []);
 }
+}   
 
 ?>

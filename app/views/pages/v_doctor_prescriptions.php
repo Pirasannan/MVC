@@ -61,15 +61,12 @@
                     <!-- Appointments Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">Issued ePrescriptions</h2>
-                            <div class="section-footer">
-                            <button class="action-button">Create eprescription</button>
-                        </div>
+                            <h2 class="section-title">Appointments</h2>
                         </div>
                         <div class="section-content">
                             <div class="appointment-item">
                                 <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Sarah Johnson</div>
+                                    <div class="doctor-name">Sarah Johnson</div>
                                     <div class="appointment-date">2024-01-15 at 10:00 AM</div>
                                 </div>
                                 <div class="appointment-status">
@@ -78,7 +75,7 @@
                             </div>
                             <div class="appointment-item">
                                 <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Michael Chen</div>
+                                    <div class="doctor-name">Michael Chen</div>
                                     <div class="appointment-date">2024-01-20 at 2:30 PM</div>
                                 </div>
                                 <div class="appointment-status">
@@ -87,27 +84,33 @@
                             </div>
                             <div class="appointment-item">
                                 <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Emily Davis</div>
+                                    <div class="doctor-name">Emily Davis</div>
                                     <div class="appointment-date">2024-01-25 at 11:15 AM</div>
                                 </div>
                                 <div class="appointment-status">
                                     <span class="status-badge pending">Pending</span>
                                 </div>
+                                
                             </div>
+                            <div class="section-footer">
+                            <button class="action-button secondary">View All Prescriptions</button>
+                        </div>
                         </div>
                     </div>
 
                     <!-- Medical Status Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">Current Medications</h2>
+                            <h2 class="section-title">Issued Prescriptions</h2>
+                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
+
                         </div>
                         <div class="section-content">
                             <div class="medication-item">
                                 <div class="medication-info">
                                     <div class="medication-name">Hypertension</div>
                                     <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
+                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
                                 </div>
                                 <div class="medication-date">2024-01-10</div>
                             </div>
@@ -115,7 +118,7 @@
                                 <div class="medication-info">
                                     <div class="medication-name">Diabetes</div>
                                     <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Michael Chen</div>
+                                    <div class="prescribed-by">Prescribed to Michael Chen</div>
                                 </div>
                                 <div class="medication-date">2024-01-05</div>
                             </div>
@@ -123,7 +126,7 @@
                                 <div class="medication-info">
                                     <div class="medication-name">Cholesterol</div>
                                     <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
+                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
                                 </div>
                                 <div class="medication-date">2023-12-28</div>
                             </div>

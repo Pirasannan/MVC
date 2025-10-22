@@ -3,7 +3,7 @@
 
 
 
-<div class="dashboard-container patient">        <!-- Sidebar Navigation -->
+<div class="dashboard-container doctor">        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo-section">
                 <div class="logo">
@@ -12,22 +12,22 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/patientdashboard" class="nav-item active">
+                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item active">
                     Dashboard
                 </a>
-                <a href="<?php echo URLROOT; ?>/Appointments/my" class="nav-item ">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
                     Appointments
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientPrescriptions" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item">
                     Prescriptions
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientMessages" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item">
                     Messages
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientMedicalrecords" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorMedicalrecords" class="nav-item">
                     Medical Records
                 </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientProfile" class="nav-item">
+                <a href="<?php echo URLROOT; ?>/Pages/doctorProfile" class="nav-item">
                     Profile
                 </a>
             </nav>
@@ -38,7 +38,7 @@
             <!-- Top Header -->
             <header class="top-header">
                 <div class="header-left">
-                    <h1 class="page-title">Patient Dashboard</h1>
+                    <h1 class="page-title">Doctor Dashboard</h1>
                 </div>
                 <div class="header-right">
                     <div class="user-info">

@@ -1,0 +1,129 @@
+/* ==== Appointments (Doctor) – desktop-first ==== */
+:root{
+  /* tweak these to match your brand palette */
+  --card: #0f172a;
+  --muted: #8a94a6;
+  --text: #e5e7eb;
+  --soft: #1e293b;
+  --line: #22304a;
+  --brand: #38bdf8;          /* headings/accents */
+  --ok: #16a34a;             /* approve / success */
+  --warn: #f59e0b;           /* start / pending */
+  --danger: #ef4444;         /* reject / cancel */
+  --neutral: #64748b;        /* disabled/secondary */
+  --chip-bg: #0b1527;
+  --chip-line: #22304a;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 24px rgba(2,8,23,0.35);
+}
+
+/* Scope the page so we don’t leak styles */
+.dashboard-container.doctor .main-content{
+  padding: 28px 32px 40px;
+  background: linear-gradient(180deg, #0b1220 0%, #0a1324 100%);
+  color: var(--text);
+}
+
+/* Page header */
+.appointments-head{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:16px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:14px;
+}
+.appointments-head h2{
+  font-size: 28px; line-height:1.25; margin:0;
+  letter-spacing:.2px; color: var(--text);
+}
+.appointments-head .sub{
+  color: var(--muted); font-size:14px;
+}
+
+/* Section/card */
+.appt-section{
+  margin-top:22px;
+}
+.appt-card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+.appt-card-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 18px;
+  border-bottom:1px solid var(--line);
+  background: rgba(56,189,248,0.05);
+}
+.appt-card-header h3{
+  margin:0; font-size:18px; color:#c7e9ff; letter-spacing:.2px;
+}
+.appt-card-header .hint{ color: var(--muted); font-size:13px; }
+.appt-empty{
+  padding:18px; color: var(--muted);
+}
+
+/* Table */
+.appt-table{
+  width:100%; border-collapse:separate; border-spacing:0; min-width:880px;
+}
+.appt-table thead th{
+  text-align:left; font-weight:600; font-size:13px; letter-spacing:.4px;
+  color:#9fb3c8; background: #0d1a30;
+  padding:12px 14px; border-bottom:1px solid var(--line);
+}
+.appt-table tbody td{
+  padding:14px; border-bottom:1px solid var(--line); vertical-align:middle;
+}
+.appt-table tbody tr:hover{ background: #0c172b; }
+
+/* Date/Time formatting */
+.cell-date{ font-weight:600; }
+.cell-time{ color: var(--muted); font-size:13px; }
+
+/* Status chip */
+.status{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius: 999px;
+  background: var(--chip-bg); border:1px solid var(--chip-line);
+  font-size:12px; letter-spacing:.2px;
+}
+.status .dot{ width:8px; height:8px; border-radius:50%; }
+.status.approved .dot{ background: var(--ok); }
+.status.pending .dot{ background: var(--warn); }
+.status.rejected .dot{ background: var(--danger); }
+.status.cancelled .dot{ background: var(--neutral); }
+
+/* Actions – buttons look like the rest of dashboard */
+.actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.btn{
+  appearance:none; border:1px solid transparent; border-radius: var(--radius-sm);
+  padding:8px 12px; font-size:13px; font-weight:600; cursor:pointer;
+  background:#102138; color:#cde7ff; transition:transform .04s ease, background .2s ease, border-color .2s ease;
+}
+.btn:hover{ transform:translateY(-1px); }
+.btn:active{ transform:translateY(0); }
+
+/* Variants */
+.btn-approve{ background: rgba(22,163,74,.12); border-color: rgba(22,163,74,.35); color:#bdf6cd; }
+.btn-approve:hover{ background: rgba(22,163,74,.18); }
+
+.btn-reject{ background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.35); color:#ffd1d1; }
+.btn-reject:hover{ background: rgba(239,68,68,.18); }
+
+.btn-cancel{ background: rgba(100,116,139,.12); border-color: rgba(100,116,139,.35); color:#d6dce6; }
+.btn-cancel:hover{ background: rgba(100,116,139,.18); }
+
+.btn-start{ background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.35); color:#ffe8b9; }
+.btn-start:hover{ background: rgba(245,158,11,.18); }
+
+.btn-complete{ background: rgba(56,189,248,.12); border-color: rgba(56,189,248,.35); color:#d2f3ff; }
+.btn-complete:hover{ background: rgba(56,189,248,.18); }
+
+.btn[disabled], .btn.disabled{
+  opacity:.55; cursor:not-allowed; filter:grayscale(.2);
+}
+
+/* Utility */
+.stack-16{ display:flex; flex-direction:column; gap:16px; }
+.nowrap{ white-space:nowrap; }

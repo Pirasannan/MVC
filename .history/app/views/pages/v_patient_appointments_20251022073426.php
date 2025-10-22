@@ -34,6 +34,7 @@
         </aside>
 
         <!-- Main Content Area -->
+        <main class="main-content">
 <main class="main-content">
   <div class="patient-appointments-head">
     <h2>My Appointments</h2>
@@ -130,6 +131,7 @@
   </section>
 </main>
 
+        </main>
     </div>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

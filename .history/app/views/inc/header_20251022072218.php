@@ -6,6 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/style.css?v=<?php echo filemtime(APPROOT.'/../public/css/style.css'); ?>">
         <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/components/appointments.css">
+
         <title><?php echo SITENAME; ?></title>
     </head>
     <body>

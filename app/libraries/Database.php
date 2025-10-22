@@ -11,6 +11,11 @@
         private $statement;
         private $error;
 
+        //Get error info
+        public function errorInfo(){
+            return $this->statement->errorInfo();
+        }
+
         public function __construct(){
             $dsn = "mysql:host=".$this->host.";dbname=".$this->dbname;
         
@@ -80,5 +85,10 @@
         public function rowCount(){
             return $this->statement->rowCount();
         }
+
+
+
+
+        
     }
 ?>

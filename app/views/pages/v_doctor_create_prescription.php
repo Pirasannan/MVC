@@ -1,8 +1,12 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php
+require APPROOT.'/views/inc/header.php'; 
+$current_page = 'doctorCreatePrescription';
+?>
 
 <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/components/form/e_pres.css?v=<?php echo filemtime(APPROOT.'/../public/css/components/form/e_pres.css'); ?>">
 
 <div class="dashboard-container doctor">
+
 	<div class="e_prescription_container ">
 		<div class="header">
 			<h1>E-Prescription</h1>
@@ -12,6 +16,20 @@
 			<!-- SECTION 1: Medication Details -->
 			<div class="section">
 				<div class="section-header">1. Medication Details</div>
+
+				<div class="form-group">
+				<label for="patient_id">Select Patient:</label>
+					<select name="patient_id" id="patient_id" required>
+    					<option value="">-- Select Patient --</option>
+							<?php foreach ($data['patients'] as $patient): ?>
+								<option value="<?php echo $patient->id; ?>">
+									<?php echo htmlspecialchars($patient->name); ?>
+								</option>
+							<?php endforeach; ?>
+					</select>
+
+					<span class="error" id="patientError"></span>
+				</div>
 
 				<div class="form-group">
 					<label for="drugName" class="required">Drug Name / Product</label>
@@ -220,14 +238,6 @@
 					<textarea id="doctorNotes" name="doctor_notes" placeholder="Instructions for the patient"></textarea>
 				</div>
 			</div>
-            <div class="section">
-                <div class="section-header">Prescription Preview</div>
-                    <div id="previewContent" class="preview-box">
-                    <em>Fill out the form to see preview...</em>
-                    </div>
-            </div>
-
-
 			<div class="footer-buttons">
 				<button type="submit" class="btn btn-primary">Confirm Prescription</button>
 				<div class="single_acc_link">

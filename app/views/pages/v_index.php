@@ -9,7 +9,7 @@
 <h1>Welcome <?php echo $_SESSION['user_name'];?></h1> -->
 
 <!-- Homepage specific CSS -->
-<link rel="stylesheet" href="public/css/style.css">
+<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/style.css">
 
     <!-- Header -->
     <header class="header">
@@ -546,9 +546,8 @@
 
 
     <script>
-    document.getElementById("register-btn").onclick = function() {
-        window.location.href = "<?php echo URLROOT; ?>/Users/login";
-    };
+    // Fix: Remove reference to non-existent register-btn element
+    // The register button is already properly linked in the HTML
     </script>
 
 

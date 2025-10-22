@@ -1,0 +1,182 @@
+/* Overlay background blur */
+.prescription-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .prescription-overlay.show {
+    display: flex;
+  }
+  
+  /* Modal container */
+  .prescription-modal {
+    background: #ffffff;
+    width: 750px;
+    max-width: 90%;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    padding: 30px;
+    color: #2c3e50;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    position: relative;
+  }
+  
+  /* Header */
+  .modal-header {
+    text-align: center;
+    border-bottom: 2px solid #3498db;
+    margin-bottom: 15px;
+    position: relative;
+  }
+  
+  .modal-header h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin: 0;
+  }
+  
+  .close-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 26px;
+    text-decoration: none;
+    color: #34495e;
+    transition: 0.2s;
+  }
+  
+  .close-btn:hover {
+    color: #e74c3c;
+  }
+  
+  .back-btn {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  
+  .back-btn:hover {
+    color: #2980b9;
+  }
+  
+  /* Clinic & Doctor Info */
+  .clinic-header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .clinic-header h3 {
+    color: #3498db;
+    margin-bottom: 4px;
+  }
+  
+  /* Patient Info & Diagnosis */
+  .patient-info p, .diagnosis p {
+    font-size: 15px;
+    margin: 3px 0;
+  }
+  
+  .divider {
+    border: none;
+    border-top: 1px solid #e1e8ed;
+    margin: 15px 0;
+  }
+  
+  /* Medication Table */
+  .medication-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .medication-list th, .medication-list td {
+    border: 1px solid #e1e8ed;
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+  }
+  
+  .medication-list th {
+    background-color: #f7f9fc;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  
+  /* Footer Buttons */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background: #3498db;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background: #2980b9;
+  }
+  
+  .btn-secondary {
+    background: #95a5a6;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background: #7f8c8d;
+  }
+  
+  /* Doctor Signature */
+  .doctor-signature {
+    text-align: right;
+    margin-top: 30px;
+    font-size: 14px;
+  }
+  
+  .back-btn {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  
+  .back-btn:hover {
+    color: #2980b9;
+  }
+  
+  .prescription-overlay {
+    display: none;
+  }
+  
+  .prescription-overlay.show {
+    display: flex;
+  }

@@ -1,10 +1,35 @@
-.create_eprescription {
-align-self: center;
-font-size: 13px;
-color: #ffffff;
-text-decoration: none;
-line-height: 20px;
-border-radius: 6px;
-background: transparent;
-transition: color .12s ease, background .12s ease, transform .08s ease;
+.create_eprescription.action-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #4A90E2; /* Matches the blue background from the image */
+    text-decoration: none;
+    color: #FFFFFF; /* White text */
+    padding: 10px 20px; /* Matches the padding from the image */
+    border-radius: 8px; /* Rounded corners */
+    font-size: 14px; /* Matches the font size */
+    font-weight: 500; /* Matches the font weight */
+    cursor: pointer;
+    transition: background-color 0.2s ease; /* Smooth hover effect */
+    width: 100%; /* Full width like the button in the image */
+    border: none; /* No border */
+    text-align: center; /* Center the text */
+}
+
+.create_eprescription.action-button:hover {
+    background-color: #357ABD; /* Darker shade for hover effect */
+}
+
+.action-button-edit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #4A90E2; /* Matches the blue background from the image */
+    text-decoration: none;
+    color: #FFFFFF; /* White text */
+    padding: 10px 20px; /* Matches the padding from the image */
+    border-radius: 8px; /* Rounded corners */
+    font-size: 14px; /* Matches the font size */
+    font-weight: 500; /* Matches the font weight */
+    cursor: pointer;
 }

@@ -1,30 +1,59 @@
 <?php 
-require APPROOT.'/views/inc/header.php'; 
-$current_page = 'patientMedicalrecords';
+    $current_page = 'patientDashboard';
+    require APPROOT.'/views/inc/header.php'; 
 ?>
 
+Settings
 
-<div class="dashboard-container">        <!-- Sidebar Navigation -->
+
+<div class="dashboard-container patient">
     <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>
 
     <!-- Main Content Area -->
     <main class="main-content">
-        <!-- Top Header -->
         <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
+
             <!-- Dashboard Content -->
-            <div class="dashboard-content">                
+            <div class="dashboard-content">
+                <!-- Stats Cards Row -->
+                <div class="stats-row">
+                    <div class="stat-card primary">
+                        <div class="stat-content">
+                            <h3 class="stat-title">Upcoming Appointments</h3>
+                            <div class="stat-number">1</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3 class="stat-title">Active Medications</h3>
+                            <div class="stat-number">3</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3 class="stat-title">Unread Messages</h3>
+                            <div class="stat-number">$56456.00</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3 class="stat-title">Medical Reports</h3>
+                            <div class="stat-number">$26456.00</div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Content Sections Row -->
                 <div class="content-sections">
                     <!-- Appointments Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">Appointments</h2>
+                            <h2 class="section-title">Upcoming Appointments</h2>
                         </div>
                         <div class="section-content">
                             <div class="appointment-item">
                                 <div class="appointment-info">
-                                    <div class="doctor-name">Sarah Johnson</div>
+                                    <div class="doctor-name">Dr. Sarah Johnson</div>
                                     <div class="appointment-date">2024-01-15 at 10:00 AM</div>
                                 </div>
                                 <div class="appointment-status">
@@ -33,7 +62,7 @@ $current_page = 'patientMedicalrecords';
                             </div>
                             <div class="appointment-item">
                                 <div class="appointment-info">
-                                    <div class="doctor-name">Michael Chen</div>
+                                    <div class="doctor-name">Dr. Michael Chen</div>
                                     <div class="appointment-date">2024-01-20 at 2:30 PM</div>
                                 </div>
                                 <div class="appointment-status">
@@ -42,33 +71,30 @@ $current_page = 'patientMedicalrecords';
                             </div>
                             <div class="appointment-item">
                                 <div class="appointment-info">
-                                    <div class="doctor-name">Emily Davis</div>
+                                    <div class="doctor-name">Dr. Emily Davis</div>
                                     <div class="appointment-date">2024-01-25 at 11:15 AM</div>
                                 </div>
                                 <div class="appointment-status">
                                     <span class="status-badge pending">Pending</span>
                                 </div>
-                                
                             </div>
-                            <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
                         </div>
+                        <div class="section-footer">
+                            <button class="action-button">Book New Appointment</button>
                         </div>
                     </div>
 
                     <!-- Medical Status Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">Issued Prescriptions</h2>
-                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
-
+                            <h2 class="section-title">Current Medications</h2>
                         </div>
                         <div class="section-content">
                             <div class="medication-item">
                                 <div class="medication-info">
                                     <div class="medication-name">Hypertension</div>
                                     <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
+                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
                                 </div>
                                 <div class="medication-date">2024-01-10</div>
                             </div>
@@ -76,7 +102,7 @@ $current_page = 'patientMedicalrecords';
                                 <div class="medication-info">
                                     <div class="medication-name">Diabetes</div>
                                     <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed to Michael Chen</div>
+                                    <div class="prescribed-by">Prescribed by Dr. Michael Chen</div>
                                 </div>
                                 <div class="medication-date">2024-01-05</div>
                             </div>
@@ -84,7 +110,7 @@ $current_page = 'patientMedicalrecords';
                                 <div class="medication-info">
                                     <div class="medication-name">Cholesterol</div>
                                     <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
+                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
                                 </div>
                                 <div class="medication-date">2023-12-28</div>
                             </div>
@@ -97,5 +123,7 @@ $current_page = 'patientMedicalrecords';
             </div>
         </main>
     </div>
+
+
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

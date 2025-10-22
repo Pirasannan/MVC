@@ -75,12 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (customFrequencyField) customFrequencyField.classList.toggle('hidden', this.value !== 'custom');
 
     const timeOfDayInput = document.getElementById('timeOfDay');
-    const frequencies = {
-      'OD': '9:00 AM',
-      'BD': '9:00 AM, 9:00 PM',
-      'TDS': '9:00 AM, 2:00 PM, 9:00 PM',
-      'QID': '9:00 AM, 1:00 PM, 5:00 PM, 9:00 PM'
-    };
+const frequencies = {
+  'OD': '9:00 AM',
+  'BD': '9:00 AM, 9:00 PM',
+  'TDS': '9:00 AM, 2:00 PM, 9:00 PM',
+  'QID': '9:00 AM, 1:00 PM, 5:00 PM, 9:00 PM',
+  'Q6H': '9:00 AM, 3:00 PM, 9:00 PM, 3:00 AM',
+  'Q8H': '9:00 AM, 5:00 PM, 1:00 AM'
+};
     if (timeOfDayInput && frequencies[this.value]) {
       timeOfDayInput.value = frequencies[this.value];
     }
@@ -95,10 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Duration calculation and valid until date
-  durationValueInput.addEventListener('input', calculateValidUntil);
-  durationTypeSelect.addEventListener('change', calculateValidUntil);
+  if (durationValueInput) {
+    durationValueInput.addEventListener('input', calculateValidUntil);
+  }
+  if (durationTypeSelect) {
+    durationTypeSelect.addEventListener('change', calculateValidUntil);
+  }
 
   function calculateValidUntil() {
+    if (!durationValueInput || !durationTypeSelect || !validUntilInput) return;
+    
     const duration = parseInt(durationValueInput.value);
     const type = durationTypeSelect.value;
 
@@ -122,46 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     validUntilInput.value = validDate.toISOString().split('T')[0];
   }
 
-  // Preview update
-  form.addEventListener('input', updatePreview);
-  form.addEventListener('change', updatePreview);
-
-  function updatePreview() {
-    const data = getFormData();
-    let html = '';
-
-    if (data.drugName) {
-      html += `<p><strong>Drug:</strong> ${data.drugName}`;
-      if (data.formulation) html += ` (${data.formulation})`;
-      html += `</p>`;
-    }
-
-    if (data.route) {
-      html += `<p><strong>Route:</strong> ${data.route}</p>`;
-    }
-
-    if (data.doseAmount && data.doseUnit) {
-      html += `<p><strong>Dose:</strong> ${data.doseAmount} ${data.doseUnit}`;
-      if (data.frequency) html += ` - ${data.frequency}`;
-      html += `</p>`;
-    }
-
-    if (data.durationValue) {
-      html += `<p><strong>Duration:</strong> ${data.durationValue} ${data.durationType}</p>`;
-    }
-
-    if (data.dispenseQuantity && data.unitType) {
-      html += `<p><strong>Dispense:</strong> ${data.dispenseQuantity} ${data.unitType}`;
-      if (data.repeats > 0) html += ` (${data.repeats} refills)`;
-      html += `</p>`;
-    }
-
-    if (data.diagnosis) {
-      html += `<p><strong>Indication:</strong> ${data.diagnosis}</p>`;
-    }
-
-    previewContent.innerHTML = html || '<p><em>Fill out the form to see preview</em></p>';
-  }
 
   function getFormData() {
     return {
@@ -321,12 +289,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Prevent PHP submission if validation fails
-  form.addEventListener('submit', function (e) {
-    if (!validateForm()) {
-      e.preventDefault(); // stop normal form submission
-      alert('Please correct the highlighted errors before submitting.');
-    }
-  });
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      if (!validateForm()) {
+        e.preventDefault(); // stop normal form submission
+        alert('Please correct the highlighted errors before submitting.');
+      }
+    });
+  }
+
+  // Initialize PRN fields visibility based on existing data
+if (prnCheckbox && prnFields) {
+  prnFields.classList.toggle('hidden', !prnCheckbox.checked);
+}
+
+// Initialize custom frequency field visibility
+if (frequencySelect && customFrequencyField) {
+  customFrequencyField.classList.toggle('hidden', frequencySelect.value !== 'custom');
+}
 
 
 });

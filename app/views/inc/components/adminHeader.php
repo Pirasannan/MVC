@@ -5,15 +5,16 @@
         'adminDashboard' => 'Admin Dashboard',
         'adminDoctors' => 'Doctors Management',
         'adminPatients' => 'Patients Management',
-        'adminMessages' => 'Notifications & Messages',
+        'adminRecords' => 'Medical Records',
+        'adminNotifications' => 'Notifications & Messages',
     ];
 
     // Get the current page title, default to 'Admin' if not found
     $page_title = isset($current_page) && isset($page_titles[$current_page]) ? $page_titles[$current_page] : 'Admin';
 
     // Admin user information (you can replace this with session data)
-    $admin_name = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'John Smith';
-    $admin_id = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : '23545';
+    $admin_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin';
+    $admin_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'N/A';
 ?>
 
 <!-- Top Header -->

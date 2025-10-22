@@ -119,7 +119,7 @@
           </div>
 
           <div class="field">
-            <label class="label" for="reason">Reason</label>
+            <label class="label" for="reason">Reason (optional)</label>
             <input class="input" type="text" id="reason" name="reason" maxlength="255" placeholder="Brief reason for the visit">
           </div>
         </div>
@@ -150,7 +150,7 @@
     list.forEach(item => {
       const row = document.createElement('div');
       row.className = 'suggest-row';
-      row.textContent = item.name;
+      row.textContent = `${item.name} (ID: ${item.id})`;
       row.addEventListener('mousedown', () => {
         // mousedown so it runs before input blur
         nameInput.value = item.name;

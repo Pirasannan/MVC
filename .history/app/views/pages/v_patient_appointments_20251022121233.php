@@ -150,7 +150,7 @@
     list.forEach(item => {
       const row = document.createElement('div');
       row.className = 'suggest-row';
-      row.textContent = item.name;
+      row.textContent = `${item.name} (ID: ${item.id})`;
       row.addEventListener('mousedown', () => {
         // mousedown so it runs before input blur
         nameInput.value = item.name;

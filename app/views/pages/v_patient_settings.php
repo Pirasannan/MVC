@@ -4,9 +4,6 @@
 ?>
 
 
-
-
-
 <div class="dashboard-container patient">
     <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>
 

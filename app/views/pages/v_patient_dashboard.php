@@ -14,7 +14,7 @@
             <div class="dashboard-content">
                 <!-- Stats Cards Row -->
                 <div class="stats-row">
-                    <div class="stat-card primary">
+                    <div class="stat-card ">
                         <div class="stat-content">
                             <h3 class="stat-title">Upcoming Appointments</h3>
                             <div class="stat-number">1</div>

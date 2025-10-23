@@ -2,24 +2,35 @@
  .appointment-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 16px 24px;
+    align-items: flex-start;
+    padding: 12px 20px;
     border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
   }
   
   .appointment-item:last-child {
     border-bottom: none;
   }
+
+  .appointment-item:hover {
+    background-color: #f9fafb;
+  }
   
+  .appointment-info {
+    flex: 1;
+    margin-right: 12px;
+  }
+
   .doctor-name {
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   
   .appointment-date {
     font-size: 14px;
     color: #6b7280;
+    margin-bottom: 2px;
   }
   
   .status-badge {
@@ -47,4 +58,177 @@
   .status-badge.rejected {
     background: #fcdcdc;
     color: #a31616;
+  }
+
+  /* Notification Items */
+  .notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+  }
+  
+  .notification-item:last-child {
+    border-bottom: none;
+  }
+
+  .notification-item:hover {
+    background-color: #f9fafb;
+  }
+  
+  .notification-info {
+    flex: 1;
+    margin-right: 16px;
+  }
+  
+  .notification-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+  
+  .notification-message {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  
+  .notification-time {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  
+  .notification-status {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Start Consultation Button */
+  .start-consultation-btn {
+    background-color: #4a90e2;
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+  }
+
+.start-consultation-btn:hover {
+  background-color: #357abd;
+  color: white;
+  text-decoration: none;
+}
+
+.start-consultation-btn i {
+  font-size: 10px;
+}
+
+/* Join Consultation Button */
+.join-consultation-btn {
+  background-color: #10b981;
+  color: white;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.join-consultation-btn:hover {
+  background-color: #059669;
+  color: white;
+  text-decoration: none;
+}
+
+  .join-consultation-btn i {
+    font-size: 10px;
+  }
+
+/* Notification Items */
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: #f9fafb;
+}
+
+.notification-info {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.notification-message {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.notification-time {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.notification-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge.new {
+  background-color: #ef4444;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.status-badge.read {
+  background-color: #e5e7eb;
+  color: #6b7280;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+  /* Patient name styling for appointments */
+  .patient-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+  }
+  
+  .appointment-type {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
   }

@@ -19,9 +19,9 @@ $current_page = 'patientDashboard';
             <div class="dashboard-content">
                 <!-- Stats Cards Row -->
                 <div class="stats-row">
-                    <div class="stat-card ">
+                    <div class="stat-card">
                         <div class="stat-content">
-                            <h3 class="stat-title">Upcoming Appointments</h3>
+                            <h3 class="stat-title">Today's Appointments</h3>
                             <div class="stat-number">1</div>
                         </div>
                     </div>
@@ -34,13 +34,13 @@ $current_page = 'patientDashboard';
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">$56456.00</div>
+                            <div class="stat-number">2</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
-                            <h3 class="stat-title">Medical Reports</h3>
-                            <div class="stat-number">$26456.00</div>
+                            <h3 class="stat-title">Recent Prescriptions</h3>
+                            <div class="stat-number">5</div>
                         </div>
                     </div>
                 </div>
@@ -55,8 +55,22 @@ $current_page = 'patientDashboard';
                         <div class="section-content">
                             <div class="appointment-item">
                                 <div class="appointment-info">
+                                    <div class="doctor-name">Dr. John Smith</div>
+                                    <div class="appointment-date">Today at 2:30 PM</div>
+                                    <div class="appointment-type">Follow-up Consultation</div>
+                                </div>
+                                <div class="appointment-status">
+                                    <span class="status-badge confirmed">Confirmed</span>
+                                    <a href="<?php echo URLROOT; ?>/Pages/patientPrecall" class="join-consultation-btn">
+                                        <i class="fas fa-video"></i> Join Consultation
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="appointment-item">
+                                <div class="appointment-info">
                                     <div class="doctor-name">Dr. Sarah Johnson</div>
-                                    <div class="appointment-date">2024-01-15 at 10:00 AM</div>
+                                    <div class="appointment-date">Tomorrow at 10:00 AM</div>
+                                    <div class="appointment-type">General Checkup</div>
                                 </div>
                                 <div class="appointment-status">
                                     <span class="status-badge scheduled">Scheduled</span>
@@ -65,16 +79,8 @@ $current_page = 'patientDashboard';
                             <div class="appointment-item">
                                 <div class="appointment-info">
                                     <div class="doctor-name">Dr. Michael Chen</div>
-                                    <div class="appointment-date">2024-01-20 at 2:30 PM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge confirmed">Confirmed</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Emily Davis</div>
-                                    <div class="appointment-date">2024-01-25 at 11:15 AM</div>
+                                    <div class="appointment-date">Jan 20 at 2:30 PM</div>
+                                    <div class="appointment-type">Specialist Consultation</div>
                                 </div>
                                 <div class="appointment-status">
                                     <span class="status-badge pending">Pending</span>
@@ -86,39 +92,55 @@ $current_page = 'patientDashboard';
                         </div>
                     </div>
 
-                    <!-- Medical Status Section -->
+                    <!-- System Notifications Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">Current Medications</h2>
+                            <h2 class="section-title">System Notifications</h2>
                         </div>
                         <div class="section-content">
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Hypertension</div>
-                                    <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">New Prescription Available</div>
+                                    <div class="notification-message">Dr. John Smith has prescribed new medication for your condition</div>
+                                    <div class="notification-time">2 hours ago</div>
                                 </div>
-                                <div class="medication-date">2024-01-10</div>
+                                <div class="notification-status">
+                                    <span class="status-badge new">New</span>
+                                </div>
                             </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Diabetes</div>
-                                    <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Michael Chen</div>
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">Appointment Reminder</div>
+                                    <div class="notification-message">Your appointment with Dr. Sarah Johnson is tomorrow at 10:00 AM</div>
+                                    <div class="notification-time">1 day ago</div>
                                 </div>
-                                <div class="medication-date">2024-01-05</div>
+                                <div class="notification-status">
+                                    <span class="status-badge read">Read</span>
+                                </div>
                             </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Cholesterol</div>
-                                    <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">Lab Results Ready</div>
+                                    <div class="notification-message">Your recent blood test results are now available for review</div>
+                                    <div class="notification-time">3 days ago</div>
                                 </div>
-                                <div class="medication-date">2023-12-28</div>
+                                <div class="notification-status">
+                                    <span class="status-badge read">Read</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-title">Prescription Refill Due</div>
+                                    <div class="notification-message">Your medication Lisinopril is due for refill in 3 days</div>
+                                    <div class="notification-time">1 week ago</div>
+                                </div>
+                                <div class="notification-status">
+                                    <span class="status-badge read">Read</span>
+                                </div>
                             </div>
                         </div>
                         <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
+                            <button class="action-button secondary">View All Notifications</button>
                         </div>
                     </div>
                 </div>

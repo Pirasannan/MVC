@@ -1,0 +1,74 @@
+* ecf57df (HEAD -> Piras, origin/Piras) Ignore macOS .DS_Store files
+* f7835c9 added deletion for prescriptions, removed prn,branded
+* 473a2d2 MADE LOGOUT ,added e prescription CRUD
+| * da6e7d0 (origin/dev, origin/HEAD, dev) Merge pull request #4 from Pirasannan/Dulana
+|/| 
+| * 01b9361 (origin/Dulana) added all admin UIs, added database connection for some details. added sql for table creation, updated a bunch of js and css.
+|/  
+* 06085a1 pulled from dev and merged to Piras
+*   5c5632f Merge remote-tracking branch 'origin/dev' into Piras
+|\  
+* | d4e764d add pages navigation in patient dashboard
+* | 7becc67 started prescriptions functionality
+* | 8df05f1 doctor sidebar functionalities
+| | * a38d82f (origin/nim) fixed css
+| | * 9808a0f implented the calender to the doctor
+| | * 788dc7c added reason for tables
+| | * 0a07ada fixed resheduling appointments functionality
+| | * 8164569 fixed url funcs
+| | * 6ba7a49 updated ajax search
+| | * fc8faa2 added styles
+| | * b3276a6 added appointments
+| |/  
+| *   9fab464 Merge pull request #3 from Pirasannan/Dulana
+| |\  
+| | * 2f56e63 changed admin sidebar order
+| | * 73af684 test
+| | *   cdd62d6 Merge remote-tracking branch 'MVC/dev' into Dulana
+| | |\  
+| | |/  
+| |/|   
+| * |   ccba846 Resolve merge: remove README.md
+| |\ \  
+| |/ /  
+|/| |   
+* | | deb3579 made changes in css and added Home page
+* | | 2a2282c add a sample index page and corrected login and signup page
+* | | dfbb62a a
+* | | 8169c73 Changes login and sign pages
+| * | 0255002 Update README.md
+| * |   2f84b14 Merge pull request #1 from Pirasannan/Piras
+| |\ \  
+| |/ /  
+|/| |   
+* | | 0f4caf1 Properly setup css for dashboard
+* | | d2a7905 added all three dashboard and css
+* | | 0a08b0e added role based dashboards redirection from login page
+|/ /  
+* | c536673 Registration role added (merged from ishini)
+* |   ce10a91 merging from ishini
+|\ \  
+* | | af83367 Made user sessions & Index page redirection
+* | | 37770a7 Added Registration - Login redirection to index
+| | * 9dc5ab8 Added admin pages with dummy data. Made dynamic template for sidebar and header of each admin page.
+| | * 23b8802 init commit
+| | * 0839e39 (origin/ishini) doctor profile update
+| | * 593354a patient profile
+| | * 20beda9 doctor profile - css changed
+| | * 737d5ec doctor profile
+| | * 61ed5f7 Added video consultation module
+| | * 75cd54b added registration /role
+| |/  
+| * 7bfe8f3 (ishini) user role
+| * ac555d3 added role base registration
+|/  
+* 9f36931 Completed Login Validation
+* 479154c Completed Signup Validation
+* 2401c71 Created a login, register page and top nav bar
+* 1bb1671 "testing after some issue"
+* f6ab25d (origin/main, main) Update README.md
+* fab1b2b Updated MVC with sample database with sql
+*   6ebc218 Have updated the MVC
+|\  
+| * 137c581 Initial commit
+* 5ed1b4d 1st commit of MVC archi. which developed untill initializing PDO

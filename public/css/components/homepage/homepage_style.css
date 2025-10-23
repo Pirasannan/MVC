@@ -339,7 +339,7 @@ button {
 }
 
 .section-header {
-  max-width: 42rem;
+  max-width: rem;
   margin: 0 auto 4rem;
   text-align: center;
 }

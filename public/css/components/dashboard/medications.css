@@ -4,6 +4,8 @@
     border-bottom: 1px solid #f3f4f6;
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    transition: background-color 0.2s ease;
   }
   
   .medication-item:last-child {
@@ -11,7 +13,7 @@
   }
 
   .medication-item:hover {
-    background-color: #f3f4f6;
+    background-color: #f9fafb;
     cursor: pointer;
   }
   
@@ -37,9 +39,59 @@
     font-size: 12px;
     color: #6b7280;
     font-weight: 500;
+    text-align: right;
+    min-width: 140px;
   }
 
-  /* Delete button styles */
+  .prescription-date {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+  }
+
+  .updated-date {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+  }
+
+  .deleted-date {
+    font-size: 11px;
+    color: #dc3545;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .prescription-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Action button styles */
+  .action-button-edit {
+    background-color: #4a90e2;
+    color: white;
+    text-decoration: none;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .action-button-edit:hover {
+    background-color: #357abd;
+    color: white;
+    text-decoration: none;
+  }
+
   .action-button-delete {
     background-color: #dc3545;
     color: white;
@@ -48,8 +100,11 @@
     border-radius: 4px;
     font-size: 12px;
     cursor: pointer;
-    margin-left: 8px;
     transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
   }
 
   .action-button-delete:hover {
@@ -72,4 +127,84 @@
     font-size: 12px;
     margin-top: 4px;
     font-weight: 600;
+  }
+
+  /* Section Header Styling */
+
+
+  .prescription-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+  }
+
+  .section-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .section-title {
+    flex: 1;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .create-prescription-btn {
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .create-prescription-btn:hover {
+    background-color: #218838;
+    color: white;
+    text-decoration: none;
+  }
+
+  /* View All Button Styling */
+  #view-all-btn {
+    padding: 6px 12px !important;
+    width: auto;
+    font-size: 12px;
+    border-radius: 4px;
+    background-color: #6c757d;
+    color: white;
+    border: none !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    margin: 0 auto;
+    display: block;
+  }
+
+  #view-all-btn:hover {
+    background-color: #5a6268 !important;
+  }
+
+  /* Empty state styling */
+  .empty-state {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 40px 24px;
+    margin: 0;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 2px dashed #d1d5db;
   }

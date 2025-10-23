@@ -29,7 +29,7 @@
             ?>
         </nav>
 
-        <div class="sidebar-bottom nav-menu">
+        <div class="sidebar-bottom">
             <a href='#'class="nav-item-bottom" id="logoutBtn">Logout</a>
             <a href="<?php echo URLROOT; ?>/Pages/doctorSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
         </div>

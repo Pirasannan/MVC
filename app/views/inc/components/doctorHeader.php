@@ -7,6 +7,7 @@
         'doctorPrescriptions' => 'Prescriptions',
         'doctorMessages' => 'Messages',
         'doctorMedicalrecords' => 'Medical Records',
+        'doctorVideoConsultation' => 'Video Consultation',
     ];
 
     // Get the current page title, default to 'Doctor' if not found

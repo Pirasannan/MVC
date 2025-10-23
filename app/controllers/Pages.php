@@ -28,6 +28,102 @@ class Pages extends Controller{
         $this->view('pages/v_admin_profile', []);
     }
 
+    public function doctorVideoConsultation() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_doctor_videoconsultation', $data);
+    }
+
+    public function patientVideoConsultation() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_patient_videoconsultation', $data);
+    }
+
+    public function doctorPrecall() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_doctor_precall', $data);
+    }
+
+    public function patientPrecall() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_patient_precall', $data);
+    }
+
+    public function doctorVideoCall() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_doctor_videocall', $data);
+    }
+
+    public function patientVideoCall() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_patient_videocall', $data);
+    }
+
 
     public function adminDashboard() {
         

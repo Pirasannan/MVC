@@ -186,6 +186,46 @@ $current_page = 'patientProfile';
                         <button class="action-button secondary">Manage Settings</button>
                     </div>
                 </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Add Payment Method</h2>
+                    </div>
+
+                    <div class="section-content payment-section-content">
+                        <div class="payment-card-icons">
+                            <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/visa.png" alt="Visa"></div>
+                            <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/mastercard.png" alt="MasterCard"></div>
+                        </div>
+
+                        <div class="payment-field">
+                            <label class="payment-label">Cardholder Name</label>
+                            <input type="text" class="payment-input" placeholder="John Doe">
+                        </div>
+
+                        <div class="payment-field">
+                            <label class="payment-label">Card Number</label>
+                            <input type="text" class="payment-input" placeholder="1234 5678 9012 3456">
+                        </div>
+
+                        <div class="payment-row">
+                            <div class="payment-field">
+                                <label class="payment-label">Expiry Date</label>
+                                <input type="text" class="payment-input" placeholder="MM/YY">
+                            </div>
+                            <div class="payment-field">
+                                <label class="payment-label">CVV</label>
+                                <input type="text" class="payment-input" placeholder="123">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-footer">
+                        <button class="action-button">Add Card</button>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </main>

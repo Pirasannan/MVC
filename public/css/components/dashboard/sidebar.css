@@ -3,14 +3,31 @@
     width: 250px;
     background: white;
     border-right: 1px solid #e5e7eb;
-    padding: 24px 0;
     position: fixed;
     height: 100vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-section {
+    padding: 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .logo {
+    text-align: center;
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4a90e2;
   }
 
   .nav-menu {
-    padding: 0 16px;
+    padding: 24px 16px;
+    flex: 1;
+    overflow-y: auto;
   }
   
   .nav-item {
@@ -41,15 +58,11 @@
   }
 
   .sidebar-bottom {
-    display: flex;
-    align-items: left;
-    flex-direction: column;
-    border-top: 250px solid white;
-    padding-top: 15px;
-  }
-
-  .sidebar-bottom{
-    color: #6b7280;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+    margin-top: auto;
+    flex-shrink: 0;
   }
 
   .nav-item-bottom {

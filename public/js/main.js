@@ -201,8 +201,326 @@ class AuthManager {
   }
 }
 
+// Doctor Verification Modal Manager
+class DoctorVerificationManager {
+  constructor() {
+    this.modal = document.getElementById('doctorModal')
+    this.closeBtn = document.querySelector('.close')
+    this.approveBtn = document.getElementById('approveBtn')
+    this.rejectBtn = document.getElementById('rejectBtn')
+    this.doctorItems = document.querySelectorAll('.appointment-item')
+    this.currentDoctorId = null
+    
+    console.log('DoctorVerificationManager initialized')
+    console.log('Modal found:', !!this.modal)
+    console.log('Doctor items found:', this.doctorItems.length)
+    
+    if (this.modal) {
+      this.init()
+    }
+  }
+
+  init() {
+    this.bindEvents()
+  }
+
+  bindEvents() {
+    console.log('Binding events to', this.doctorItems.length, 'doctor items')
+    
+    // Open modal when doctor item is clicked
+    this.doctorItems.forEach((item, index) => {
+      console.log('Adding click listener to item', index)
+      item.addEventListener('click', (e) => {
+        console.log('Doctor item clicked:', item.dataset.doctorName)
+        this.currentDoctorId = item.dataset.doctorId
+        document.getElementById('modal-doctor-name').textContent = item.dataset.doctorName
+        document.getElementById('modal-doctor-email').textContent = item.dataset.doctorEmail
+        document.getElementById('modal-doctor-created').textContent = item.dataset.doctorCreated
+        this.modal.style.display = 'block'
+      })
+    })
+
+    // Close modal
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener('click', () => {
+        this.modal.style.display = 'none'
+      })
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === this.modal) {
+        this.modal.style.display = 'none'
+      }
+    })
+
+    // Approve doctor
+    if (this.approveBtn) {
+      this.approveBtn.addEventListener('click', () => {
+        this.approveDoctor()
+      })
+    }
+
+    // Reject doctor
+    if (this.rejectBtn) {
+      this.rejectBtn.addEventListener('click', () => {
+        this.rejectDoctor()
+      })
+    }
+  }
+
+  approveDoctor() {
+    if (this.currentDoctorId) {
+      fetch(window.location.origin + '/MVC/Pages/approveDoctor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          doctor_id: this.currentDoctorId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Doctor approved successfully!')
+          location.reload()
+        } else {
+          alert('Error: ' + (data.message || 'Failed to approve doctor'))
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error)
+        alert('Error approving doctor')
+      })
+    }
+  }
+
+  rejectDoctor() {
+    const reason = prompt('Please enter rejection reason:')
+    if (reason && this.currentDoctorId) {
+      fetch(window.location.origin + '/MVC/Pages/rejectDoctor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          doctor_id: this.currentDoctorId,
+          reason: reason
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Doctor rejected successfully!')
+          location.reload()
+        } else {
+          alert('Error: ' + (data.message || 'Failed to reject doctor'))
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error)
+        alert('Error rejecting doctor')
+      })
+    }
+  }
+}
+
+// Notification Manager
+class NotificationManager {
+  constructor() {
+    this.sendBtn = document.getElementById('sendNotificationBtn')
+    this.recipientType = document.getElementById('recipientType')
+    this.title = document.getElementById('notificationTitle')
+    this.message = document.getElementById('notificationMessage')
+    
+    if (this.sendBtn) {
+      this.init()
+    }
+  }
+
+  init() {
+    this.bindEvents()
+  }
+
+  bindEvents() {
+    this.sendBtn.addEventListener('click', () => {
+      this.sendNotification()
+    })
+  }
+
+  sendNotification() {
+    const data = {
+      recipient_type: this.recipientType.value,
+      title: this.title.value,
+      message: this.message.value,
+      notification_type: 'info'
+    }
+
+    // Validate
+    if (!data.title.trim() || !data.message.trim()) {
+      alert('Please fill in both title and message')
+      return
+    }
+
+    // Send request
+    fetch(window.location.origin + '/MVC/Pages/sendNotification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Notification sent successfully!')
+        // Clear form
+        this.title.value = ''
+        this.message.value = ''
+        // Reload page to show new notification
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to send notification'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error sending notification')
+    })
+  }
+}
+
+// Patient Verification Modal Manager
+class PatientVerificationManager {
+  constructor() {
+    this.modal = document.getElementById('patientModal')
+    this.closeBtn = document.querySelector('.close')
+    this.approveBtn = document.getElementById('approveBtn')
+    this.rejectBtn = document.getElementById('rejectBtn')
+    this.patientItems = document.querySelectorAll('.appointment-item')
+    this.currentPatientId = null
+    
+    console.log('PatientVerificationManager initialized')
+    console.log('Modal found:', !!this.modal)
+    console.log('Patient items found:', this.patientItems.length)
+    
+    if (this.modal) {
+      this.init()
+    }
+  }
+
+  init() {
+    this.bindEvents()
+  }
+
+  bindEvents() {
+    console.log('Binding events to', this.patientItems.length, 'patient items')
+    
+    // Open modal when patient item is clicked
+    this.patientItems.forEach((item, index) => {
+      console.log('Adding click listener to item', index)
+      item.addEventListener('click', (e) => {
+        console.log('Patient item clicked:', item.dataset.patientName)
+        this.currentPatientId = item.dataset.patientId
+        document.getElementById('modal-patient-name').textContent = item.dataset.patientName
+        document.getElementById('modal-patient-email').textContent = item.dataset.patientEmail
+        document.getElementById('modal-patient-created').textContent = item.dataset.patientCreated
+        this.modal.style.display = 'block'
+      })
+    })
+
+    // Close modal
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener('click', () => {
+        this.modal.style.display = 'none'
+      })
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === this.modal) {
+        this.modal.style.display = 'none'
+      }
+    })
+
+    // Approve patient
+    if (this.approveBtn) {
+      this.approveBtn.addEventListener('click', () => {
+        this.approvePatient()
+      })
+    }
+
+    // Reject patient
+    if (this.rejectBtn) {
+      this.rejectBtn.addEventListener('click', () => {
+        this.rejectPatient()
+      })
+    }
+  }
+
+  approvePatient() {
+    if (this.currentPatientId) {
+      fetch(window.location.origin + '/MVC/Pages/approvePatient', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patient_id: this.currentPatientId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Patient approved successfully!')
+          location.reload()
+        } else {
+          alert('Error: ' + (data.message || 'Failed to approve patient'))
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error)
+        alert('Error approving patient')
+      })
+    }
+  }
+
+  rejectPatient() {
+    const reason = prompt('Please enter rejection reason:')
+    if (reason && this.currentPatientId) {
+      fetch(window.location.origin + '/MVC/Pages/rejectPatient', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patient_id: this.currentPatientId,
+          reason: reason
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Patient rejected successfully!')
+          location.reload()
+        } else {
+          alert('Error: ' + (data.message || 'Failed to reject patient'))
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error)
+        alert('Error rejecting patient')
+      })
+    }
+  }
+}
+
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
   window.authManager = new AuthManager()
   window.pageManager = new PageManager()
+  window.doctorVerificationManager = new DoctorVerificationManager()
+  window.patientVerificationManager = new PatientVerificationManager()
+  window.notificationManager = new NotificationManager()
 })

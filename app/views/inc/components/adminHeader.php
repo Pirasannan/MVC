@@ -12,8 +12,8 @@
     $page_title = isset($current_page) && isset($page_titles[$current_page]) ? $page_titles[$current_page] : 'Admin';
 
     // Admin user information (you can replace this with session data)
-    $admin_name = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'John Smith';
-    $admin_id = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : '23545';
+    $admin_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'John Smith';
+    $admin_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '23545';
 ?>
 
 <!-- Top Header -->

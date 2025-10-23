@@ -10,10 +10,10 @@
             <?php 
                 $menu_items = [
                     'Dashboard' => 'adminDashboard',
-                    'Profile' => 'adminProfile',
                     'Doctors' => 'adminDoctors',
                     'Patients' => 'adminPatients',
-                    'Notifications' => 'adminNotifications'
+                    'Notifications' => 'adminNotifications',
+                    'Profile' => 'adminProfile'
                 ];
 
                 foreach($menu_items as $label => $action) {

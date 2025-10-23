@@ -29,10 +29,10 @@ class Doctor extends Controller {
             'drug_name' => trim($_POST['drug_name'] ?? ''),
             'formulation' => trim($_POST['formulation'] ?? ''),
             'route' => trim($_POST['route'] ?? ''),
-            'brand_substitution' => isset($_POST['brand_substitution']) ? 1 : 0,
-            'prn' => isset($_POST['prn']) ? 1 : 0,
-            'max_per_24h' => $_POST['max_per_24h'] ?? null,
-            'prn_indication' => $_POST['prn_indication'] ?? null,
+            'brand_substitution' => 0, // Set to 0 since field is commented out
+            'prn' => 0, // Set to 0 since field is commented out
+            'max_per_24h' => null, // Set to null since field is commented out
+            'prn_indication' => null, // Set to null since field is commented out
             'dose_amount' => trim($_POST['dose_amount'] ?? ''),
             'dose_unit' => trim($_POST['dose_unit'] ?? ''),
             'frequency' => trim($_POST['frequency'] ?? ''),
@@ -42,8 +42,8 @@ class Doctor extends Controller {
             'duration_value' => $_POST['duration_value'] ?? null,
             'duration_type' => $_POST['duration_type'] ?? null,
             'special_instructions' => trim($_POST['special_instructions'] ?? ''),
-            'dispense_quantity' => $_POST['dispense_quantity'] ?? null,
-            'unit_type' => $_POST['unit_type'] ?? '',
+            'dispense_quantity' => null, // Set to null since field is commented out
+            'unit_type' => null, // Set to null since field is commented out
             'diagnosis' => trim($_POST['diagnosis'] ?? ''),
             'valid_until' => $_POST['valid_until'] ?? null,
             'pharmacy_note' => trim($_POST['pharmacy_note'] ?? ''),
@@ -69,9 +69,7 @@ class Doctor extends Controller {
             }
         }
 
-        if ($data['dispense_quantity'] !== null && $data['dispense_quantity'] !== '') {
-            $data['dispense_quantity'] = (int)$data['dispense_quantity'];
-        }
+        // dispense_quantity processing removed since field is commented out
 
         if ($data['valid_until'] === '') {
             $data['valid_until'] = null;
@@ -79,7 +77,7 @@ class Doctor extends Controller {
 
         $required = [
             'doctor_id','patient_id' ,'drug_name', 'route', 'dose_amount', 'dose_unit',
-            'frequency', 'dispense_quantity', 'unit_type', 'diagnosis'
+            'frequency', 'diagnosis'
         ];
 
         foreach ($required as $field) {
@@ -99,14 +97,14 @@ class Doctor extends Controller {
             }
         }
 
-        // PRN fields if PRN checked
-        if (!empty($data['prn'])) {
-            if (empty($data['max_per_24h']) || (int)$data['max_per_24h'] <= 0 || empty($data['prn_indication'])) {
-                http_response_code(400);
-                echo 'PRN requires max_per_24h and prn_indication.';
-                exit;
-            }
-        }
+        // PRN fields validation - commented out since PRN fields are disabled
+        // if (!empty($data['prn'])) {
+        //     if (empty($data['max_per_24h']) || (int)$data['max_per_24h'] <= 0 || empty($data['prn_indication'])) {
+        //         http_response_code(400);
+        //         echo 'PRN requires max_per_24h and prn_indication.';
+        //         exit;
+        //     }
+        // }
 
 
         if ($this->prescriptionModel->addPrescription($data)) {
@@ -158,10 +156,10 @@ class Doctor extends Controller {
 			'drug_name' => trim($_POST['drug_name'] ?? ''),
 			'formulation' => trim($_POST['formulation'] ?? ''),
 			'route' => trim($_POST['route'] ?? ''),
-			'brand_substitution' => isset($_POST['brand_substitution']) ? 1 : 0,
-			'prn' => isset($_POST['prn']) ? 1 : 0,
-			'max_per_24h' => $_POST['max_per_24h'] ?? null,
-			'prn_indication' => $_POST['prn_indication'] ?? null,
+			'brand_substitution' => 0, // Set to 0 since field is commented out
+			'prn' => 0, // Set to 0 since field is commented out
+			'max_per_24h' => null, // Set to null since field is commented out
+			'prn_indication' => null, // Set to null since field is commented out
 			'dose_amount' => trim($_POST['dose_amount'] ?? ''),
 			'dose_unit' => trim($_POST['dose_unit'] ?? ''),
 			'frequency' => trim($_POST['frequency'] ?? ''),
@@ -171,8 +169,8 @@ class Doctor extends Controller {
 			'duration_value' => $_POST['duration_value'] ?? null,
 			'duration_type' => $_POST['duration_type'] ?? null,
 			'special_instructions' => trim($_POST['special_instructions'] ?? ''),
-			'dispense_quantity' => $_POST['dispense_quantity'] ?? null,
-			'unit_type' => $_POST['unit_type'] ?? '',
+			'dispense_quantity' => null, // Set to null since field is commented out
+			'unit_type' => null, // Set to null since field is commented out
 			'diagnosis' => trim($_POST['diagnosis'] ?? ''),
 			'valid_until' => $_POST['valid_until'] ?? null,
 			'pharmacy_note' => trim($_POST['pharmacy_note'] ?? ''),
@@ -199,9 +197,7 @@ class Doctor extends Controller {
 			}
 		}
 
-		if ($data['dispense_quantity'] !== null && $data['dispense_quantity'] !== '') {
-			$data['dispense_quantity'] = (int)$data['dispense_quantity'];
-		}
+		// dispense_quantity processing removed since field is commented out
 
 		if ($data['valid_until'] === '') {
 			$data['valid_until'] = null;
@@ -210,7 +206,7 @@ class Doctor extends Controller {
 		// Validation
 		$required = [
 			'doctor_id','patient_id' ,'drug_name', 'route', 'dose_amount', 'dose_unit',
-			'frequency', 'dispense_quantity', 'unit_type', 'diagnosis'
+			'frequency', 'diagnosis'
 		];
 
 		foreach ($required as $field) {
@@ -230,14 +226,14 @@ class Doctor extends Controller {
 			}
 		}
 
-		// PRN fields if PRN checked
-		if (!empty($data['prn'])) {
-			if (empty($data['max_per_24h']) || (int)$data['max_per_24h'] <= 0 || empty($data['prn_indication'])) {
-				http_response_code(400);
-				echo 'PRN requires max_per_24h and prn_indication.';
-				exit;
-			}
-		}
+		// PRN fields validation - commented out since PRN fields are disabled
+		// if (!empty($data['prn'])) {
+		//     if (empty($data['max_per_24h']) || (int)$data['max_per_24h'] <= 0 || empty($data['prn_indication'])) {
+		//         http_response_code(400);
+		//         echo 'PRN requires max_per_24h and prn_indication.';
+		//         exit;
+		//     }
+		// }
 
 		// Update prescription
 		try {
@@ -259,6 +255,24 @@ class Doctor extends Controller {
 	
 
 
+
+	public function deletePrescription($id) {
+		// Check if prescription exists and belongs to the doctor
+		$prescription = $this->prescriptionModel->getPrescriptionById($id);
+		
+		if (!$prescription || $prescription->doctor_id != $_SESSION['user_id']) {
+			header('Location: ' . URLROOT . '/Pages/doctorPrescriptions');
+			exit;
+		}
+
+		if ($this->prescriptionModel->softDeletePrescription($id, $_SESSION['user_id'])) {
+			header('Location: ' . URLROOT . '/Pages/doctorPrescriptions?deleted=1');
+			exit;
+		} else {
+			header('Location: ' . URLROOT . '/Pages/doctorPrescriptions?error=1');
+			exit;
+		}
+	}
 
 }
 ?>

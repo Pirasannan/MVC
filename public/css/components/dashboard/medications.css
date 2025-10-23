@@ -38,3 +38,38 @@
     color: #6b7280;
     font-weight: 500;
   }
+
+  /* Delete button styles */
+  .action-button-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background-color 0.2s;
+  }
+
+  .action-button-delete:hover {
+    background-color: #c82333;
+  }
+
+  /* Deleted item styles */
+  .deleted-item {
+    opacity: 0.6;
+    background-color: #f8f9fa;
+    border-left: 4px solid #dc3545;
+  }
+
+  .deleted-item:hover {
+    background-color: #e9ecef;
+  }
+
+  .deleted-status {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 600;
+  }

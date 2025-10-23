@@ -14,6 +14,8 @@
 
     // Patient user information (you can replace this with session data)
     $patient_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Patient';
+    $patient_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'N/A';
+
 ?>
 
 <!-- Top Header -->
@@ -28,7 +30,6 @@
             </div>
             <div class="user-details">
                 <span class="user-name"><?php echo $patient_name; ?></span>
-                <span class="user-id">ID: <?php echo $patient_id; ?></span>
             </div>
         </div>
     </div>

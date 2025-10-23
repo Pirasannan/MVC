@@ -62,7 +62,7 @@ $current_page = 'doctorCreatePrescription';
 					<span class="error" id="routeError"></span>
 				</div>
 
-				<div class="form-group">
+				<!-- <div class="form-group">
 					<label class="checkbox-label">
 						<input type="checkbox" id="brandSubstitution" name="brand_substitution" value="1">
 						Brand substitution not permitted
@@ -74,7 +74,7 @@ $current_page = 'doctorCreatePrescription';
 						<input type="checkbox" id="prn" name="prn" value="1">
 						PRN (As needed)
 					</label>
-				</div>
+				</div> -->
 
 				<div id="prnFields" class="hidden">
 					<div class="form-row">
@@ -179,7 +179,7 @@ $current_page = 'doctorCreatePrescription';
 			</div>
 
 			<!-- SECTION 3: Dispensing & Quantity -->
-			<div class="section">
+			<!-- <div class="section">
 				<div class="section-header">3. Dispensing & Quantity</div>
 
 				<div class="form-row">
@@ -201,7 +201,7 @@ $current_page = 'doctorCreatePrescription';
 						<span class="error" id="unitTypeError"></span>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 			<!-- SECTION 4: Diagnosis / Indication -->
 			<div class="section">

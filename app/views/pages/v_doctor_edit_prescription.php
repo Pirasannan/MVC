@@ -58,7 +58,7 @@
 					<span class="error" id="routeError"></span>
 				</div>
 
-				<div class="form-group">
+				<!-- <div class="form-group">
 					<label>
 						<input type="checkbox" name="brand_substitution" value="1" <?php echo ($data['brand_substitution'] ?? 0) ? 'checked' : ''; ?>>
 						Allow brand substitution
@@ -70,7 +70,7 @@
 						<input type="checkbox" id="prn" name="prn" value="1" <?php echo ($data['prn'] ?? 0) ? 'checked' : ''; ?>>
 						PRN (As needed)
 					</label>
-				</div>
+				</div> -->
 
 				<div id="prnFields" class="hidden">
     				<div class="form-row">
@@ -178,7 +178,7 @@
 			</div>
 
 			<!-- SECTION 3: Dispensing & Quantity -->
-			<div class="section">
+			<!-- <div class="section">
 				<div class="section-header">3. Dispensing & Quantity</div>
 
 				<div class="form-row">
@@ -200,7 +200,7 @@
 						<span class="error" id="unitTypeError"></span>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 			<!-- SECTION 4: Diagnosis / Indication -->
 			<div class="section">

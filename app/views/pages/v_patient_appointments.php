@@ -61,8 +61,6 @@ $current_page = 'patientAppointments';
                     <div class="content-section">
                         <div class="section-header">
                             <h2 class="section-title">Issued Prescriptions</h2>
-                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
-
                         </div>
                         <div class="section-content">
                             <div class="medication-item">

@@ -136,10 +136,10 @@ const frequencies = {
       drugName: document.getElementById('drugName').value,
       formulation: document.getElementById('formulation').value,
       route: document.getElementById('route').value,
-      brandSubstitution: document.getElementById('brandSubstitution').checked,
-      prn: document.getElementById('prn').checked,
-      maxPer24h: document.getElementById('maxPer24h').value,
-      prnIndication: document.getElementById('prnIndication').value,
+      brandSubstitution: false, // Set to false since field is commented out
+      prn: false, // Set to false since field is commented out
+      maxPer24h: null, // Set to null since field is commented out
+      prnIndication: null, // Set to null since field is commented out
       doseAmount: document.getElementById('doseAmount').value,
       doseUnit: document.getElementById('doseUnit').value,
       frequency: document.getElementById('frequency').value,
@@ -149,20 +149,20 @@ const frequencies = {
       durationValue: document.getElementById('durationValue').value,
       durationType: document.getElementById('durationType').value,
       specialInstructions: document.getElementById('specialInstructions').value,
-      dispenseQuantity: document.getElementById('dispenseQuantity').value,
-      unitType: document.getElementById('unitType').value,
-      repeats: document.getElementById('repeats').value,
-      repeatInterval: document.getElementById('repeatInterval').value,
-      unusualQuantity: document.getElementById('unusualQuantity').checked,
-      unusualQuantityJustification: document.getElementById('unusualQuantityJustification').value,
-      unusualDose: document.getElementById('unusualDose').checked,
-      unusualDoseJustification: document.getElementById('unusualDoseJustification').value,
-      emergencySupply: document.getElementById('emergencySupply').checked,
+      dispenseQuantity: null, // Set to null since field is commented out
+      unitType: null, // Set to null since field is commented out
+      repeats: document.getElementById('repeats') ? document.getElementById('repeats').value : null,
+      repeatInterval: document.getElementById('repeatInterval') ? document.getElementById('repeatInterval').value : null,
+      unusualQuantity: document.getElementById('unusualQuantity') ? document.getElementById('unusualQuantity').checked : false,
+      unusualQuantityJustification: document.getElementById('unusualQuantityJustification') ? document.getElementById('unusualQuantityJustification').value : null,
+      unusualDose: document.getElementById('unusualDose') ? document.getElementById('unusualDose').checked : false,
+      unusualDoseJustification: document.getElementById('unusualDoseJustification') ? document.getElementById('unusualDoseJustification').value : null,
+      emergencySupply: document.getElementById('emergencySupply') ? document.getElementById('emergencySupply').checked : false,
       diagnosis: document.getElementById('diagnosis').value,
       validUntil: document.getElementById('validUntil').value,
-      pharmacy: document.getElementById('pharmacy').value,
-      repeatAuthority: document.getElementById('repeatAuthority').value,
-      noASL: document.getElementById('noASL').checked,
+      pharmacy: document.getElementById('pharmacy') ? document.getElementById('pharmacy').value : null,
+      repeatAuthority: document.getElementById('repeatAuthority') ? document.getElementById('repeatAuthority').value : null,
+      noASL: document.getElementById('noASL') ? document.getElementById('noASL').checked : false,
       pharmacyNote: document.getElementById('pharmacyNote').value,
       doctorNotes: document.getElementById('doctorNotes').value
     };
@@ -220,29 +220,29 @@ const frequencies = {
       isValid = false;
     }
 
-    // PRN validation
-    if (data.prn) {
-      if (!data.maxPer24h || Number(data.maxPer24h) <= 0) {
-        showError('maxPer24hError', 'Max per 24h is required for PRN');
-        isValid = false;
-      }
-      if (!data.prnIndication.trim()) {
-        showError('prnIndicationError', 'PRN indication is required');
-        isValid = false;
-      }
-    }
+    // PRN validation - commented out since PRN fields are disabled
+    // if (data.prn) {
+    //   if (!data.maxPer24h || Number(data.maxPer24h) <= 0) {
+    //     showError('maxPer24hError', 'Max per 24h is required for PRN');
+    //     isValid = false;
+    //   }
+    //   if (!data.prnIndication.trim()) {
+    //     showError('prnIndicationError', 'PRN indication is required');
+    //     isValid = false;
+    //   }
+    // }
 
-    // Dispense quantity required
-    if (!data.dispenseQuantity || Number(data.dispenseQuantity) <= 0) {
-      showError('dispenseQuantityError', 'Dispense quantity is required');
-      isValid = false;
-    }
+    // Dispense quantity required - commented out since dispensing section is disabled
+    // if (!data.dispenseQuantity || Number(data.dispenseQuantity) <= 0) {
+    //   showError('dispenseQuantityError', 'Dispense quantity is required');
+    //   isValid = false;
+    // }
 
-    // Unit type required
-    if (!data.unitType) {
-      showError('unitTypeError', 'Unit type is required');
-      isValid = false;
-    }
+    // Unit type required - commented out since dispensing section is disabled
+    // if (!data.unitType) {
+    //   showError('unitTypeError', 'Unit type is required');
+    //   isValid = false;
+    // }
 
     // Repeat interval required if repeats > 0
     if (Number(data.repeats) > 0 && (!data.repeatInterval || Number(data.repeatInterval) <= 0)) {

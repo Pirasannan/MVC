@@ -16,12 +16,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </div>
-                    <span class="logo-text">MEDILINK</span>
+                    <a class="logo-text">MEDILINK</a>
                 </div>
                 
                 <nav class="nav" id="mainNav">
@@ -33,11 +28,6 @@
 
                 <div class="header-actions">
                     <a class="btn btn-primary" href ="<?php echo URLROOT; ?>/Users/register" >Get Started</a>
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -48,20 +38,10 @@
         <div class="hero-background"></div>
         <div class="container">
             <div class="hero-content">
-                <span class="badge">Virtual Consultation Platform</span>
-                <h1 class="hero-title">Care Beyond Distance - Connecting You with Healthcare Anytime, Anywhere</h1>
+                <h1 class="hero-title">Connecting You with Healthcare Anytime, Anywhere</h1>
                 <p class="hero-description">
                     Experience seamless virtual consultations with trusted doctors. Quality healthcare made simple, accessible, and secure for everyone.
                 </p>
-                <div class="hero-actions">
-                    <button class="btn btn-large btn-hero-primary">
-                        Get Started
-                        <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </button>
-                    <button class="btn btn-large btn-hero-secondary">Learn More</button>
-                </div>
             </div>
         </div>
     </section>
@@ -75,7 +55,7 @@
                     <p class="stat-label">Patients prefer virtual care</p>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">10,000+</div>
+                    <div class="stat-number">1000+</div>
                     <p class="stat-label">Consultations completed</p>
                 </div>
                 <div class="stat-item">
@@ -85,6 +65,10 @@
                 <div class="stat-item">
                     <div class="stat-number">24/7</div>
                     <p class="stat-label">Healthcare access</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">20+</div>
+                    <p class="stat-label">Registered GP clinis</p>
                 </div>
             </div>
         </div>
@@ -480,31 +464,17 @@
             <div class="cta-content">
                 <h2 class="cta-title">Ready to Experience Better Healthcare?</h2>
                 <p class="cta-description">Join thousands who've discovered convenient, quality medical care</p>
-                <button class="btn btn-large btn-cta">
-                    Get Started Free
-                    <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </button>
+                <a href ="<?php echo URLROOT; ?>/Users/register"><button class="btn btn-large btn-cta">
+                    Get Started
+                    </button></a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-column">
-                    <div class="footer-logo">
-                        <div class="logo-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </div>
-                        <span class="logo-text">MEDILINK</span>
-                    </div>
-                    <p class="footer-description">Enabling secure and seamless healthcare connections for everyone.</p>
-                </div>
 
                 <div class="footer-column">
                     <h4 class="footer-title">Platform</h4>
@@ -545,10 +515,7 @@
 </body>
 
 
-    <script>
-    // Fix: Remove reference to non-existent register-btn element
-    // The register button is already properly linked in the HTML
-    </script>
+    
 
 
     <!-- <script src="<?php echo URLROOT; ?>/public/js/main.js"></script>

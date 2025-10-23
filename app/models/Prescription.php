@@ -50,7 +50,7 @@ class Prescription {
             SELECT p.*, d.name AS doctor_name
             FROM prescriptions p
             INNER JOIN Users d ON p.doctor_id = d.id
-            WHERE p.patient_id = :patient_id
+            WHERE p.patient_id = :patient_id AND p.is_deleted = "not_deleted"
             ORDER BY p.created_at DESC
         ');
         $this->db->bind(':patient_id', $patient_id);
@@ -135,6 +135,24 @@ public function updatePrescription($data) {
         return $result;
     } catch (Throwable $e) {
         error_log('Prescription update error: ' . $e->getMessage());
+        return false;
+    }
+}
+
+public function softDeletePrescription($id, $doctor_id) {
+    try {
+        $this->db->query('
+            UPDATE prescriptions 
+            SET is_deleted = "deleted", updated_at = CURRENT_TIMESTAMP
+            WHERE id = :id AND doctor_id = :doctor_id
+        ');
+        
+        $this->db->bind(':id', $id);
+        $this->db->bind(':doctor_id', $doctor_id);
+        
+        return $this->db->execute();
+    } catch (Throwable $e) {
+        error_log('Prescription soft delete error: ' . $e->getMessage());
         return false;
     }
 }

@@ -29,7 +29,6 @@
             </div>
             <div class="user-details">
                 <span class="user-name"><?php echo $doctor_name; ?></span>
-                <span class="user-id">ID: <?php echo $doctor_id; ?></span>
             </div>
         </div>
     </div>

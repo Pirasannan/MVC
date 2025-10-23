@@ -26,7 +26,7 @@
             ?>
         </nav>
 
-        <div class="sidebar-bottom">
+        <div class="sidebar-bottom nav-menu">
             <a href='#'class="nav-item-bottom" id="logoutBtn">Logout</a>
             <a href="<?php echo URLROOT; ?>/Pages/adminSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
         </div>

@@ -42,9 +42,9 @@
 
   .sidebar-bottom {
     display: flex;
-    align-items: center;
+    align-items: left;
     flex-direction: column;
-    border-top: 320px solid white;
+    border-top: 250px solid white;
     padding-top: 15px;
   }
 

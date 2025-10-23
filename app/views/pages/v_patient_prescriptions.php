@@ -1,143 +1,90 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php 
+require APPROOT.'/views/inc/header.php'; 
+$current_page = 'patientPrescriptions';
+?>
 
 
+<div class="dashboard-container">        <!-- Sidebar Navigation -->
+    <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>
 
-
-<div class="dashboard-container doctor">        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo-section">
-                <div class="logo">
-                    <span class="logo-text">MEDILINK</span>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Issued Prescriptions</h2>
                 </div>
+
+                <div class="section-content" id="prescription-list">
+                    <?php if (!empty($data['prescriptions'])): ?>
+                        <?php foreach ($data['prescriptions'] as $p): ?>
+                            <div class="medication-item" onclick="openPrescriptionModal(event)">
+                                <div class="medication-info">
+                                    <div class="medication-name"><?= htmlspecialchars($p->diagnosis) ?></div>
+                                    <div class="medication-details">
+                                        <?= htmlspecialchars($p->drug_name) ?> - 
+                                        <?= htmlspecialchars($p->dose_amount) . htmlspecialchars($p->dose_unit) ?>, 
+                                        <?= htmlspecialchars($p->frequency) ?>
+                                    </div>
+                                    <div class="prescribed-by">
+                                        Prescribed by Dr. <?= htmlspecialchars($p->doctor_name) ?>
+                                    </div>
+                                </div>
+                                <div class="medication-date">
+                                    <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?><br>
+                                    <?php if (!empty($p->updated_at)): ?>
+                                        <small>Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?></small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p align="center">No prescriptions found.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- View All Button -->
+                <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
+                    <div class="section-footer">
+                        <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
+                    </div>
+                <?php endif; ?>
+                
             </div>
-            
-            <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/patientdashboard" class="nav-item ">
-                    Dashboard
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientAppointments" class="nav-item">
-                    Appointments
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientPrescriptions" class="nav-item active">
-                    Prescriptions
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientMessages" class="nav-item">
-                    Messages
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientMedicalrecords" class="nav-item">
-                    Medical Records
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientProfile" class="nav-item">
-                    Profile
-                </a>
-            </nav>
-        </aside>
+        </div>
+    </main>
+</div>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <h1 class="page-title">Prescriptions</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <span class="avatar-icon">👤</span>
-                        </div>
-                        <div class="user-details">
-                            <span class="user-name">John Smith</span>
-                            <span class="user-id">ID: 23545</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
+<!-- Include Prescription Modal -->
+<?php /*require APPROOT.'/views/pages/prescriptions/view_prescription.php'; */?> 
 
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">                
+<script>
+function openPrescriptionModal(event) {
+    // Only open modal if the click is not on a button or link
+    if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('a') || event.target.closest('button')) {
+        return;
+    }
+    
+    const modal = document.getElementById('prescriptionPopup');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
 
-                <!-- Content Sections Row -->
-                <div class="content-sections">
-                    <!-- Appointments Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Appointments</h2>
-                        </div>
-                        <div class="section-content">
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Sarah Johnson</div>
-                                    <div class="appointment-date">2024-01-15 at 10:00 AM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge scheduled">Scheduled</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Michael Chen</div>
-                                    <div class="appointment-date">2024-01-20 at 2:30 PM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge confirmed">Confirmed</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Emily Davis</div>
-                                    <div class="appointment-date">2024-01-25 at 11:15 AM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge pending">Pending</span>
-                                </div>
-                                
-                            </div>
-                            <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
-                        </div>
-                        </div>
-                    </div>
-
-                    <!-- Medical Status Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Issued Prescriptions</h2>
-                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
-
-                        </div>
-                        <div class="section-content">
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Hypertension</div>
-                                    <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2024-01-10</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Diabetes</div>
-                                    <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed to Michael Chen</div>
-                                </div>
-                                <div class="medication-date">2024-01-05</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Cholesterol</div>
-                                    <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2023-12-28</div>
-                            </div>
-                        </div>
-                        <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+// Show more prescriptions
+function toggleAllPrescriptions() {
+    const list = document.getElementById('prescription-list');
+    const btn = document.getElementById('view-all-btn');
+    if (list && btn) {
+        list.classList.toggle('expanded');
+        btn.textContent = list.classList.contains('expanded') 
+            ? 'Show Less' 
+            : 'View All Prescriptions';
+    }
+}
+</script>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

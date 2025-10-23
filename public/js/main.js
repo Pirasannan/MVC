@@ -516,6 +516,104 @@ class PatientVerificationManager {
   }
 }
 
+// Prescription Manager
+class PrescriptionManager {
+  constructor() {
+    this.modal = document.getElementById('prescriptionPopup')
+    this.deleteModal = document.getElementById('deletePrescriptionPopup')
+    this.closeBtn = document.querySelector('.close')
+    this.prescriptionItems = document.querySelectorAll('.medication-item')
+    this.viewAllBtn = document.getElementById('view-all-btn')
+    this.prescriptionList = document.getElementById('prescription-list') || document.getElementById('doctor-prescription-list')
+    this.currentPrescriptionId = null
+    
+    console.log('PrescriptionManager initialized')
+    console.log('Modal found:', !!this.modal)
+    console.log('Delete modal found:', !!this.deleteModal)
+    console.log('Prescription items found:', this.prescriptionItems.length)
+    
+    if (this.prescriptionItems.length > 0) {
+      this.init()
+    }
+  }
+
+  init() {
+    this.bindEvents()
+  }
+
+  bindEvents() {
+    console.log('Binding events to', this.prescriptionItems.length, 'prescription items')
+    
+    // Open modal when prescription item is clicked
+    this.prescriptionItems.forEach((item, index) => {
+      console.log('Adding click listener to item', index)
+      item.addEventListener('click', (e) => {
+        console.log('Prescription item clicked')
+        this.openPrescriptionModal(e)
+      })
+    })
+
+    // Handle view all button
+    if (this.viewAllBtn) {
+      this.viewAllBtn.addEventListener('click', () => {
+        this.toggleAllPrescriptions()
+      })
+    }
+
+    // Handle delete confirmation
+    this.bindDeleteEvents()
+  }
+
+  bindDeleteEvents() {
+    const cancelBtn = document.getElementById('cancelDelete')
+    const confirmBtn = document.getElementById('confirmDelete')
+    
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        if (this.deleteModal) {
+          this.deleteModal.style.display = 'none'
+        }
+      })
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        if (this.currentPrescriptionId) {
+          window.location.href = window.location.origin + '/MVC/Doctor/deletePrescription/' + this.currentPrescriptionId
+        }
+      })
+    }
+  }
+
+  openPrescriptionModal(event) {
+    // Only open modal if the click is not on a button or link
+    if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('a') || event.target.closest('button')) {
+      return
+    }
+    
+    if (this.modal) {
+      this.modal.style.display = 'flex'
+    }
+  }
+
+  toggleAllPrescriptions() {
+    if (this.prescriptionList && this.viewAllBtn) {
+      this.prescriptionList.classList.toggle('expanded')
+      this.viewAllBtn.textContent = this.prescriptionList.classList.contains('expanded') 
+        ? 'Show Less' 
+        : 'View All Prescriptions'
+    }
+  }
+
+  confirmDeletePrescription(event, prescriptionId) {
+    event.stopPropagation()
+    this.currentPrescriptionId = prescriptionId
+    if (this.deleteModal) {
+      this.deleteModal.style.display = 'flex'
+    }
+  }
+}
+
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
   window.authManager = new AuthManager()
@@ -523,4 +621,5 @@ document.addEventListener("DOMContentLoaded", () => {
   window.doctorVerificationManager = new DoctorVerificationManager()
   window.patientVerificationManager = new PatientVerificationManager()
   window.notificationManager = new NotificationManager()
+  window.prescriptionManager = new PrescriptionManager()
 })

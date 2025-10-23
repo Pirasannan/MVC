@@ -1,143 +1,166 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php 
+require APPROOT.'/views/inc/header.php';
+$current_page = 'doctorPrescriptions';
+?>
 
 
 
 
-<div class="dashboard-container doctor">        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo-section">
-                <div class="logo">
-                    <span class="logo-text">MEDILINK</span>
-                </div>
-            </div>
-            
-            <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
-                    Dashboard
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
-                    Appointments
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item active">
-                    Prescriptions
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item">
-                    Messages
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorMedicalrecords" class="nav-item">
-                    Medical Records
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorProfile" class="nav-item">
-                    Profile
-                </a>
-            </nav>
-        </aside>
+<div class="dashboard-container">        <!-- Sidebar Navigation -->
+    <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <h1 class="page-title">Prescriptions</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <span class="avatar-icon">👤</span>
-                        </div>
-                        <div class="user-details">
-                            <span class="user-name">John Smith</span>
-                            <span class="user-id">ID: 23545</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <?php require APPROOT.'/views/inc/components/doctorHeader.php'; ?>
             <!-- Dashboard Content -->
-            <div class="dashboard-content">                
+            
+            <?php if (isset($_GET['created']) && $_GET['created'] == '1'): ?>
+                <div class="success-message" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    ✅ Prescription created successfully<?php if (!empty($data['patient_name'])): ?> for <?php echo htmlspecialchars($data['patient_name']); ?><?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['updated']) && $_GET['updated'] == '1'): ?>
+                <div class="success-message" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    ✅ Prescription updated successfully<?php if (!empty($data['patient_name'])): ?> for <?php echo htmlspecialchars($data['patient_name']); ?><?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['deleted']) && $_GET['deleted'] == '1'): ?>
+                <div class="success-message" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    ✅ Prescription deleted successfully
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['error']) && $_GET['error'] == '1'): ?>
+                <div class="error-message" style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    ❌ Error deleting prescription. Please try again.
+                </div>
+            <?php endif; ?>
 
                 <!-- Content Sections Row -->
                 <div class="content-sections">
                     <!-- Appointments Section -->
                     <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Appointments</h2>
-                        </div>
-                        <div class="section-content">
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Sarah Johnson</div>
-                                    <div class="appointment-date">2024-01-15 at 10:00 AM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge scheduled">Scheduled</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Michael Chen</div>
-                                    <div class="appointment-date">2024-01-20 at 2:30 PM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge confirmed">Confirmed</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Emily Davis</div>
-                                    <div class="appointment-date">2024-01-25 at 11:15 AM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge pending">Pending</span>
-                                </div>
-                                
-                            </div>
-                            <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
-                        </div>
-                        </div>
-                    </div>
+
 
                     <!-- Medical Status Section -->
                     <div class="content-section">
                         <div class="section-header">
                             <h2 class="section-title">Issued Prescriptions</h2>
-                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
-
+                            <a class="create_eprescription action-button" href="<?php echo URLROOT; ?>/Pages/createprescription">Create ePrescription</a>
                         </div>
-                        <div class="section-content">
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Hypertension</div>
-                                    <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2024-01-10</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Diabetes</div>
-                                    <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed to Michael Chen</div>
-                                </div>
-                                <div class="medication-date">2024-01-05</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Cholesterol</div>
-                                    <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2023-12-28</div>
-                            </div>
+                        <div class="section-content" id="doctor-prescription-list">
+                            <?php if (!empty($data['prescriptions'])): ?>
+                                <?php foreach ($data['prescriptions'] as $p): ?>
+                                    <div class="medication-item <?= ($p->is_deleted === 'deleted') ? 'deleted-item' : '' ?>" onclick="openPrescriptionModal(event)">
+                                        <div class="medication-info">
+                                            <div class="medication-name"><?= htmlspecialchars($p->diagnosis) ?></div>
+                                            <div class="medication-details">
+                                                <?= htmlspecialchars($p->drug_name) ?> - 
+                                                <?= htmlspecialchars($p->dose_amount) . htmlspecialchars($p->dose_unit) ?>, 
+                                                <?= htmlspecialchars($p->frequency) ?>
+                                            </div>
+                                            <div class="prescribed-by">Prescribed to <?= htmlspecialchars($p->patient_name ?? ('Patient #' . $p->patient_id)) ?></div>
+                                            <?php if ($p->is_deleted === 'deleted'): ?>
+                                                <div class="deleted-status" style="color: #dc3545; font-size: 12px; margin-top: 4px;">
+                                                    <strong>DELETED</strong>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="medication-date">
+                                            <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?><br>
+                                            <?php if (!empty($p->updated_at)): ?>
+                                                <small>Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?></small>
+                                            <?php endif; ?>
+                                            <div style="margin-top:8px;">
+                                                <a class="action-button-edit" href="<?= URLROOT ?>/Doctor/editPrescription/<?= (int)$p->id ?>" onclick="event.stopPropagation()">Edit</a>
+                                                <?php if ($p->is_deleted !== 'deleted'): ?>
+                                                    <button class="action-button-delete" onclick="confirmDeletePrescription(event, <?= (int)$p->id ?>)">Delete</button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p align="center" >No issued prescriptions found.</p>
+                            <?php endif; ?>
                         </div>
-                        <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
-                        </div>
+                        
+                        <!-- View All Button -->
+                <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
+                    <div class="section-footer">
+                        <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
+                    </div>
+                <?php endif; ?>
+                
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+<!-- Include Prescription Modal -->
+ <?php /*require APPROOT.'/views/pages/prescriptions/view_prescription.php'; */?> 
+
+<!-- Delete confirmation popup
+<div id="deletePrescriptionPopup" class="popup-overlay">
+  <div class="popup-box">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this prescription? This action cannot be undone.</p>
+    <div class="popup-actions">
+      <button id="confirmDelete" class="confirm-btn">Yes, Delete</button>
+      <button id="cancelDelete" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openPrescriptionModal(event) {
+    // Only open modal if the click is not on a button or link
+    if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('a') || event.target.closest('button')) {
+        return;
+    }
+    
+    const modal = document.getElementById('prescriptionPopup');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Show more prescriptions
+function toggleAllPrescriptions() {
+    const list = document.getElementById('doctor-prescription-list');
+    const btn = document.getElementById('view-all-btn');
+    if (list && btn) {
+        list.classList.toggle('expanded');
+        btn.textContent = list.classList.contains('expanded') 
+            ? 'Show Less' 
+            : 'View All Prescriptions';
+    }
+}
+
+// Delete prescription confirmation
+function confirmDeletePrescription(event, prescriptionId) {
+    event.stopPropagation();
+    document.getElementById('deletePrescriptionPopup').style.display = 'flex';
+    
+    // Store the prescription ID for deletion
+    document.getElementById('confirmDelete').setAttribute('data-prescription-id', prescriptionId);
+}
+
+// Handle delete confirmation popup
+document.getElementById("cancelDelete").addEventListener("click", function() {
+    document.getElementById("deletePrescriptionPopup").style.display = "none";
+});
+
+document.getElementById("confirmDelete").addEventListener("click", function() {
+    const prescriptionId = this.getAttribute('data-prescription-id');
+    if (prescriptionId) {
+        window.location.href = "<?php echo URLROOT; ?>/Doctor/deletePrescription/" + prescriptionId;
+    }
+});
+</script> -->
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

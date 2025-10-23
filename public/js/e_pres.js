@@ -75,12 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (customFrequencyField) customFrequencyField.classList.toggle('hidden', this.value !== 'custom');
 
     const timeOfDayInput = document.getElementById('timeOfDay');
-    const frequencies = {
-      'OD': '9:00 AM',
-      'BD': '9:00 AM, 9:00 PM',
-      'TDS': '9:00 AM, 2:00 PM, 9:00 PM',
-      'QID': '9:00 AM, 1:00 PM, 5:00 PM, 9:00 PM'
-    };
+const frequencies = {
+  'OD': '9:00 AM',
+  'BD': '9:00 AM, 9:00 PM',
+  'TDS': '9:00 AM, 2:00 PM, 9:00 PM',
+  'QID': '9:00 AM, 1:00 PM, 5:00 PM, 9:00 PM',
+  'Q6H': '9:00 AM, 3:00 PM, 9:00 PM, 3:00 AM',
+  'Q8H': '9:00 AM, 5:00 PM, 1:00 AM'
+};
     if (timeOfDayInput && frequencies[this.value]) {
       timeOfDayInput.value = frequencies[this.value];
     }
@@ -95,10 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Duration calculation and valid until date
-  durationValueInput.addEventListener('input', calculateValidUntil);
-  durationTypeSelect.addEventListener('change', calculateValidUntil);
+  if (durationValueInput) {
+    durationValueInput.addEventListener('input', calculateValidUntil);
+  }
+  if (durationTypeSelect) {
+    durationTypeSelect.addEventListener('change', calculateValidUntil);
+  }
 
   function calculateValidUntil() {
+    if (!durationValueInput || !durationTypeSelect || !validUntilInput) return;
+    
     const duration = parseInt(durationValueInput.value);
     const type = durationTypeSelect.value;
 
@@ -122,56 +130,16 @@ document.addEventListener('DOMContentLoaded', () => {
     validUntilInput.value = validDate.toISOString().split('T')[0];
   }
 
-  // Preview update
-  form.addEventListener('input', updatePreview);
-  form.addEventListener('change', updatePreview);
-
-  function updatePreview() {
-    const data = getFormData();
-    let html = '';
-
-    if (data.drugName) {
-      html += `<p><strong>Drug:</strong> ${data.drugName}`;
-      if (data.formulation) html += ` (${data.formulation})`;
-      html += `</p>`;
-    }
-
-    if (data.route) {
-      html += `<p><strong>Route:</strong> ${data.route}</p>`;
-    }
-
-    if (data.doseAmount && data.doseUnit) {
-      html += `<p><strong>Dose:</strong> ${data.doseAmount} ${data.doseUnit}`;
-      if (data.frequency) html += ` - ${data.frequency}`;
-      html += `</p>`;
-    }
-
-    if (data.durationValue) {
-      html += `<p><strong>Duration:</strong> ${data.durationValue} ${data.durationType}</p>`;
-    }
-
-    if (data.dispenseQuantity && data.unitType) {
-      html += `<p><strong>Dispense:</strong> ${data.dispenseQuantity} ${data.unitType}`;
-      if (data.repeats > 0) html += ` (${data.repeats} refills)`;
-      html += `</p>`;
-    }
-
-    if (data.diagnosis) {
-      html += `<p><strong>Indication:</strong> ${data.diagnosis}</p>`;
-    }
-
-    previewContent.innerHTML = html || '<p><em>Fill out the form to see preview</em></p>';
-  }
 
   function getFormData() {
     return {
       drugName: document.getElementById('drugName').value,
       formulation: document.getElementById('formulation').value,
       route: document.getElementById('route').value,
-      brandSubstitution: document.getElementById('brandSubstitution').checked,
-      prn: document.getElementById('prn').checked,
-      maxPer24h: document.getElementById('maxPer24h').value,
-      prnIndication: document.getElementById('prnIndication').value,
+      brandSubstitution: false, // Set to false since field is commented out
+      prn: false, // Set to false since field is commented out
+      maxPer24h: null, // Set to null since field is commented out
+      prnIndication: null, // Set to null since field is commented out
       doseAmount: document.getElementById('doseAmount').value,
       doseUnit: document.getElementById('doseUnit').value,
       frequency: document.getElementById('frequency').value,
@@ -181,20 +149,20 @@ document.addEventListener('DOMContentLoaded', () => {
       durationValue: document.getElementById('durationValue').value,
       durationType: document.getElementById('durationType').value,
       specialInstructions: document.getElementById('specialInstructions').value,
-      dispenseQuantity: document.getElementById('dispenseQuantity').value,
-      unitType: document.getElementById('unitType').value,
-      repeats: document.getElementById('repeats').value,
-      repeatInterval: document.getElementById('repeatInterval').value,
-      unusualQuantity: document.getElementById('unusualQuantity').checked,
-      unusualQuantityJustification: document.getElementById('unusualQuantityJustification').value,
-      unusualDose: document.getElementById('unusualDose').checked,
-      unusualDoseJustification: document.getElementById('unusualDoseJustification').value,
-      emergencySupply: document.getElementById('emergencySupply').checked,
+      dispenseQuantity: null, // Set to null since field is commented out
+      unitType: null, // Set to null since field is commented out
+      repeats: document.getElementById('repeats') ? document.getElementById('repeats').value : null,
+      repeatInterval: document.getElementById('repeatInterval') ? document.getElementById('repeatInterval').value : null,
+      unusualQuantity: document.getElementById('unusualQuantity') ? document.getElementById('unusualQuantity').checked : false,
+      unusualQuantityJustification: document.getElementById('unusualQuantityJustification') ? document.getElementById('unusualQuantityJustification').value : null,
+      unusualDose: document.getElementById('unusualDose') ? document.getElementById('unusualDose').checked : false,
+      unusualDoseJustification: document.getElementById('unusualDoseJustification') ? document.getElementById('unusualDoseJustification').value : null,
+      emergencySupply: document.getElementById('emergencySupply') ? document.getElementById('emergencySupply').checked : false,
       diagnosis: document.getElementById('diagnosis').value,
       validUntil: document.getElementById('validUntil').value,
-      pharmacy: document.getElementById('pharmacy').value,
-      repeatAuthority: document.getElementById('repeatAuthority').value,
-      noASL: document.getElementById('noASL').checked,
+      pharmacy: document.getElementById('pharmacy') ? document.getElementById('pharmacy').value : null,
+      repeatAuthority: document.getElementById('repeatAuthority') ? document.getElementById('repeatAuthority').value : null,
+      noASL: document.getElementById('noASL') ? document.getElementById('noASL').checked : false,
       pharmacyNote: document.getElementById('pharmacyNote').value,
       doctorNotes: document.getElementById('doctorNotes').value
     };
@@ -252,29 +220,29 @@ document.addEventListener('DOMContentLoaded', () => {
       isValid = false;
     }
 
-    // PRN validation
-    if (data.prn) {
-      if (!data.maxPer24h || Number(data.maxPer24h) <= 0) {
-        showError('maxPer24hError', 'Max per 24h is required for PRN');
-        isValid = false;
-      }
-      if (!data.prnIndication.trim()) {
-        showError('prnIndicationError', 'PRN indication is required');
-        isValid = false;
-      }
-    }
+    // PRN validation - commented out since PRN fields are disabled
+    // if (data.prn) {
+    //   if (!data.maxPer24h || Number(data.maxPer24h) <= 0) {
+    //     showError('maxPer24hError', 'Max per 24h is required for PRN');
+    //     isValid = false;
+    //   }
+    //   if (!data.prnIndication.trim()) {
+    //     showError('prnIndicationError', 'PRN indication is required');
+    //     isValid = false;
+    //   }
+    // }
 
-    // Dispense quantity required
-    if (!data.dispenseQuantity || Number(data.dispenseQuantity) <= 0) {
-      showError('dispenseQuantityError', 'Dispense quantity is required');
-      isValid = false;
-    }
+    // Dispense quantity required - commented out since dispensing section is disabled
+    // if (!data.dispenseQuantity || Number(data.dispenseQuantity) <= 0) {
+    //   showError('dispenseQuantityError', 'Dispense quantity is required');
+    //   isValid = false;
+    // }
 
-    // Unit type required
-    if (!data.unitType) {
-      showError('unitTypeError', 'Unit type is required');
-      isValid = false;
-    }
+    // Unit type required - commented out since dispensing section is disabled
+    // if (!data.unitType) {
+    //   showError('unitTypeError', 'Unit type is required');
+    //   isValid = false;
+    // }
 
     // Repeat interval required if repeats > 0
     if (Number(data.repeats) > 0 && (!data.repeatInterval || Number(data.repeatInterval) <= 0)) {
@@ -321,12 +289,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Prevent PHP submission if validation fails
-  form.addEventListener('submit', function (e) {
-    if (!validateForm()) {
-      e.preventDefault(); // stop normal form submission
-      alert('Please correct the highlighted errors before submitting.');
-    }
-  });
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      if (!validateForm()) {
+        e.preventDefault(); // stop normal form submission
+        alert('Please correct the highlighted errors before submitting.');
+      }
+    });
+  }
+
+  // Initialize PRN fields visibility based on existing data
+if (prnCheckbox && prnFields) {
+  prnFields.classList.toggle('hidden', !prnCheckbox.checked);
+}
+
+// Initialize custom frequency field visibility
+if (frequencySelect && customFrequencyField) {
+  customFrequencyField.classList.toggle('hidden', frequencySelect.value !== 'custom');
+}
 
 
 });

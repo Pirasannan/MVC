@@ -10,11 +10,12 @@
         <nav class="nav-menu">
             <?php 
                 $menu_items = [
-                    'Dashboard' => 'adminDashboard',
-                    'Doctors' => 'adminDoctors',
-                    'Patients' => 'adminPatients',
-                    'Notifications' => 'adminNotifications',
-                    'Profile' => 'adminProfile'
+                    'Dashboard' => 'patientDashboard',
+                    'Appointments' => 'patientAppointments',
+                    'Prescriptions' => 'patientPrescriptions',
+                    'Messages' => 'patientMessages',
+                    'Medical Records' => 'patientMedicalrecords',
+                    'Profile' => 'patientProfile'
                 ];
 
                 foreach($menu_items as $label => $action) {
@@ -28,8 +29,9 @@
 
         <div class="sidebar-bottom">
             <a href='#'class="nav-item-bottom" id="logoutBtn">Logout</a>
-            <a href="<?php echo URLROOT; ?>/Pages/adminSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
+            <a href="<?php echo URLROOT; ?>/Pages/patientSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
         </div>
         <?php require APPROOT.'/views/inc/components/logoutPopup.php'; ?>
+
     </aside>
 ?>

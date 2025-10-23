@@ -1,0 +1,87 @@
+-- ======================================================
+-- ✅ FIXED: Virtual Consultation Platform Schema
+-- Works 100% with foreign keys
+-- ======================================================
+
+-- Drop tables in correct order to avoid FK conflicts
+DROP TABLE IF EXISTS `prescriptions`;
+DROP TABLE IF EXISTS `Users`;
+
+-- ======================================================
+-- 🧩 USERS TABLE (Base table)
+-- ======================================================
+CREATE TABLE `Users` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) UNIQUE NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `role` ENUM('Admin','Doctor','Patient') NOT NULL,
+    `status` ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ======================================================
+-- 💊 PRESCRIPTIONS TABLE (Child table)
+-- ======================================================
+CREATE TABLE `prescriptions` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `doctor_id` INT UNSIGNED NOT NULL,
+    `patient_id` INT UNSIGNED NOT NULL,
+    
+    `drug_name` VARCHAR(255) NOT NULL,
+    `formulation` VARCHAR(255),
+    `route` VARCHAR(100),
+    `brand_substitution` BOOLEAN DEFAULT 0,
+    `prn` BOOLEAN DEFAULT 0,
+    `max_per_24h` INT,
+    `prn_indication` VARCHAR(255),
+    `dose_amount` VARCHAR(50),
+    `dose_unit` VARCHAR(50),
+    `frequency` VARCHAR(50),
+    `custom_frequency` INT,
+    `time_of_day` VARCHAR(255),
+    `meal_relation` VARCHAR(100),
+    `duration_value` INT,
+    `duration_type` VARCHAR(50),
+    `special_instructions` TEXT,
+    `dispense_quantity` INT,
+    `unit_type` VARCHAR(100),
+    `diagnosis` VARCHAR(255),
+    `valid_until` DATE,
+    `pharmacy_note` TEXT,
+    `doctor_notes` TEXT,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- ✅ Foreign Key Constraints
+    CONSTRAINT `fk_prescriptions_doctor`
+        FOREIGN KEY (`doctor_id`) REFERENCES `Users`(`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT `fk_prescriptions_patient`
+        FOREIGN KEY (`patient_id`) REFERENCES `Users`(`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ======================================================
+-- ✅ INDEXES
+-- ======================================================
+CREATE INDEX `idx_prescriptions_doctor` ON `prescriptions`(`doctor_id`);
+CREATE INDEX `idx_prescriptions_patient` ON `prescriptions`(`patient_id`);
+
+-- ======================================================
+-- ✅ OPTIONAL TEST DATA
+-- ======================================================
+-- INSERT INTO `Users` (`name`, `email`, `password`, `role`) VALUES
+-- ('Dr. John Doe', 'dr.john@example.com', 'password123', 'Doctor'),
+-- ('Jane Smith', 'jane@example.com', 'password123', 'Patient');
+
+-- INSERT INTO `prescriptions` 
+-- (`doctor_id`, `patient_id`, `drug_name`, `dose_amount`, `dose_unit`, `frequency`, `dispense_quantity`, `unit_type`, `diagnosis`)
+-- VALUES (1, 2, 'Paracetamol', '500', 'mg', 'Twice daily', 10, 'tablets', 'Fever');
+
+
+ALTER TABLE prescriptions 
+ADD COLUMN updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP;
+
+

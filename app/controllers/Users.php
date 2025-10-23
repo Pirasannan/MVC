@@ -11,7 +11,7 @@ class Users extends Controller {
     {
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             // sanitize & collect
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $data = [
                 'name' => trim($_POST['name'] ?? ''),
                 'email' => trim($_POST['email'] ?? ''),
@@ -41,12 +41,26 @@ class Users extends Controller {
                 $data['name_err'] = 'Please enter your name.';
             }
 
+            // SLMC validation - only for doctors
             if($data['role'] === 'doctor'){
                 if(empty($data['slmc'])){
                     $data['slmc_err'] = 'Please enter your SLMC number.';
                 } elseif(!preg_match('/^[0-9]+$/', $data['slmc'])){
                     $data['slmc_err'] = 'SLMC must be numeric.';
+                } else {
+                    // Check if SLMC number already exists in Users table
+                    if($this->userModel->findUserBySlmc($data['slmc'])){
+                        $data['slmc_err'] = 'There is already a user with this SLMC number.';
+                    } 
+                    // Validate SLMC number against slmc table
+                    elseif(!$this->userModel->validateSlmcNumber($data['slmc'])){
+                        $data['slmc_err'] = 'Invalid SLMC number. Please check your registration number.';
+                    }
                 }
+            } else {
+                // For non-doctors, clear SLMC to avoid issues
+                $data['slmc'] = null;
+                $data['slmc_err'] = ''; // Clear any SLMC errors for non-doctors
             }
 
             // password validation
@@ -64,27 +78,20 @@ class Users extends Controller {
             }
 
             // if any errors, re-render view
-            if(!empty($data['email_err']) || !empty($data['name_err']) || !empty($data['slmc_err']) || !empty($data['password_err']) || !empty($data['confirm_password_err']) || !empty($data['role_err'])){
+            if(!empty($data['name_err']) || !empty($data['email_err']) || !empty($data['slmc_err']) || !empty($data['password_err']) || !empty($data['confirm_password_err'])){
                 $this->view('users/v_register', $data);
                 return;
             }
 
-            //validation completed & No errors , then register users
-            if(empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])){
-                //Hash the password
-                $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-                    
+            // If we reach here, all validations passed - register the user
+            //Hash the password
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+                
             //Register the user
-                if($this->userModel->register($data)){
+            if($this->userModel->register($data)){
                 redirect('Users/login');
-                }
-                else{
-                    die('Something went wrong');
-                }
-            }
-            else{
-                //Load view
-                $this->view('users/v_register', $data);
+            } else {
+                die('Something went wrong');
             }
         }
         else {
@@ -93,15 +100,15 @@ class Users extends Controller {
                 'role'=> '',
                 'name' => '',
                 'email' => '',
+                'slmc' => '',
                 'password' => '',
                 'confirm_password' => '',
-
                 'role_err' =>'',
                 'name_err' => '',
                 'email_err' => '',
+                'slmc_err' => '',
                 'password_err' => '',
                 'confirm_password_err' => '',
-
             ];
 
             //Load view
@@ -113,7 +120,9 @@ class Users extends Controller {
     public function login(){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
             //validate the form
-            $_POST = array_map('htmlspecialchars', $_POST);
+            $_POST = array_map(function($value) {
+                return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            }, $_POST);
             
             $data = [
                 'email' => trim($_POST['email']),
@@ -184,6 +193,8 @@ class Users extends Controller {
         $_SESSION['user_name'] = $user->name;
         $_SESSION['user_email'] = $user->email;
         $_SESSION['user_role'] = strtolower($user->role ?? '');
+        $_SESSION['user_slmc'] = $user->slmc ?? null;
+
 
         //Role based sessions
         switch($_SESSION['user_role']){
@@ -222,6 +233,14 @@ class Users extends Controller {
             return false;
         }
     }
+
+    // Show e-prescription form
+    public function add() {
+        $patients = $this->userModel->getPatients();
+        $data = ['patients' => $patients];
+        $this->view('pages/v_add_prescription', $data); // create this view file
+    }
+
 
 }
 

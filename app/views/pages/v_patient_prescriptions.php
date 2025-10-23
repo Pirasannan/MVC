@@ -59,7 +59,7 @@ $current_page = 'patientPrescriptions';
 </div>
 
 <!-- Include Prescription Modal -->
-<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?>
+<?php /*require APPROOT.'/views/pages/prescriptions/view_prescription.php'; */?> 
 
 <script>
 function openPrescriptionModal(event) {

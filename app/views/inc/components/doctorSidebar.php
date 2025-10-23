@@ -7,6 +7,8 @@
             </div>
         </div>
         
+       
+        <div class="sidebar-top"></div>
         <nav class="nav-menu">
             <?php 
                 $menu_items = [
@@ -34,3 +36,5 @@
         <?php require APPROOT.'/views/inc/components/logoutPopup.php'; ?>
 
     </aside>
+
+   

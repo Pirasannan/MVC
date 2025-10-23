@@ -24,22 +24,22 @@ $current_page = 'doctorDashboard';
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
-                            <h3 class="stat-title">Active Medications</h3>
+                            <h3 class="stat-title">Number of Patients</h3>
                             <div class="stat-number">3</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">$56456.00</div>
+                            <div class="stat-number">10</div>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <!-- <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Medical Reports</h3>
                             <div class="stat-number">$26456.00</div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Content Sections Row -->

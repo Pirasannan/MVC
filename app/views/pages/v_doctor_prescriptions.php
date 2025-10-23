@@ -102,9 +102,9 @@ $current_page = 'doctorPrescriptions';
     </div>
 
 <!-- Include Prescription Modal -->
-<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?>
+ <?php /*require APPROOT.'/views/pages/prescriptions/view_prescription.php'; */?> 
 
-<!-- Delete confirmation popup -->
+<!-- Delete confirmation popup
 <div id="deletePrescriptionPopup" class="popup-overlay">
   <div class="popup-box">
     <h3>Confirm Delete</h3>
@@ -161,6 +161,6 @@ document.getElementById("confirmDelete").addEventListener("click", function() {
         window.location.href = "<?php echo URLROOT; ?>/Doctor/deletePrescription/" + prescriptionId;
     }
 });
-</script>
+</script> -->
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

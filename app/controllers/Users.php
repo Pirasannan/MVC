@@ -163,7 +163,8 @@ class Users extends Controller {
                 // Load view with errors
                 $this->view('users/v_login', $data);
             }
-        } else {
+        } 
+        else {
             //initial form
             $data = [
                 'email' => '',

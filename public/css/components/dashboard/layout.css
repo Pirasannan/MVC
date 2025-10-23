@@ -38,3 +38,7 @@
   .action-button.secondary:hover {
     background: #e5e7eb;
   }
+
+  .remove-underline {
+    text-decoration: none;
+  }

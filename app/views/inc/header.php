@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/style.css?v=<?php echo filemtime(APPROOT.'/../public/css/style.css'); ?>">
+        <script src="<?php echo URLROOT; ?>/public/js/main.js?v=<?php echo filemtime(APPROOT.'/../public/js/main.js'); ?>"></script>
         
         <title><?php echo SITENAME; ?></title>
     </head>

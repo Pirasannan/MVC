@@ -1,0 +1,62 @@
+-- Insert dummy admin users
+INSERT INTO Users (name, email, password, role, status, created_at, updated_at) VALUES
+('Admin User', 'admin@system.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'active', NOW(), NOW()),
+('System Admin', 'system@admin.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'active', NOW(), NOW()),
+('Super Admin', 'super@admin.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'active', NOW(), NOW());
+
+-- Insert dummy doctors (mix of statuses)
+INSERT INTO Users (name, email, password, role, status, created_at, updated_at) VALUES
+-- Pending doctors (inactive status)
+('Dr. Rajesh Kumar', 'rajesh.kumar@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'inactive', '2025-01-15 10:30:00', NOW()),
+('Dr. Nisha Perera', 'nisha.perera@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'inactive', '2025-01-16 14:20:00', NOW()),
+('Dr. Amara Fernando', 'amara.fernando@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'inactive', '2025-01-17 09:15:00', NOW()),
+('Dr. Kasun Silva', 'kasun.silva@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'inactive', '2025-01-18 16:45:00', NOW()),
+
+-- Verified doctors (active status)
+('Dr. Sarah Johnson', 'sarah.johnson@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'active', '2025-01-10 08:00:00', '2025-01-20 10:30:00'),
+('Dr. Michael Chen', 'michael.chen@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'active', '2025-01-11 12:15:00', '2025-01-21 14:20:00'),
+('Dr. Emily Davis', 'emily.davis@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'active', '2025-01-12 15:30:00', '2025-01-22 09:15:00'),
+('Dr. Sunil Jayawardena', 'sunil.jayawardena@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'active', '2025-01-13 11:45:00', '2025-01-23 16:45:00'),
+
+-- Rejected doctors (suspended status)
+('Dr. Anil Rodrigo', 'anil.rodrigo@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'suspended', '2025-01-05 13:20:00', '2025-01-12 15:30:00'),
+('Dr. Priya Gunawardena', 'priya.gunawardena@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'suspended', '2025-01-06 09:45:00', '2025-01-08 11:20:00'),
+('Dr. Rohan Wijesinghe', 'rohan.wijesinghe@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'suspended', '2025-01-07 14:10:00', '2025-01-05 16:45:00'),
+
+-- Inactive doctors
+('Dr. Chaminda Perera', 'chaminda.perera@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'inactive', '2025-01-08 10:30:00', '2025-01-25 12:00:00'),
+('Dr. Lakshmi Fernando', 'lakshmi.fernando@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'suspended', '2025-01-09 16:20:00', '2025-01-01 14:30:00'),
+('Dr. Dinesh Rathnayake', 'dinesh.rathnayake@doctor.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Doctor', 'inactive', '2025-01-14 08:15:00', '2025-01-10 09:45:00');
+
+-- Insert dummy patients (mix of statuses)
+INSERT INTO Users (name, email, password, role, status, created_at, updated_at) VALUES
+-- Pending patients (inactive status)
+('Kamal Wickramasinghe', 'kamal.wickramasinghe@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'inactive', '2025-01-18 10:30:00', NOW()),
+('Priya Mendis', 'priya.mendis@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'inactive', '2025-01-17 14:20:00', NOW()),
+('Saman De Silva', 'saman.desilva@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'inactive', '2025-01-17 09:15:00', NOW()),
+('Nimal Jayasuriya', 'nimal.jayasuriya@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'inactive', '2025-01-16 16:45:00', NOW()),
+
+-- Verified patients (active status)
+('Anura Bandara', 'anura.bandara@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'active', '2025-01-10 08:00:00', '2025-01-20 10:30:00'),
+('Nethmi Silva', 'nethmi.silva@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'active', '2025-01-11 12:15:00', '2025-01-21 14:20:00'),
+('Roshan Fernando', 'roshan.fernando@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'active', '2025-01-12 15:30:00', '2025-01-22 09:15:00'),
+('Dilani Perera', 'dilani.perera@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'active', '2025-01-13 11:45:00', '2025-01-23 16:45:00'),
+('Kumar Dissanayake', 'kumar.dissanayake@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'active', '2025-01-14 07:30:00', '2025-01-24 13:20:00'),
+('Malini Rajapaksa', 'malini.rajapaksa@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'active', '2025-01-15 09:45:00', '2025-01-25 15:40:00'),
+
+-- Rejected patients (suspended status)
+('Chaminda Gunasekara', 'chaminda.gunasekara@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'suspended', '2025-01-05 13:20:00', '2025-01-12 15:30:00'),
+('Tharaka Amarasinghe', 'tharaka.amarasinghe@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'suspended', '2025-01-06 09:45:00', '2025-01-08 11:20:00'),
+
+-- Inactive patients
+('Sunil Wijeratne', 'sunil.wijeratne@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'inactive', '2025-01-08 10:30:00', '2025-01-25 12:00:00'),
+('Yasmin Fonseka', 'yasmin.fonseka@patient.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Patient', 'suspended', '2025-01-09 16:20:00', '2025-01-01 14:30:00');
+
+-- Insert some notifications for testing
+INSERT INTO notifications (recipient_type, recipient_id, title, message, notification_type, status, created_at) VALUES
+('all', NULL, 'System Maintenance', 'Scheduled maintenance will occur tonight from 2-4 AM', 'info', 'sent', '2025-01-20 10:00:00'),
+('doctor', NULL, 'New Patient Registration', 'A new patient has registered and requires verification', 'info', 'sent', '2025-01-21 14:30:00'),
+('patient', NULL, 'Appointment Reminder', 'Your appointment is scheduled for tomorrow at 2 PM', 'info', 'sent', '2025-01-22 09:15:00'),
+('admin', NULL, 'Doctor Verification Required', '3 new doctors are pending verification', 'warning', 'sent', '2025-01-23 11:45:00'),
+('all', NULL, 'New Feature Announcement', 'New prescription template feature now available in your dashboard', 'info', 'sent', '2025-01-24 16:20:00'),
+('doctor', NULL, 'Patient Flagged Content', 'Inappropriate message reported in consultation chat', 'warning', 'sent', '2025-01-25 08:30:00');

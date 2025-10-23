@@ -1,6 +1,6 @@
 <?php
 
-    //Database configuration
+    //Database configuration(connect db to framework)
     define('DB_HOST','localhost');
     define('DB_USER','root');
     define('DB_PASSWORD','');

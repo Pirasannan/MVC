@@ -1,5 +1,5 @@
 <?php 
-    class Database {
+    class Database {//set db config details to variables
         private $host = DB_HOST;
         private $user = DB_USER;
         private $password = DB_PASSWORD;
@@ -8,8 +8,8 @@
         //dbh = data base host
         private $dbh;
 
-        private $statement;
-        private $error;
+        private $statement;//SQL statement
+        private $error;//to store errors thrown due to query
 
         public function __construct(){
             $dsn = "mysql:host=".$this->host.";dbname=".$this->dbname;

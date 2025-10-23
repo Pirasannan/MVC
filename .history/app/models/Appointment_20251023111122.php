@@ -168,7 +168,7 @@ public function expireStaleReschedules(): int {
 public function getApprovedBetweenForDoctor(int $doctorId, string $startUtc, string $endUtc){
     $sql = "SELECT 
                 a.id, a.patient_id, a.doctor_id, a.status, a.starts_at,
-                u.name AS patient_name 
+                u.name AS patient_name   -- <-- CHANGE THIS if your Users table uses a different column
             FROM appointments a
             LEFT JOIN Users u ON u.id = a.patient_id
             WHERE a.doctor_id = :doc

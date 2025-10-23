@@ -53,17 +53,17 @@ public function doctor(){
 
     $rows = $this->apModel->getApprovedBetweenForDoctor((int)$_SESSION['user_id'], $fetchStartUtc, $fetchEndUtc);
 
-$byDate = [];
-foreach ($rows as $r) {
-    $dtUtc   = new DateTimeImmutable($r->starts_at, $tzUTC);
-    $dtLocal = $dtUtc->setTimezone($tzLocal);
-    $key = $dtLocal->format('Y-m-d');
-    if (!isset($byDate[$key])) $byDate[$key] = [];
-    $byDate[$key][] = [
-        'time' => $dtLocal->format('H:i'),
-        'name' => isset($r->patient_name) ? (string)$r->patient_name : ''
-    ];
-}
+    $byDate = [];
+    foreach ($rows as $r) {
+        $dtUtc   = new DateTimeImmutable($r->scheduled_at, $tzUTC);
+        $dtLocal = $dtUtc->setTimezone($tzLocal);
+        $key = $dtLocal->format('Y-m-d');
+        if (!isset($byDate[$key])) $byDate[$key] = [];
+        $byDate[$key][] = [
+            'time' => $dtLocal->format('H:i'),
+            'name' => $r->patient_name ?? ''
+        ];
+    }
 
     $prevMonth = $firstLocal->modify('-1 month')->format('Y-m');
     $nextMonth = $firstLocal->modify('+1 month')->format('Y-m');

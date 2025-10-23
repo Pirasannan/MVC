@@ -61,7 +61,7 @@ foreach ($rows as $r) {
     if (!isset($byDate[$key])) $byDate[$key] = [];
     $byDate[$key][] = [
         'time' => $dtLocal->format('H:i'),
-        'name' => isset($r->patient_name) ? (string)$r->patient_name : ''
+        // name omitted for now (unknown Users schema)
     ];
 }
 

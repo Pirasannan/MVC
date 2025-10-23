@@ -166,15 +166,13 @@ public function expireStaleReschedules(): int {
 }
 
 public function getApprovedBetweenForDoctor(int $doctorId, string $startUtc, string $endUtc){
-    $sql = "SELECT 
-                a.id, a.patient_id, a.doctor_id, a.status, a.starts_at,
-                u.name AS patient_name 
-            FROM appointments a
-            LEFT JOIN Users u ON u.id = a.patient_id
-            WHERE a.doctor_id = :doc
-              AND a.status = 'approved'
-              AND a.starts_at BETWEEN :start AND :end
-            ORDER BY a.starts_at ASC";
+    $sql = "SELECT id, patient_id, patient_name, doctor_id, status,
+                   scheduled_at
+            FROM appointments
+            WHERE doctor_id = :doc
+              AND status = 'approved'
+              AND scheduled_at BETWEEN :start AND :end
+            ORDER BY scheduled_at ASC";
     $this->db->query($sql);
     $this->db->bind(':doc',  $doctorId);
     $this->db->bind(':start', $startUtc);

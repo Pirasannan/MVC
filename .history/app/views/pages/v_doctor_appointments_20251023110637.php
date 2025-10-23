@@ -282,7 +282,7 @@ function closeResModal(){
 </div>
 
 <style>
-.calendar-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.08);margin-bottom:20px;margin-top:30px;}
+.calendar-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.08);margin-bottom:20px;margin-top:40px;}
 .calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .calendar-title{margin:0;font-size:1.1rem;letter-spacing:.2px}
 .cal-nav{text-decoration:none;padding:6px 10px;border-radius:10px;background:#f3f4f6;color:#333}

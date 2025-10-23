@@ -187,15 +187,15 @@
     transform: translateY(-1px);
 }
 
-.action-button:not(.primary):not(.secondary):not(.danger) {
+/* .action-button:not(.primary):not(.secondary):not(.danger) {
     background: #10b981;
     color: white;
-}
-
+} */
+/* 
 .action-button:not(.primary):not(.secondary):not(.danger):hover {
     background: #059669;
     transform: translateY(-1px);
-}
+} */
 
 /* Upload Modal Styles */
 .modal-content {

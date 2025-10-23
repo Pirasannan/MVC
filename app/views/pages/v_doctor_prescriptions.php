@@ -41,12 +41,9 @@ $current_page = 'doctorPrescriptions';
 
                 <!-- Content Sections Row -->
                 <div class="content-sections">
-                    <!-- Appointments Section -->
-                    <div class="content-section">
-
 
                     <!-- Medical Status Section -->
-                    <div class="content-section">
+                    <div class="content-section full-width">
                         <div class="section-header">
                             <h2 class="section-title">Issued Prescriptions</h2>
                             <a class="create_eprescription action-button" href="<?php echo URLROOT; ?>/Pages/createprescription">Create ePrescription</a>
@@ -89,11 +86,11 @@ $current_page = 'doctorPrescriptions';
                         </div>
                         
                         <!-- View All Button -->
-                <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
-                    <div class="section-footer">
-                        <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
-                    </div>
-                <?php endif; ?>
+                        <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
+                            <div class="section-footer">
+                                <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
+                            </div>
+                        <?php endif; ?>
                 
                     </div>
                 </div>

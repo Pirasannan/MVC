@@ -1,5 +1,5 @@
 <?php 
-    $current_page = 'patientDashboard';
+    $current_page = 'patientSettings';
     require APPROOT.'/views/inc/header.php'; 
 ?>
 
@@ -12,113 +12,46 @@
         <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
 
             <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Stats Cards Row -->
-                <div class="stats-row">
-                    <div class="stat-card primary">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Upcoming Appointments</h3>
-                            <div class="stat-number">1</div>
+            <div class="content-section account-settings">
+            <div class="section-header">
+                <h2 class="section-title">Account Settings</h2>
+            </div>
+            <div class="section-content">
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Change Password</h4>
+                            <p>Update your account password for security</p>
                         </div>
+                        <button class="action-button secondary">Change</button>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Active Medications</h3>
-                            <div class="stat-number">3</div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Email Notifications</h4>
+                            <p>Manage your email notification preferences</p>
                         </div>
+                        <button class="action-button secondary">Configure</button>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">$56456.00</div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Privacy Settings</h4>
+                            <p>Control your profile visibility and data sharing</p>
                         </div>
+                        <button class="action-button secondary">Manage</button>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Medical Reports</h3>
-                            <div class="stat-number">$26456.00</div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Account Deactivation</h4>
+                            <p>Temporarily deactivate your account</p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Content Sections Row -->
-                <div class="content-sections">
-                    <!-- Appointments Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Upcoming Appointments</h2>
-                        </div>
-                        <div class="section-content">
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Sarah Johnson</div>
-                                    <div class="appointment-date">2024-01-15 at 10:00 AM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge scheduled">Scheduled</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Michael Chen</div>
-                                    <div class="appointment-date">2024-01-20 at 2:30 PM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge confirmed">Confirmed</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Emily Davis</div>
-                                    <div class="appointment-date">2024-01-25 at 11:15 AM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge pending">Pending</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="section-footer">
-                            <button class="action-button">Book New Appointment</button>
-                        </div>
-                    </div>
-
-                    <!-- Medical Status Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Current Medications</h2>
-                        </div>
-                        <div class="section-content">
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Hypertension</div>
-                                    <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2024-01-10</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Diabetes</div>
-                                    <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Michael Chen</div>
-                                </div>
-                                <div class="medication-date">2024-01-05</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Cholesterol</div>
-                                    <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2023-12-28</div>
-                            </div>
-                        </div>
-                        <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
-                        </div>
+                        <button class="action-button danger">Deactivate</button>
                     </div>
                 </div>
             </div>
+        </div>
         </main>
     </div>
 

@@ -466,18 +466,3 @@
 .cell-list .p{color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .more{color:#6b7280;font-size:.85rem}
 @media (max-width:900px){.cell-list li .p{display:none}}
-
-.res-modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,.45);
-  display: none; align-items: center; justify-content: center; z-index: 1000;
-}
-.res-modal__content {
-  background: #fff; padding: 1.25rem; width: 100%; max-width: 480px;
-  border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.2);
-}
-.res-modal__title { margin: 0 0 .75rem 0; }
-.res-modal__row { margin-bottom: .75rem; display:flex; flex-direction:column; gap:.35rem; }
-.res-modal__actions { display:flex; gap:.5rem; justify-content:flex-end; }
-.badge.badge-warning {
-  display:inline-block; padding:.2rem .5rem; background:#FFC107; color:#222; border-radius:8px; font-size:.8rem;
-}

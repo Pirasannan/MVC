@@ -59,32 +59,8 @@ $current_page = 'patientPrescriptions';
 </div>
 
 <!-- Include Prescription Modal -->
-<?php /*require APPROOT.'/views/pages/prescriptions/view_prescription.php'; */?> 
+<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?> 
 
-<script>
-function openPrescriptionModal(event) {
-    // Only open modal if the click is not on a button or link
-    if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('a') || event.target.closest('button')) {
-        return;
-    }
-    
-    const modal = document.getElementById('prescriptionPopup');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
-
-// Show more prescriptions
-function toggleAllPrescriptions() {
-    const list = document.getElementById('prescription-list');
-    const btn = document.getElementById('view-all-btn');
-    if (list && btn) {
-        list.classList.toggle('expanded');
-        btn.textContent = list.classList.contains('expanded') 
-            ? 'Show Less' 
-            : 'View All Prescriptions';
-    }
-}
-</script>
+<!-- Modal functionality is handled by modal-manager.js -->
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

@@ -173,10 +173,3 @@
     color: #2980b9;
   }
   
-  .prescription-overlay {
-    display: none;
-  }
-  
-  .prescription-overlay.show {
-    display: flex;
-  }

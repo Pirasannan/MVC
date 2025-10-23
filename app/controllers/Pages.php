@@ -673,7 +673,9 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_doctor_appointments', []);
+        
+        // Redirect to the proper Appointments controller method
+        redirect('Appointments/doctor');
     }
 
     public function createprescription() {
@@ -770,7 +772,9 @@ class Pages extends Controller{
          redirect('Pages/index');
          return;
         }
-        $this->view('pages/v_patient_appointments', []);
+        
+        // Redirect to the proper Appointments controller method
+        redirect('Appointments/my');
     }
 
     public function patientSettings() {

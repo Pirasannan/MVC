@@ -1,0 +1,143 @@
+<?php require APPROOT.'/views/inc/header.php'; ?>
+
+
+
+
+<div class="dashboard-container doctor">        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <span class="logo-text">MEDILINK</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="<?php echo URLROOT; ?>/Pages/patientdashboard" class="nav-item ">
+                    Dashboard
+                </a>
+                <a href="<?php echo URLROOT; ?>/Appointments/my" class="nav-item">
+                    Appointments
+                </a>
+                <a href="<?php echo URLROOT; ?>/Pages/patientPrescriptions" class="nav-item ">
+                    Prescriptions
+                </a>
+                <a href="<?php echo URLROOT; ?>/Pages/patientMessages" class="nav-item">
+                    Messages
+                </a>
+                <a href="<?php echo URLROOT; ?>/Pages/patientMedicalrecords" class="nav-item active">
+                    Medical Records
+                </a>
+                <a href="<?php echo URLROOT; ?>/Pages/patientProfile" class="nav-item">
+                    Profile
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">Prescriptions</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <span class="avatar-icon">👤</span>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">John Smith</span>
+                            <span class="user-id">ID: 23545</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">                
+
+                <!-- Content Sections Row -->
+                <div class="content-sections">
+                    <!-- Appointments Section -->
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Appointments</h2>
+                        </div>
+                        <div class="section-content">
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <div class="doctor-name">Sarah Johnson</div>
+                                    <div class="appointment-date">2024-01-15 at 10:00 AM</div>
+                                </div>
+                                <div class="appointment-status">
+                                    <span class="status-badge scheduled">Scheduled</span>
+                                </div>
+                            </div>
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <div class="doctor-name">Michael Chen</div>
+                                    <div class="appointment-date">2024-01-20 at 2:30 PM</div>
+                                </div>
+                                <div class="appointment-status">
+                                    <span class="status-badge confirmed">Confirmed</span>
+                                </div>
+                            </div>
+                            <div class="appointment-item">
+                                <div class="appointment-info">
+                                    <div class="doctor-name">Emily Davis</div>
+                                    <div class="appointment-date">2024-01-25 at 11:15 AM</div>
+                                </div>
+                                <div class="appointment-status">
+                                    <span class="status-badge pending">Pending</span>
+                                </div>
+                                
+                            </div>
+                            <div class="section-footer">
+                            <button class="action-button secondary">View All Prescriptions</button>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Medical Status Section -->
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Issued Prescriptions</h2>
+                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
+
+                        </div>
+                        <div class="section-content">
+                            <div class="medication-item">
+                                <div class="medication-info">
+                                    <div class="medication-name">Hypertension</div>
+                                    <div class="medication-details">Lisinopril - 10mg, Once daily</div>
+                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
+                                </div>
+                                <div class="medication-date">2024-01-10</div>
+                            </div>
+                            <div class="medication-item">
+                                <div class="medication-info">
+                                    <div class="medication-name">Diabetes</div>
+                                    <div class="medication-details">Metformin - 500mg, Twice daily</div>
+                                    <div class="prescribed-by">Prescribed to Michael Chen</div>
+                                </div>
+                                <div class="medication-date">2024-01-05</div>
+                            </div>
+                            <div class="medication-item">
+                                <div class="medication-info">
+                                    <div class="medication-name">Cholesterol</div>
+                                    <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
+                                    <div class="prescribed-by">Prescribed to Sarah Johnson</div>
+                                </div>
+                                <div class="medication-date">2023-12-28</div>
+                            </div>
+                        </div>
+                        <div class="section-footer">
+                            <button class="action-button secondary">View All Prescriptions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<?php require APPROOT.'/views/inc/footer.php'; ?>

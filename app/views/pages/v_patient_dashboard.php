@@ -1,14 +1,16 @@
-<?php 
-    $current_page = 'patientDashboard';
-    require APPROOT.'/views/inc/header.php'; 
-?>
+<?php require APPROOT.'/views/inc/header.php'; ?>
 
-<div class="dashboard-container patient">
+
+
+
+<div class="dashboard-container patient">        
+    <!-- Sidebar Navigation -->
     <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-        <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
@@ -120,7 +122,5 @@
             </div>
         </main>
     </div>
-
-
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

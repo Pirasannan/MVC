@@ -6,7 +6,8 @@
         'adminDoctors' => 'Doctors Management',
         'adminPatients' => 'Patients Management',
         'adminRecords' => 'Medical Records',
-        'adminNotifications' => 'Notifications & Messages',
+        'adminNotifications' => 'Notifications',
+        'adminMessages' => 'Messages'
     ];
 
     // Get the current page title, default to 'Admin' if not found

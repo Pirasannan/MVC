@@ -1,17 +1,17 @@
-<?php 
-require APPROOT.'/views/inc/header.php'; 
-$current_page = 'doctorDashboard';
-?>
+<?php require APPROOT.'/views/inc/header.php'; ?>
 
 
-<div class="dashboard-container">        <!-- Sidebar Navigation -->
-    <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-        <!-- Top Header -->
-        <?php require APPROOT.'/views/inc/components/doctorHeader.php'; ?>
 
+<div class="dashboard-container doctor">        
+        <!-- Sidebar Navigation -->        
+        <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <?php require APPROOT.'/views/inc/components/doctorHeader.php'; ?>
+                
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <!-- Stats Cards Row -->
@@ -24,22 +24,22 @@ $current_page = 'doctorDashboard';
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
-                            <h3 class="stat-title">Number of Patients</h3>
+                            <h3 class="stat-title">Active Medications</h3>
                             <div class="stat-number">3</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">10</div>
+                            <div class="stat-number">$56456.00</div>
                         </div>
                     </div>
-                    <!-- <div class="stat-card">
+                    <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Medical Reports</h3>
                             <div class="stat-number">$26456.00</div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
 
                 <!-- Content Sections Row -->

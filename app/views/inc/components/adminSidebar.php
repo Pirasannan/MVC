@@ -14,6 +14,7 @@
                     'Doctors' => 'adminDoctors',
                     'Patients' => 'adminPatients',
                     'Notifications' => 'adminNotifications',
+                    'Messages' => 'adminMessages',
                     'Profile' => 'adminProfile'
                 ];
 

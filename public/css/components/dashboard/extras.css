@@ -1,3 +1,14 @@
+.create_eprescription {
+align-self: center;
+font-size: 13px;
+color: #ffffff;
+text-decoration: none;
+line-height: 20px;
+border-radius: 6px;
+background: transparent;
+transition: color .12s ease, background .12s ease, transform .08s ease;
+}
+
 .create_eprescription.action-button {
     display: flex;
     justify-content: center;

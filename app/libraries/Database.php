@@ -60,35 +60,29 @@
             }
             $this->statement->bindValue($param, $value, $type);
 
-         }
-
-        //execute the prepare statment
-        public function execute(){//method used on DB
-            return $this ->statement->execute();//built in PDO method
         }
 
-        // get multiple records as results
-        public function resultSet(){
-            $this->execute();
-            return $this->statement->fetchAll(PDO::FETCH_OBJ);  //convert the results as PDO , to return it as array.
+            //execute the prepare statment
+            public function execute(){
+                return $this ->statement->execute();
+            }
 
-        }
+            // get multiple records as results
+            public function resultSet(){
+                $this->execute();
+                return $this->statement->fetchAll(PDO::FETCH_OBJ);  //convert the results as PDO , to return it as array.
+            }
 
-        // get single record as result
-        public function single(){
-            $this->execute();
-            return $this->statement->fetch(PDO::FETCH_OBJ);  // we are returning the data in an array. "FETCH_ASSOC" is for array "FETCH_OBJ" is for object
+            // get single record as result
+            public function single(){
+                $this->execute();
+                return $this->statement->fetch(PDO::FETCH_OBJ);  // we are returning the data in an array. "FETCH_ASSOC" is for array "FETCH_OBJ" is for object
 
-        }
+            }
 
-        //Check records count
-        public function rowCount(){
-            return $this->statement->rowCount();
-        }
-
-
-
-
-        
+            //Check records count
+            public function rowCount(){
+                return $this->statement->rowCount();
+            }
     }
 ?>

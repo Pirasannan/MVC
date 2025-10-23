@@ -1,4 +1,8 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php 
+require APPROOT.'/views/inc/header.php'; 
+$current_page = 'patientMessages';
+?>
+
 <link rel='stylesheet' href='<?php echo URLROOT; ?>/css/components/messages/patient_messages.css'>
 
 <div class="dashboard-container patient">

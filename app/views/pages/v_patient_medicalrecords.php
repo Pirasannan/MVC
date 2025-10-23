@@ -1,8 +1,7 @@
 <?php
 
 require APPROOT.'/views/inc/header.php';
-
-$current_page = 'patientMedicalRecords';
+$current_page = 'patientMedicalrecords';
 
 ?>
 

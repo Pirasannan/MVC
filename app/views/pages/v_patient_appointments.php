@@ -1,57 +1,16 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php 
+require APPROOT.'/views/inc/header.php'; 
+$current_page = 'patientAppointments';
+?>
 
 
+<div class="dashboard-container">        <!-- Sidebar Navigation -->
+    <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>
 
-
-<div class="dashboard-container doctor">        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo-section">
-                <div class="logo">
-                    <span class="logo-text">MEDILINK</span>
-                </div>
-            </div>
-            
-            <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/patientdashboard" class="nav-item ">
-                    Dashboard
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientAppointments" class="nav-item active">
-                    Appointments
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientPrescriptions" class="nav-item ">
-                    Prescriptions
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientMessages" class="nav-item">
-                    Messages
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientMedicalrecords" class="nav-item">
-                    Medical Records
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/patientProfile" class="nav-item">
-                    Profile
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <h1 class="page-title">Prescriptions</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <span class="avatar-icon">👤</span>
-                        </div>
-                        <div class="user-details">
-                            <span class="user-name">John Smith</span>
-                            <span class="user-id">ID: 23545</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">                
@@ -102,8 +61,6 @@
                     <div class="content-section">
                         <div class="section-header">
                             <h2 class="section-title">Issued Prescriptions</h2>
-                            <button class="action-button" ><a class ="create_eprescription" href="<?php echo URLROOT; ?>/Pages/createprescription"  >Create ePrescription</a></button>
-
                         </div>
                         <div class="section-content">
                             <div class="medication-item">

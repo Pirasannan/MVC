@@ -1,58 +1,17 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php 
+require APPROOT.'/views/inc/header.php'; 
+$current_page = 'doctorMedicalrecords';
+?>
 
 
 
+<div class="dashboard-container">        <!-- Sidebar Navigation -->
+    <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>
 
-<div class="dashboard-container doctor">        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo-section">
-                <div class="logo">
-                    <span class="logo-text">MEDILINK</span>
-                </div>
-            </div>
-            
-            <nav class="nav-menu">
-                <a href="<?php echo URLROOT; ?>/Pages/doctordashboard" class="nav-item ">
-                    Dashboard
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorAppointments" class="nav-item">
-                    Appointments
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorPrescriptions" class="nav-item">
-                    Prescriptions
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorMessages" class="nav-item">
-                    Messages
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorMedicalrecords" class="nav-item active">
-                    Medical Records
-                </a>
-                <a href="<?php echo URLROOT; ?>/Pages/doctorProfile" class="nav-item">
-                    Profile
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Header -->
-            <header class="top-header">
-                <div class="header-left">
-                    <h1 class="page-title">Doctor Dashboard</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <span class="avatar-icon">👤</span>
-                        </div>
-                        <div class="user-details">
-                            <span class="user-name">John Smith</span>
-                            <span class="user-id">ID: 23545</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <?php require APPROOT.'/views/inc/components/doctorHeader.php'; ?>
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <!-- Stats Cards Row -->

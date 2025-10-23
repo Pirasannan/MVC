@@ -23,5 +23,6 @@ CREATE TABLE prescriptions (
     valid_until DATE,
     pharmacy_note TEXT,
     doctor_notes TEXT,
+    is_deleted ENUM('not_deleted', 'deleted') DEFAULT 'not_deleted',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

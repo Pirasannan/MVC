@@ -119,13 +119,7 @@
     justify-content: center;
 }
 
-/* responsive adjustments */
-@media (max-width: 640px) {
-    .topnav { padding: 10px 12px; }
-    .topnav-logo-text { font-size: 1rem; }
-    .topnav-nav-actions { gap: 8px; }
-    .topnav-nav-link, .topnav-nav-btn { padding: 7px 10px; font-size: 0.92rem; }
-}
+
 
 /* ensure predictable box-sizing */
 .topnav, .topnav * { box-sizing: border-box; }

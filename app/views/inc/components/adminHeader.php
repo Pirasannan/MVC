@@ -5,7 +5,8 @@
         'adminDashboard' => 'Admin Dashboard',
         'adminDoctors' => 'Doctors Management',
         'adminPatients' => 'Patients Management',
-        'adminMessages' => 'Notifications & Messages',
+        'adminRecords' => 'Medical Records',
+        'adminNotifications' => 'Notifications & Messages',
     ];
 
     // Get the current page title, default to 'Admin' if not found
@@ -28,7 +29,6 @@
             </div>
             <div class="user-details">
                 <span class="user-name"><?php echo $admin_name; ?></span>
-                <span class="user-id">ID: <?php echo $admin_id; ?></span>
             </div>
         </div>
     </div>

@@ -119,7 +119,7 @@ $current_page = 'patientProfile';
 
             <!-- Recent Activity Section -->
             <div class="content-sections">
-                <div class="content-section">
+                <div class="content-section full-width">
                     <div class="section-header">
                         <h2 class="section-title">Recent Activity</h2>
                     </div>
@@ -148,42 +148,6 @@ $current_page = 'patientProfile';
                     </div>
                     <div class="section-footer">
                         <button class="action-button secondary">View All Records</button>
-                    </div>
-                </div>
-
-                <!-- Account Settings Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Account Settings</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-title">Change Password</div>
-                                <div class="setting-description">Update your account password</div>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-title">Notification Preferences</div>
-                                <div class="setting-description">Manage appointment reminders</div>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-title">Privacy Settings</div>
-                                <div class="setting-description">Control data sharing preferences</div>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <div class="setting-title">Download Records</div>
-                                <div class="setting-description">Export medical history</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button secondary">Manage Settings</button>
                     </div>
                 </div>
             </div>

@@ -15,9 +15,7 @@ $current_page = 'doctorMedicalrecords';
     <main class="main-content">
         <!-- Top Header -->
         <?php require APPROOT.'/views/inc/components/doctorHeader.php'; ?>
-<div class="main-content">
-    <main class="content">
-
+<div>
         <div class="page-content">
             <!-- Filters Section -->
             <div class="filters-section">

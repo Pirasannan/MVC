@@ -120,8 +120,7 @@ public function proposeRescheduleByDoctor(int $appointmentId, int $doctorId, str
 
 public function patientAcceptReschedule(int $appointmentId, int $patientId): bool {
     $sql = "UPDATE appointments
-            SET starts_at = proposed_datetime,
-                ends_at = DATE_ADD(proposed_datetime, INTERVAL 15 MINUTE),
+            SET scheduled_at = proposed_datetime,
                 status = 'approved',
                 proposed_datetime = NULL,
                 proposed_by = NULL,

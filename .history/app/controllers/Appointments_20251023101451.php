@@ -6,21 +6,7 @@ class Appointments extends Controller{
     // PATIENT
     public function my(){
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') return redirect('Pages/index');
-        
-        $appointments = $this->apModel->getByPatient($_SESSION['user_id']);
-        
-        // Check for pending reschedule requests
-        $pendingReschedules = 0;
-        foreach($appointments as $apt) {
-            if (($apt->reschedule_status ?? 'none') === 'pending_patient') {
-                $pendingReschedules++;
-            }
-        }
-        
-        $data = [ 
-            'appointments' => $appointments,
-            'pending_reschedules' => $pendingReschedules
-        ];
+        $data = [ 'appointments' => $this->apModel->getByPatient($_SESSION['user_id']) ];
         $this->view('pages/v_patient_appointments', $data);
     }
 

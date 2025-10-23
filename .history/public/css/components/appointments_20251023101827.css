@@ -83,7 +83,7 @@
 .appt-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1000px;
+  min-width: 880px;
 }
 .appt-table thead th {
   text-align: left;
@@ -225,33 +225,6 @@
   cursor: not-allowed;
 }
 
-/* Reschedule Alert */
-.reschedule-alert {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border: 1px solid #f59e0b;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
-}
-
-.alert-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.alert-content strong {
-  color: #92400e;
-  font-size: 16px;
-}
-
-.alert-content p {
-  color: #78350f;
-  margin: 0;
-  font-size: 14px;
-}
-
 /* Reschedule Proposals */
 .reschedule-proposal {
   background: #fef3c7;
@@ -350,30 +323,15 @@
 .p-empty{ padding:20px; color:var(--muted); }
 
 /* Table (reuse base table tokens) */
-.p-appt-table{ width:100%; border-collapse:collapse; min-width:1020px; }
+.p-appt-table{ width:100%; border-collapse:collapse; min-width:880px; }
 .p-appt-table thead th{
   text-align:left; font-weight:600; font-size:13px; letter-spacing:.4px;
   color:#374151; background:var(--soft); padding:12px 14px; border-bottom:1px solid var(--line);
 }
 .p-appt-table tbody td{ padding:14px; border-bottom:1px solid var(--line); vertical-align:middle; }
 .p-appt-table tbody tr:hover{ background:#f9f9f9; }
-
-/* Actions column specific styling */
-.p-appt-table th:last-child,
-.p-appt-table td:last-child {
-  width: 300px;
-  min-width: 280px;
-}
-
 .cell-date{ font-weight:600; }
 .cell-time{ color:var(--muted); font-size:13px; }
-.cell-reason{ 
-  color:var(--muted); 
-  font-size:13px; 
-  max-width:200px; 
-  word-wrap:break-word; 
-  line-height:1.4; 
-}
 
 /* Status chip (reuse) */
 .status{ display:inline-flex; align-items:center; gap:8px; padding:5px 10px; border-radius:999px;

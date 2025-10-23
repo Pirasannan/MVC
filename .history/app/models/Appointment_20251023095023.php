@@ -108,20 +108,14 @@ public function proposeRescheduleByDoctor(int $appointmentId, int $doctorId, str
                 reschedule_status = 'pending_patient',
                 reschedule_message = :msg,
                 reschedule_expires_at = DATE_ADD(NOW(), INTERVAL 48 HOUR)
-            WHERE id = :id AND doctor_id = :doc AND status IN ('pending')";
-    
-    $this->db->query($sql);
-    $this->db->bind(':newdt', $newDatetime);
-    $this->db->bind(':msg', $message);
-    $this->db->bind(':id', $appointmentId);
-    $this->db->bind(':doc', $doctorId);
-    return $this->db->execute();
+            WHERE id = :id AND doctor_id = :doc AND status IN ('pending')"; // adjust to your statuses
 }
 
 public function patientAcceptReschedule(int $appointmentId, int $patientId): bool {
+    // Guard: belongs to patient & reschedule_status='pending_patient'
+    // Set main time to proposed, mark approved
     $sql = "UPDATE appointments
-            SET starts_at = proposed_datetime,
-                ends_at = DATE_ADD(proposed_datetime, INTERVAL 15 MINUTE),
+            SET scheduled_at = proposed_datetime,
                 status = 'approved',
                 proposed_datetime = NULL,
                 proposed_by = NULL,
@@ -129,11 +123,7 @@ public function patientAcceptReschedule(int $appointmentId, int $patientId): boo
                 reschedule_message = NULL,
                 reschedule_expires_at = NULL
             WHERE id = :id AND patient_id = :pid AND reschedule_status = 'pending_patient'";
-    
-    $this->db->query($sql);
-    $this->db->bind(':id', $appointmentId);
-    $this->db->bind(':pid', $patientId);
-    return $this->db->execute();
+    // execute …
 }
 
 public function patientDeclineReschedule(int $appointmentId, int $patientId): bool {
@@ -144,14 +134,11 @@ public function patientDeclineReschedule(int $appointmentId, int $patientId): bo
                 reschedule_message = NULL,
                 reschedule_expires_at = NULL
             WHERE id = :id AND patient_id = :pid AND reschedule_status = 'pending_patient'";
-    
-    $this->db->query($sql);
-    $this->db->bind(':id', $appointmentId);
-    $this->db->bind(':pid', $patientId);
-    return $this->db->execute();
+    // execute …
 }
 
 public function expireStaleReschedules(): int {
+    // Call this on page load or via a cron to auto-clean expired proposals
     $sql = "UPDATE appointments
             SET proposed_datetime = NULL,
                 proposed_by = NULL,
@@ -159,10 +146,7 @@ public function expireStaleReschedules(): int {
                 reschedule_message = NULL,
                 reschedule_expires_at = NULL
             WHERE reschedule_status='pending_patient' AND reschedule_expires_at < NOW()";
-    
-    $this->db->query($sql);
-    $this->db->execute();
-    return $this->db->rowCount();
+    // execute and return affected rows
 }
 
 

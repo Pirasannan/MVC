@@ -62,7 +62,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -73,7 +72,6 @@
                 <td class="cell-date"><?= date('Y-m-d', strtotime($a->starts_at)) ?></td>
                 <td class="cell-time"><?= date('H:i', strtotime($a->starts_at)) ?>–<?= date('H:i', strtotime($a->ends_at)) ?></td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status pending"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>
@@ -83,10 +81,10 @@
                     <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
                     <!-- Reschedule button / info -->
                       <?php
-    $currentDt = $a->starts_at ?? '';
-    $rescheduleStatus = $a->reschedule_status ?? 'none';
+    $currentDt = $a->scheduled_at
+      ?? (isset($a->date, $a->time) ? ($a->date . ' ' . $a->time) : '');
   ?>
-  <?php if ($rescheduleStatus !== 'pending_patient'): ?>
+  <?php if ($a->reschedule_status !== 'pending_patient'): ?>
     <button type="button"
             class="btn btn-warning btn-reschedule"
             data-id="<?= $a->id ?>"
@@ -126,7 +124,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -140,7 +137,6 @@
                   <small>(15 min)</small>
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status approved"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>

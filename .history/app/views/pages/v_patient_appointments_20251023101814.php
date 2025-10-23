@@ -42,16 +42,6 @@
 
   <?php if(isset($_SESSION['flash'])){ echo '<p>'.htmlspecialchars($_SESSION['flash']).'</p>'; unset($_SESSION['flash']); } ?>
 
-  <!-- Reschedule Notification -->
-  <?php if (!empty($data['pending_reschedules'])): ?>
-    <div class="reschedule-alert">
-      <div class="alert-content">
-        <strong>⏰ Reschedule Request</strong>
-        <p>You have <?= $data['pending_reschedules'] ?> appointment<?= $data['pending_reschedules'] > 1 ? 's' : '' ?> with new time proposals from doctors. Please review and respond below.</p>
-      </div>
-    </div>
-  <?php endif; ?>
-
   <!-- List -->
   <section class="p-appt-section">
     <div class="p-card">
@@ -70,7 +60,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Doctor</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -84,7 +73,6 @@
                   <small>(15 min)</small>
                 </td>
                 <td><?= htmlspecialchars($a->doctor_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <?php
                     $st = strtolower($a->status);

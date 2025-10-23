@@ -6,21 +6,7 @@ class Appointments extends Controller{
     // PATIENT
     public function my(){
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') return redirect('Pages/index');
-        
-        $appointments = $this->apModel->getByPatient($_SESSION['user_id']);
-        
-        // Check for pending reschedule requests
-        $pendingReschedules = 0;
-        foreach($appointments as $apt) {
-            if (($apt->reschedule_status ?? 'none') === 'pending_patient') {
-                $pendingReschedules++;
-            }
-        }
-        
-        $data = [ 
-            'appointments' => $appointments,
-            'pending_reschedules' => $pendingReschedules
-        ];
+        $data = [ 'appointments' => $this->apModel->getByPatient($_SESSION['user_id']) ];
         $this->view('pages/v_patient_appointments', $data);
     }
 
@@ -139,73 +125,44 @@ public function findDoctors(){
     echo json_encode($out);
 }
 
-//doctor reschedule
+//doctor reshedule
 public function reschedule($id) {
-    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
-        return redirect('Pages/index');
-    }
-    
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        return redirect('Appointments/doctor');
-    }
-    
-    $id = (int)$id;
+    $this->requireDoctor();
     $newDT = $_POST['new_datetime'] ?? null; 
-    $msg = trim($_POST['message'] ?? '');
-    
-    if (!$newDT) {
-        $_SESSION['flash'] = 'Please select a new date and time.';
-        return redirect('Appointments/doctor');
-    }
-    
-    // Convert datetime-local format to MySQL datetime format
-    $newDT = str_replace('T', ' ', $newDT) . ':00';
-    
-    $ok = $this->apModel->proposeRescheduleByDoctor($id, $_SESSION['user_id'], $newDT, $msg);
-    
+    $msg   = trim($_POST['message'] ?? '');
+    $ok = $this->appointmentModel->proposeRescheduleByDoctor((int)$id, $_SESSION['doctor_id'], $newDT, $msg);
     if ($ok) {
-        $_SESSION['flash'] = 'Reschedule proposed. Waiting for patient to respond.';
+        $this->notifyPatientOfProposal($id); 
+        flash('appt_msg', 'Reschedule proposed. Waiting for patient to respond.');
     } else {
-        $_SESSION['flash'] = 'Could not propose reschedule. Check time conflicts or status.';
+        flash('appt_err', 'Could not propose reschedule. Check time conflicts or status.');
     }
-    
-    return redirect('Appointments/doctor');
+    redirect('Appointments/my'); 
 }
 
-//patients accept reschedule
+//patients accept reschedule or decline
 public function reschedule_accept($id) {
-    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
-        return redirect('Pages/index');
-    }
-    
-    $id = (int)$id;
-    $ok = $this->apModel->patientAcceptReschedule($id, $_SESSION['user_id']);
-    
+    $this->requirePatient();
+    $ok = $this->appointmentModel->patientAcceptReschedule((int)$id, $_SESSION['patient_id']);
     if ($ok) {
-        $_SESSION['flash'] = 'Reschedule accepted. Appointment approved.';
+        $this->notifyDoctorAccepted($id);
+        flash('appt_msg', 'Reschedule accepted. Appointment approved.');
     } else {
-        $_SESSION['flash'] = 'That reschedule request is no longer valid.';
+        flash('appt_err', 'That reschedule request is no longer valid.');
     }
-    
-    return redirect('Appointments/my');
+    redirect('Appointments/my');
 }
 
-//patients decline reschedule
 public function reschedule_decline($id) {
-    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
-        return redirect('Pages/index');
-    }
-    
-    $id = (int)$id;
-    $ok = $this->apModel->patientDeclineReschedule($id, $_SESSION['user_id']);
-    
+    $this->requirePatient();
+    $ok = $this->appointmentModel->patientDeclineReschedule((int)$id, $_SESSION['patient_id']);
     if ($ok) {
-        $_SESSION['flash'] = 'Reschedule declined. The doctor will review your appointment.';
+        $this->notifyDoctorDeclined($id);
+        flash('appt_msg', 'Reschedule declined. The doctor will review your appointment.');
     } else {
-        $_SESSION['flash'] = 'That reschedule request is no longer valid.';
+        flash('appt_err', 'That reschedule request is no longer valid.');
     }
-    
-    return redirect('Appointments/my');
+    redirect('Appointments/my');
 }
 
 

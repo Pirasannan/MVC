@@ -126,7 +126,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -140,7 +139,6 @@
                   <small>(15 min)</small>
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status approved"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>

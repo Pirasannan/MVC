@@ -62,7 +62,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -73,7 +72,6 @@
                 <td class="cell-date"><?= date('Y-m-d', strtotime($a->starts_at)) ?></td>
                 <td class="cell-time"><?= date('H:i', strtotime($a->starts_at)) ?>–<?= date('H:i', strtotime($a->ends_at)) ?></td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status pending"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>
@@ -83,10 +81,10 @@
                     <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
                     <!-- Reschedule button / info -->
                       <?php
-    $currentDt = $a->starts_at ?? '';
-    $rescheduleStatus = $a->reschedule_status ?? 'none';
+    $currentDt = $a->scheduled_at
+      ?? (isset($a->date, $a->time) ? ($a->date . ' ' . $a->time) : '');
   ?>
-  <?php if ($rescheduleStatus !== 'pending_patient'): ?>
+  <?php if ($a->reschedule_status !== 'pending_patient'): ?>
     <button type="button"
             class="btn btn-warning btn-reschedule"
             data-id="<?= $a->id ?>"
@@ -126,7 +124,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -140,7 +137,6 @@
                   <small>(15 min)</small>
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status approved"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>
@@ -192,6 +188,7 @@
 </div>
 
 <style>
+/* Quick minimal styles (you can align with your theme) */
 .res-modal {
   position: fixed; inset: 0; background: rgba(0,0,0,.45);
   display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -215,11 +212,14 @@ function openResModal(btn) {
   resApptId = btn.getAttribute('data-id');
   const cur = btn.getAttribute('data-current') || '';
   const form = document.getElementById('resForm');
+  // Point to your controller action from step 3)
   form.action = "<?= URLROOT ?>/Appointments/reschedule/" + resApptId;
 
+  // If you want to prefill the picker, convert "YYYY-MM-DD HH:MM" -> "YYYY-MM-DDTHH:MM"
   const input = form.querySelector('input[name="new_datetime"]');
   if (cur && cur.indexOf('T') === -1) {
-    input.value = cur.replace(' ', 'T').slice(0, 16);
+    // attempt a simple transform if space separated
+    input.value = cur.replace(' ', 'T').slice(0, 16); // keep till minutes
   } else {
     input.value = '';
   }

@@ -62,7 +62,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -73,7 +72,6 @@
                 <td class="cell-date"><?= date('Y-m-d', strtotime($a->starts_at)) ?></td>
                 <td class="cell-time"><?= date('H:i', strtotime($a->starts_at)) ?>–<?= date('H:i', strtotime($a->ends_at)) ?></td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status pending"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>
@@ -81,22 +79,16 @@
                   <div class="actions">
                     <a class="btn btn-approve" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/approved">Approve</a>
                     <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
-                    <!-- Reschedule button / info -->
-                      <?php
-    $currentDt = $a->starts_at ?? '';
-    $rescheduleStatus = $a->reschedule_status ?? 'none';
-  ?>
-  <?php if ($rescheduleStatus !== 'pending_patient'): ?>
-    <button type="button"
-            class="btn btn-warning btn-reschedule"
-            data-id="<?= $a->id ?>"
-            data-current="<?= htmlspecialchars($currentDt) ?>"
-            onclick="openResModal(this)">
-      Reschedule
-    </button>
-  <?php else: ?>
-    <span class="badge badge-warning">Waiting for patient confirmation</span>
-  <?php endif; ?>
+<button class="btn btn-warning btn-sm"
+        data-appt='<?= json_encode([
+            "id"=>$appt->id,
+            "current"=>$appt->scheduled_at
+            "patientName"=>$appt->patient_name
+        ]) ?>'
+        onclick="openResModal(this)">
+  Reschedule
+</button>
+
                   </div>
                 </td>
               </tr>
@@ -126,7 +118,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Patient</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th class="nowrap">Actions</th>
               </tr>
@@ -140,7 +131,6 @@
                   <small>(15 min)</small>
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <span class="status approved"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
                 </td>
@@ -160,79 +150,6 @@
       <?php endif; ?>
     </div>
   </section>
-
-<!-- Reschedule Modal -->
-<div id="resModal" class="res-modal" style="display:none;">
-  <div class="res-modal__content">
-    <h3 class="res-modal__title">Propose a new time</h3>
-
-    <form id="resForm" method="POST" action="">
-      <!-- CSRF if you use one -->
-      <?php if (!empty($_SESSION['csrf'])): ?>
-        <input type="hidden" name="csrf" value="<?= $_SESSION['csrf'] ?>">
-      <?php endif; ?>
-
-      <div class="res-modal__row">
-        <label>New date & time</label>
-        <!-- IMPORTANT: datetime-local expects `YYYY-MM-DDTHH:MM` -->
-        <input type="datetime-local" name="new_datetime" required>
-      </div>
-
-      <div class="res-modal__row">
-        <label>Note to patient (optional)</label>
-        <input type="text" name="message" placeholder="e.g., I have a ward round at your original time.">
-      </div>
-
-      <div class="res-modal__actions">
-        <button type="submit" class="btn btn-warning">Send Proposal</button>
-        <button type="button" class="btn btn-light" onclick="closeResModal()">Close</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<style>
-.res-modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,.45);
-  display: none; align-items: center; justify-content: center; z-index: 1000;
-}
-.res-modal__content {
-  background: #fff; padding: 1.25rem; width: 100%; max-width: 480px;
-  border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.2);
-}
-.res-modal__title { margin: 0 0 .75rem 0; }
-.res-modal__row { margin-bottom: .75rem; display:flex; flex-direction:column; gap:.35rem; }
-.res-modal__actions { display:flex; gap:.5rem; justify-content:flex-end; }
-.badge.badge-warning {
-  display:inline-block; padding:.2rem .5rem; background:#FFC107; color:#222; border-radius:8px; font-size:.8rem;
-}
-</style>
-
-<script>
-let resApptId = null;
-
-function openResModal(btn) {
-  resApptId = btn.getAttribute('data-id');
-  const cur = btn.getAttribute('data-current') || '';
-  const form = document.getElementById('resForm');
-  form.action = "<?= URLROOT ?>/Appointments/reschedule/" + resApptId;
-
-  const input = form.querySelector('input[name="new_datetime"]');
-  if (cur && cur.indexOf('T') === -1) {
-    input.value = cur.replace(' ', 'T').slice(0, 16);
-  } else {
-    input.value = '';
-  }
-
-  document.getElementById('resModal').style.display = 'flex';
-}
-
-function closeResModal(){
-  document.getElementById('resModal').style.display = 'none';
-}
-</script>
-
-
 </main>
     </div>
 

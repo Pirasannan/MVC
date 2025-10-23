@@ -70,7 +70,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Doctor</th>
-                <th>Reason</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -84,7 +83,6 @@
                   <small>(15 min)</small>
                 </td>
                 <td><?= htmlspecialchars($a->doctor_name) ?></td>
-                <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
                 <td>
                   <?php
                     $st = strtolower($a->status);

@@ -83,7 +83,7 @@
 .appt-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1000px;
+  min-width: 880px;
 }
 .appt-table thead th {
   text-align: left;
@@ -350,7 +350,7 @@
 .p-empty{ padding:20px; color:var(--muted); }
 
 /* Table (reuse base table tokens) */
-.p-appt-table{ width:100%; border-collapse:collapse; min-width:1020px; }
+.p-appt-table{ width:100%; border-collapse:collapse; min-width:900px; }
 .p-appt-table thead th{
   text-align:left; font-weight:600; font-size:13px; letter-spacing:.4px;
   color:#374151; background:var(--soft); padding:12px 14px; border-bottom:1px solid var(--line);

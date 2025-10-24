@@ -13,10 +13,15 @@ $current_page = 'patientPrescriptions';
         <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-            <div class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">Issued Prescriptions</h2>
-                </div>
+            <!-- Content Sections Row -->
+            <div class="content-sections">
+                <!-- Prescriptions Section -->
+                <div class="content-section full-width">
+                    <div class="prescription-header">
+                        <div class="section-header-content">
+                            <h2 class="section-title">My Prescriptions</h2>
+                        </div>
+                    </div>
 
                 <div class="section-content" id="prescription-list">
                     <?php if (!empty($data['prescriptions'])): ?>
@@ -34,25 +39,38 @@ $current_page = 'patientPrescriptions';
                                     </div>
                                 </div>
                                 <div class="medication-date">
-                                    <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?><br>
+                                    <div class="prescription-date">
+                                        <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?>
+                                    </div>
                                     <?php if (!empty($p->updated_at)): ?>
-                                        <small>Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?></small>
+                                        <div class="updated-date">
+                                            Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($p->is_deleted === 'deleted'): ?>
+                                        <div class="deleted-date">
+                                            Deleted: <?= htmlspecialchars(date('Y-m-d H:i', strtotime($p->updated_at ?: $p->created_at))) ?>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <p align="center">No prescriptions found.</p>
+                        <div class="empty-state">
+                            <i class="fas fa-prescription-bottle-alt" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                            <p>No prescriptions found.</p>
+                            <p style="font-size: 14px; margin-top: 8px;">Your prescriptions will appear here once prescribed by your doctor.</p>
+                        </div>
                     <?php endif; ?>
                 </div>
 
-                <!-- View All Button -->
-                <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
-                    <div class="section-footer">
-                        <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
-                    </div>
-                <?php endif; ?>
-                
+                    <!-- View All Button -->
+                    <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
+                        <div class="section-footer">
+                            <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </main>

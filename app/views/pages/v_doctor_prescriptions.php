@@ -39,14 +39,21 @@ $current_page = 'doctorPrescriptions';
                 </div>
             <?php endif; ?>
 
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
                 <!-- Content Sections Row -->
                 <div class="content-sections">
-
-                    <!-- Medical Status Section -->
+                    <!-- Prescriptions Section -->
                     <div class="content-section full-width">
-                        <div class="section-header">
-                            <h2 class="section-title">Issued Prescriptions</h2>
-                            <a class="create_eprescription action-button" href="<?php echo URLROOT; ?>/Pages/createprescription">Create ePrescription</a>
+                        <div class="prescription-header">
+                            <div class="section-header-content">
+                                <h2 class="section-title">Issued Prescriptions</h2>
+                                <div class="header-actions">
+                                    <a class="create-prescription-btn" href="<?php echo URLROOT; ?>/Pages/createprescription" >
+                                        <i class="fas fa-plus"></i> Create ePrescription
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         <div class="section-content" id="doctor-prescription-list">
                             <?php if (!empty($data['prescriptions'])): ?>
@@ -67,21 +74,38 @@ $current_page = 'doctorPrescriptions';
                                             <?php endif; ?>
                                         </div>
                                         <div class="medication-date">
-                                            <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?><br>
+                                            <div class="prescription-date">
+                                                <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?>
+                                            </div>
                                             <?php if (!empty($p->updated_at)): ?>
-                                                <small>Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?></small>
+                                                <div class="updated-date">
+                                                    Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?>
+                                                </div>
                                             <?php endif; ?>
-                                            <div style="margin-top:8px;">
-                                                <a class="action-button-edit" href="<?= URLROOT ?>/Doctor/editPrescription/<?= (int)$p->id ?>" onclick="event.stopPropagation()">Edit</a>
+                                            <?php if ($p->is_deleted === 'deleted'): ?>
+                                                <div class="deleted-date">
+                                                    Deleted: <?= htmlspecialchars(date('Y-m-d H:i', strtotime($p->updated_at ?: $p->created_at))) ?>
+                                                </div>
+                                            <?php endif; ?>
+                                            <div class="prescription-actions">
                                                 <?php if ($p->is_deleted !== 'deleted'): ?>
-                                                    <button class="action-button-delete" onclick="confirmDeletePrescription(event, <?= (int)$p->id ?>); event.stopPropagation();">Delete</button>
+                                                    <a class="action-button-edit" href="<?= URLROOT ?>/Doctor/editPrescription/<?= (int)$p->id ?>" onclick="event.stopPropagation()">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <button class="action-button-delete" onclick="confirmDeletePrescription(event, <?= (int)$p->id ?>)">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <p align="center" >No issued prescriptions found.</p>
+                                <div class="empty-state">
+                                    <i class="fas fa-prescription-bottle-alt" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                    <p>No issued prescriptions found.</p>
+                                    <p style="font-size: 14px; margin-top: 8px;">Create your first ePrescription to get started.</p>
+                                </div>
                             <?php endif; ?>
                         </div>
                         

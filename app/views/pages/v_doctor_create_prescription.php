@@ -12,7 +12,7 @@ $current_page = 'doctorCreatePrescription';
 			<h1>E-Prescription</h1>
 		</div>
 
-		<form id="prescriptionForm" method="POST" action="<?php echo URLROOT; ?>/Doctor/addPrescription">
+		<form id="prescriptionForm" method="POST" action="<?php echo URLROOT; ?>/Doctor/addPrescription" >
 			<!-- SECTION 1: Medication Details -->
 			<div class="section">
 				<div class="section-header">1. Medication Details</div>

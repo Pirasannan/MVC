@@ -31,7 +31,7 @@
 
             <!-- Stats Row -->
             <div class="stats-row">
-                <div class="stat-card primary">
+                <div class="stat-card ">
                     <div class="stat-content">
                         <h3 class="stat-title">Unread Messages</h3>
                         <div class="stat-number"><?php echo $data['unread_count']; ?></div>
@@ -43,12 +43,12 @@
                         <div class="stat-number"><?php echo count($data['conversations']); ?></div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <!-- <div class="stat-card">
                     <div class="stat-content">
                         <h3 class="stat-title">Active Patients</h3>
                         <div class="stat-number"><?php echo count($data['patients']); ?></div>
                     </div>
-                </div>
+                </div> -->
                 <div class="stat-card">
                     <div class="stat-content">
                         <h3 class="stat-title">Response Rate</h3>

@@ -3,6 +3,14 @@
     $current_page = 'doctorSettings';
 ?>
 
+<style>
+/* Override button width for settings page */
+.settings-grid .action-button {
+    width: auto;
+    min-width: 120px;
+}
+</style>
+
 
 <div class="dashboard-container doctor">
     <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>

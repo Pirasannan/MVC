@@ -3,6 +3,14 @@
     require APPROOT.'/views/inc/header.php'; 
 ?>
 
+<style>
+/* Override button width for settings page */
+.settings-grid .action-button {
+    width: auto;
+    min-width: 120px;
+}
+</style>
+
 
 <div class="dashboard-container patient">
     <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>

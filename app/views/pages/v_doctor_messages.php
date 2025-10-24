@@ -4,6 +4,16 @@
 ?>
 <link rel='stylesheet' href='<?php echo URLROOT; ?>/css/components/messages/doctor_messages.css'>
 
+<style>
+/* Override send message button color */
+.message-form .action-button.primary.large {
+    background: #4a90e2 !important;
+}
+.message-form .action-button.primary.large:hover {
+    background: #357abd !important;
+}
+</style>
+
 <div class="dashboard-container doctor">
     <!-- Sidebar Navigation -->
     <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>

@@ -135,7 +135,7 @@
 
 /* Join Consultation Button */
 .join-consultation-btn {
-  background-color: #10b981;
+  background-color: #4a90e2;
   color: white;
   text-decoration: none;
   padding: 6px 12px;
@@ -150,7 +150,7 @@
 }
 
 .join-consultation-btn:hover {
-  background-color: #059669;
+  background-color: #5fa4f1;
   color: white;
   text-decoration: none;
 }

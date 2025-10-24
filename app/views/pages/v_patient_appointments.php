@@ -101,7 +101,7 @@ $current_page = 'patientAppointments';
                   <?php elseif ($rescheduleStatus === 'declined'): ?>
                     <span class="badge badge-info">Reschedule declined</span>
                   <?php elseif (strtolower($a->status) === 'approved'): ?>
-                    <a href="<?php echo URLROOT; ?>/Pages/patientPrecall" class="join-consultation-btn" style="display: inline-block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500;">
+                    <a href="<?php echo URLROOT; ?>/Pages/patientPrecall" class="join-consultation-btn" style="display: inline-block; padding: 8px 16px; background: #4a90e2; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500;">
                       <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
                     </a>
                   <?php else: ?>
@@ -120,7 +120,7 @@ $current_page = 'patientAppointments';
   <!-- Book -->
   <section class="p-appt-section">
     <div class="p-card">
-      <div class="p-card-header">
+      <div class="p-card-header">f
         <h3>Request a new appointment</h3>
         <span class="hint">Pick a doctor, date and time</span>
       </div>

@@ -39,7 +39,7 @@ transition: color .12s ease, background .12s ease, transform .08s ease;
     text-decoration: none;
     color: #FFFFFF; /* White text */
     padding: 10px 20px; /* Matches the padding from the image */
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 4px; /* Rounded corners */
     font-size: 14px; /* Matches the font size */
     font-weight: 500; /* Matches the font weight */
     cursor: pointer;

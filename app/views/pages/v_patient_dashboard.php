@@ -61,9 +61,6 @@ $current_page = 'patientDashboard';
                                 </div>
                                 <div class="appointment-status">
                                     <span class="status-badge confirmed">Confirmed</span>
-                                    <a href="<?php echo URLROOT; ?>/Pages/patientPrecall" class="join-consultation-btn">
-                                        <i class="fas fa-video"></i> Join Consultation
-                                    </a>
                                 </div>
                             </div>
                             <div class="appointment-item">
@@ -88,7 +85,7 @@ $current_page = 'patientDashboard';
                             </div>
                         </div>
                         <div class="section-footer">
-                            <button class="action-button">Book New Appointment</button>
+                            <a href="<?php echo URLROOT; ?>/Pages/patientBookAppointment"><button class="action-button primary">Book New Appointment</button></a>
                         </div>
                     </div>
 
@@ -140,7 +137,7 @@ $current_page = 'patientDashboard';
                             </div>
                         </div>
                         <div class="section-footer">
-                            <button class="action-button secondary">View All Notifications</button>
+                            <button class="action-button primary">View All Notifications</button>
                         </div>
                     </div>
                 </div>

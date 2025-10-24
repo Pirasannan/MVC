@@ -871,6 +871,16 @@ class Pages extends Controller{
         redirect('Appointments/my');
     }
 
+    public function patientBookAppointment() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         redirect('Pages/index');
+         return;
+        }
+        
+        // Redirect to the patient appointments page where they can book new appointments
+        redirect('Appointments/my');
+    }
+
     public function patientSettings() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
          redirect('Pages/index');

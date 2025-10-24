@@ -71,9 +71,6 @@
                                 </div>
                                 <div class="appointment-status">
                                     <span class="status-badge confirmed">Confirmed</span>
-                                    <a href="<?php echo URLROOT; ?>/Pages/doctorPrecall" class="start-consultation-btn">
-                                        <i class="fas fa-video"></i> Start Consultation
-                                    </a>
                                 </div>
                             </div>
                             <div class="appointment-item">

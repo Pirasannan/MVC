@@ -15,7 +15,6 @@ $current_page = 'patientAppointments';
         <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
 
         <!-- Main Content Area -->
-<main class="main-content">
   <div class="patient-appointments-head">
     <h2>My Appointments</h2>
     <span class="sub">View history and request a new booking</span>
@@ -101,6 +100,10 @@ $current_page = 'patientAppointments';
                     <span class="badge badge-success">Reschedule accepted</span>
                   <?php elseif ($rescheduleStatus === 'declined'): ?>
                     <span class="badge badge-info">Reschedule declined</span>
+                  <?php elseif (strtolower($a->status) === 'approved'): ?>
+                    <a href="<?php echo URLROOT; ?>/Pages/patientPrecall" class="join-consultation-btn" style="display: inline-block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500;">
+                      <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
+                    </a>
                   <?php else: ?>
                     <span class="no-action">-</span>
                   <?php endif; ?>

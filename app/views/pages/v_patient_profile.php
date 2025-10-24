@@ -112,7 +112,7 @@ $current_page = 'patientProfile';
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button secondary">Update Medical Info</button>
+                        <button class="action-button primary">Update Medical Info</button>
                     </div>
                 </div>
             </div>
@@ -147,7 +147,7 @@ $current_page = 'patientProfile';
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button secondary">View All Records</button>
+                        <button class="action-button primary">View All Records</button>
                     </div>
                 </div>
 

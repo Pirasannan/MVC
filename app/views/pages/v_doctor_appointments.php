@@ -128,8 +128,7 @@ $current_page = 'doctorAppointments';
                 </td>
                 <td>
                   <div class="actions">
-                    <!-- dummy Start button -->
-                    <button type="button" class="btn btn-start" disabled>Start</button>
+                    <a href="<?php echo URLROOT; ?>/Pages/doctorPrecall" class="btn btn-start">Start</a>
                     <a class="btn btn-cancel"   href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/cancelled">Cancel</a>
                     <a class="btn btn-complete" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/completed">Complete</a>
                   </div>

@@ -1,6 +1,6 @@
 <?php 
     require APPROOT.'/views/inc/header.php'; 
-    $current_page = 'adminActivityLog';
+    $current_page = 'adminProfile';
 ?>
 
 <div class="dashboard-container">

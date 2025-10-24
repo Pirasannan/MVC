@@ -173,6 +173,46 @@
     </main>
 </div>
 
+<!-- Conversation View Modal -->
+<div id="conversationModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header" style="border-bottom: 2px solid #3498db; margin-bottom: 20px; padding-bottom: 15px;">
+            <h2 style="margin: 0; color: #2c3e50;">Conversation Details</h2>
+            <button onclick="closeConversationModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="conversation-info" style="margin-bottom: 20px;">
+                <h3 id="modalPatientName" style="color: #2c3e50; margin-bottom: 10px;">Patient Name</h3>
+                <p><strong>Last Message:</strong> <span id="modalLastMessage">Message content will appear here</span></p>
+            </div>
+            
+            <div class="message-history" style="max-height: 300px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; background: #f8f9fa;">
+                <div class="message-item" style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">Patient</div>
+                    <div>This is a sample message from the patient. The actual conversation history would be loaded here.</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 8px;">2024-01-15 10:30 AM</div>
+                </div>
+                
+                <div class="message-item" style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 8px; border-left: 4px solid #27ae60;">
+                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">You</div>
+                    <div>This is your response to the patient. All your messages would appear here.</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 8px;">2024-01-15 11:15 AM</div>
+                </div>
+            </div>
+            
+            <div class="reply-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                <h4 style="margin-bottom: 10px; color: #2c3e50;">Send Reply</h4>
+                <textarea id="replyMessage" placeholder="Type your reply here..." style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 10px; resize: vertical; min-height: 80px;"></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="sendReply()" class="action-button primary" style="padding: 10px 20px;">Send Reply</button>
+                    <button onclick="closeConversationModal()" class="action-button secondary" style="padding: 10px 20px;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- JavaScript for interactive functionality -->
 <script>
 
@@ -195,9 +235,63 @@ function markAsRead(patientId) {
 }
 
 function viewConversation(patientId) {
-    // This could be expanded to show a detailed conversation view
-    alert('Conversation view feature coming soon! Patient ID: ' + patientId);
+    // Open the conversation modal
+    const modal = document.getElementById('conversationModal');
+    if (modal) {
+        // Set the patient ID in the modal for reference
+        modal.setAttribute('data-patient-id', patientId);
+        
+        // Update modal content with patient-specific information
+        const patientName = document.querySelector(`[onclick="viewConversation(${patientId})"]`).closest('.conversation-card').querySelector('.patient-name').textContent;
+        const lastMessage = document.querySelector(`[onclick="viewConversation(${patientId})"]`).closest('.conversation-card').querySelector('.message-text').textContent;
+        
+        document.getElementById('modalPatientName').textContent = patientName;
+        document.getElementById('modalLastMessage').textContent = lastMessage;
+        
+        // Show the modal
+        modal.style.display = 'flex';
+    }
 }
+
+function closeConversationModal() {
+    const modal = document.getElementById('conversationModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function sendReply() {
+    const replyText = document.getElementById('replyMessage').value.trim();
+    const patientId = document.getElementById('conversationModal').getAttribute('data-patient-id');
+    
+    if (!replyText) {
+        alert('Please enter a message before sending.');
+        return;
+    }
+    
+    // Here you would typically send the reply via AJAX or form submission
+    // For now, we'll just show a success message
+    alert('Reply sent successfully!');
+    document.getElementById('replyMessage').value = '';
+    
+    // Close the modal
+    closeConversationModal();
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('conversationModal');
+    if (e.target === modal) {
+        closeConversationModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeConversationModal();
+    }
+});
 
 // Auto-hide alerts after 5 seconds
 document.addEventListener('DOMContentLoaded', function() {

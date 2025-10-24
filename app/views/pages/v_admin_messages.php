@@ -119,6 +119,45 @@
     </main>
 </div>
 
+<!-- Message View Modal -->
+<div id="messageModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 30px; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header" style="border-bottom: 2px solid #3498db; margin-bottom: 20px; padding-bottom: 15px;">
+            <h2 style="margin: 0; color: #2c3e50;">Message Details</h2>
+            <button onclick="closeMessageModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="message-info" style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <div>
+                        <strong>From:</strong> <span id="modalSender">Dr. Sarah Johnson</span>
+                    </div>
+                    <div>
+                        <strong>To:</strong> <span id="modalRecipient">Michael Chen</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Subject:</strong> <span id="modalSubject">Prescription Follow-up</span>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Time:</strong> <span id="modalMessageTime">Oct 23, 2024 • 10:30 AM</span>
+                </div>
+            </div>
+            
+            <div class="message-content" style="border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; background: #f8f9fa; min-height: 150px;">
+                <h4 style="margin-bottom: 15px; color: #2c3e50;">Message Content:</h4>
+                <p id="modalMessageText" style="line-height: 1.6; color: #333;">This is the full message content that would appear here.</p>
+            </div>
+            
+            <div class="message-actions" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="moderateMessageFromModal()" class="action-button secondary">Moderate Message</button>
+                <button onclick="closeMessageModal()" class="action-button primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- JavaScript for interactive functionality -->
 <script>
 
@@ -130,14 +169,63 @@ function clearAnnouncementForm() {
 }
 
 function viewMessage(messageId) {
-    // This could be expanded to show a detailed message view
-    alert('Message details view coming soon! Message ID: ' + messageId);
+    // Open the message modal
+    const modal = document.getElementById('messageModal');
+    if (modal) {
+        // Set the message ID in the modal for reference
+        modal.setAttribute('data-message-id', messageId);
+        
+        // Update modal content with message-specific information
+        const messageCard = document.querySelector(`[onclick="viewMessage(${messageId})"]`).closest('.message-card');
+        const sender = messageCard.querySelector('.sender').textContent;
+        const recipient = messageCard.querySelector('.recipient').textContent;
+        const subject = messageCard.querySelector('.message-subject').textContent;
+        const messageText = messageCard.querySelector('.message-text').textContent;
+        const messageTime = messageCard.querySelector('.message-time').textContent;
+        
+        document.getElementById('modalSender').textContent = sender;
+        document.getElementById('modalRecipient').textContent = recipient;
+        document.getElementById('modalSubject').textContent = subject;
+        document.getElementById('modalMessageText').textContent = messageText;
+        document.getElementById('modalMessageTime').textContent = messageTime;
+        
+        // Show the modal
+        modal.style.display = 'flex';
+    }
 }
 
 function moderateMessage(messageId) {
     // This could be expanded to show moderation options
     alert('Message moderation feature coming soon! Message ID: ' + messageId);
 }
+
+function closeMessageModal() {
+    const modal = document.getElementById('messageModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function moderateMessageFromModal() {
+    const messageId = document.getElementById('messageModal').getAttribute('data-message-id');
+    closeMessageModal();
+    moderateMessage(messageId);
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('messageModal');
+    if (e.target === modal) {
+        closeMessageModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeMessageModal();
+    }
+});
 
 // Auto-hide alerts after 5 seconds
 document.addEventListener('DOMContentLoaded', function() {

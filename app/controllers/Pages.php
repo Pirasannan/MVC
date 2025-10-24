@@ -421,11 +421,9 @@ class Pages extends Controller{
             return redirect('Pages/index');
         }
 
-        $data = [
-            'user' => $this->adminModel->getAdminProfile($_SESSION['user_id'])
-        ];
-
-        $this->view('pages/v_admin_profile_update', $data);
+        // Show alert that profile was updated
+        echo "<script>alert('Profile updated successfully!'); window.history.back();</script>";
+        exit;
     }
 
     public function adminChangePassword() {

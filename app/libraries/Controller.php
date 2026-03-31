@@ -1,21 +1,21 @@
 <?php
     class Controller{
 
-        // to load the model
+        // to load the model (model is used to sql queries)
         public function model($model) {
-            require_once '../app/models/'.$model.'.php';
+            require_once APPROOT.'/models/'.$model.'.php';
             
             //instantiate the model and pass it to the controller member variable
             return new $model();
         }
 
-        // to load the view
+        // to load the view (files containing output html)
         public function view($view,$data = []) {
-            if(file_exists('../app/views/'.$view.'.php')){
-                require_once '../app/views/'.$view.'.php';
+            if(file_exists(APPROOT.'/views/'.$view.'.php')){
+                require_once APPROOT.'/views/'.$view.'.php';
             }
             else{
-                die('Corresponding view does not exist');
+                die('Corresponding view does not exist');   
             }
         }
     }

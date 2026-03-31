@@ -12,7 +12,7 @@ class Core {//this is the router
         $url = $this->getURL();
         $controllerName = isset($url[0]) && $url[0] !== '' ? ucwords($url[0]) : 'Pages';
 
-        if(file_exists('../app/controllers/' . $controllerName . '.php')) {
+        if(file_exists(APPROOT.'/controllers/' . $controllerName . '.php')) {
             //if the controller exits, then load it
             $this->currentController = $controllerName;
 
@@ -20,8 +20,8 @@ class Core {//this is the router
             unset($url[0]);
         }
         //call the controller
-        require_once '../app/controllers/' . $this->currentController .'.php';
-
+        require_once APPROOT.'/controllers/' . $this->currentController .'.php';
+        
         //instantiate controller class
         $this->currentController = new $this->currentController;
 

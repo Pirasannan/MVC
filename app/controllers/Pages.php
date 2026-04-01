@@ -12,11 +12,12 @@ class Pages extends Controller{
     
     
     public function index() {
-        $data = [];
-        $this->view('pages/v_index',$data);
+        $this->view('pages/v_index');
     }
 
-
+    public function error() {
+        $this->view('pages/error');
+    }
 
 
     public function adminProfile() {

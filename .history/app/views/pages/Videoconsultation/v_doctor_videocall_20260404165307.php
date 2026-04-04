@@ -158,126 +158,98 @@ $apt = $data['appointment'];
     </div>
 </div>
 
-<script type="module">
-import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1';
+<script>
+let callStartTime = new Date();
+let isMicOn = true;
+let isCameraOn = true;
+let callTimer;
 
-/* ── Stream credentials from PHP ── */
-const API_KEY   = '<?= htmlspecialchars($data['stream_api_key'],  ENT_QUOTES) ?>';
-const TOKEN     = '<?= htmlspecialchars($data['stream_token'],     ENT_QUOTES) ?>';
-const CALL_ID   = '<?= htmlspecialchars($data['call_id'],          ENT_QUOTES) ?>';
-const USER_ID   = '<?= htmlspecialchars($data['stream_user_id'],   ENT_QUOTES) ?>';
-const USER_NAME = '<?= htmlspecialchars($data['stream_user_name'], ENT_QUOTES) ?>';
-const BACK_URL  = '<?= URLROOT ?>/Appointments/doctor';
-
-/* ── State ── */
-let micEnabled    = true;
-let cameraEnabled = true;
-let callTimerRef  = null;
-let streamCall    = null;
-let streamClient  = null;
-let participantSub = null;
-
-/* ── Call timer ── */
+// Start call timer
 function startCallTimer() {
-    const start = Date.now();
-    callTimerRef = setInterval(() => {
-        const elapsed  = Date.now() - start;
-        const minutes  = Math.floor(elapsed / 60000);
-        const seconds  = Math.floor((elapsed % 60000) / 1000);
-        document.getElementById('callTimer').textContent =
-            String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
+    callTimer = setInterval(() => {
+        const now = new Date();
+        const elapsed = now - callStartTime;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        
+        const timeString = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        document.getElementById('callTimer').textContent = timeString;
     }, 1000);
 }
 
-/* ── Bind a MediaStream to a <video> element ── */
-function bindStream(videoEl, stream) {
-    if (videoEl && stream && videoEl.srcObject !== stream) {
-        videoEl.srcObject = stream;
-        videoEl.play().catch(() => {});
-    }
+// Initialize controls
+function initializeControls() {
+    // Microphone toggle
+    document.getElementById('micBtn').addEventListener('click', function() {
+        isMicOn = !isMicOn;
+        const btn = this;
+        
+        if (isMicOn) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Camera toggle
+    document.getElementById('cameraBtn').addEventListener('click', function() {
+        isCameraOn = !isCameraOn;
+        const btn = this;
+        
+        if (isCameraOn) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // End call
+    document.getElementById('endCallBtn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to end the call?')) {
+            endCall();
+        }
+    });
 }
 
-/* ── Initialise Stream Video ── */
-async function init() {
-    try {
-        streamClient = new StreamVideoClient({
-            apiKey: API_KEY,
-            user:   { id: USER_ID, name: USER_NAME },
-            token:  TOKEN,
-        });
-
-        streamCall = streamClient.call('<?= STREAM_CALL_TYPE ?>', CALL_ID);
-
-        // Doctor creates the call room (idempotent – safe to call again)
-        await streamCall.join({ create: true });
-
-        await streamCall.camera.enable();
-        await streamCall.microphone.enable();
-
-        /* Local video */
-        streamCall.camera.state.mediaStream$.subscribe(stream => {
-            bindStream(document.getElementById('local-video'), stream);
-        });
-
-        /* Remote participants */
-        const overlay = document.getElementById('remoteOverlay');
-        const connStatus = document.getElementById('connectionStatus');
-
-        participantSub = streamCall.state.remoteParticipants$.subscribe(participants => {
-            const remoteEl = document.getElementById('remote-video');
-            if (participants.length > 0) {
-                overlay.style.display = 'none';
-                const p = participants[0];
-                if (p.videoStream) bindStream(remoteEl, p.videoStream);
-                if (connStatus) connStatus.textContent = 'Connected';
-            } else {
-                overlay.style.display = '';
-                if (connStatus) connStatus.textContent = 'Waiting for patient\u2026';
-            }
-        });
-
-        startCallTimer();
-        document.getElementById('callTimer').closest('.call-status') &&
-            (document.getElementById('callTimer').closest('.call-duration').querySelector('.call-status').textContent = 'Live');
-
-    } catch (err) {
-        console.error('Stream Video init error:', err);
-        alert('Could not connect to video call. Please try again.');
-    }
+// Toggle chat panel
+function toggleChat() {
+    const panel = document.getElementById('chatPanel');
+    panel.classList.toggle('active');
 }
 
-/* ── Mic toggle ── */
-document.getElementById('micBtn').addEventListener('click', async () => {
-    if (!streamCall) return;
-    await streamCall.microphone.toggle();
-    micEnabled = !micEnabled;
-    document.getElementById('micBtn').classList.toggle('active', micEnabled);
+// Toggle notes panel
+function toggleNotes() {
+    const panel = document.getElementById('notesPanel');
+    panel.classList.toggle('active');
+}
+
+// Save notes
+function saveNotes() {
+    const notes = document.getElementById('notesTextarea').value;
+    console.log('Notes saved:', notes);
+    alert('Notes saved successfully!');
+}
+
+// Create prescription
+function createPrescription() {
+    window.location.href = '<?php echo URLROOT; ?>/Pages/createprescription';
+}
+
+// End call
+function endCall() {
+    if (callTimer) {
+        clearInterval(callTimer);
+    }
+    
+    // Redirect to appointments page
+    window.location.href = '<?php echo URLROOT; ?>/Pages/doctorAppointments';
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    startCallTimer();
+    initializeControls();
 });
-
-/* ── Camera toggle ── */
-document.getElementById('cameraBtn').addEventListener('click', async () => {
-    if (!streamCall) return;
-    await streamCall.camera.toggle();
-    cameraEnabled = !cameraEnabled;
-    document.getElementById('cameraBtn').classList.toggle('active', cameraEnabled);
-});
-
-/* ── End call ── */
-document.getElementById('endCallBtn').addEventListener('click', async () => {
-    if (!confirm('End the call?')) return;
-    if (callTimerRef) clearInterval(callTimerRef);
-    if (participantSub) participantSub.unsubscribe();
-    if (streamCall)   await streamCall.leave();
-    if (streamClient) await streamClient.disconnectUser();
-    window.location.href = BACK_URL;
-});
-
-/* ── Utility panels ── */
-window.toggleChat  = () => document.getElementById('chatPanel').classList.toggle('active');
-window.toggleNotes = () => document.getElementById('notesPanel').classList.toggle('active');
-window.saveNotes   = () => alert('Notes saved!');
-
-init();
 </script>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

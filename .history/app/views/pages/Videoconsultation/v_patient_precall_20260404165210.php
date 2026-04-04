@@ -20,11 +20,12 @@ $appointmentId = (int)$apt->id;
 
         <!-- Patient Info -->
         <div class="patient-info-card">
-            <div class="patient-avatar"></div>
+            <div class="patient-avatar">
+            </div>
             <div class="patient-details">
-                <h3><?= htmlspecialchars($apt->doctor_name) ?></h3>
-                <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
-                <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>
+                <h3>Dr.Maran</h3>
+                <p class="appointment-time">Today at 2:30 PM</p>
+                <p class="appointment-type">Follow-up Consultation</p>
             </div>
         </div>
 
@@ -72,23 +73,23 @@ $appointmentId = (int)$apt->id;
             <h3>Consultation Details</h3>
             <div class="details-grid">
                 <div class="detail-item">
-                    <strong>Doctor:</strong> <?= htmlspecialchars($apt->doctor_name) ?>
+                    <strong>Apt.Type:</strong>Follow-up Consultation
                 </div>
                 <div class="detail-item">
-                    <strong>Reason:</strong> <?= htmlspecialchars($apt->reason ?? '—') ?>
+                    <strong>Purpose:</strong> Review treatment progress
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="precall-actions">
-            <a href="<?= URLROOT ?>/VideoCall/room/<?= $appointmentId ?>" class="btn-primary">
+<a href="<?php echo URLROOT; ?>/Pages/patientVideoCall" class="btn-primary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 7l-7 5 7 5V7z"/>
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                 </svg>
-                Join Call
-            </a>
+                Join Call   
+            </a>         
         </div>
     </div>
 </div>
@@ -143,7 +144,16 @@ document.getElementById('speakerBtn').addEventListener('click', function() {
     }
 });
 
-// (navigation handled by the <a> link)
+// Start video call
+function startVideoCall() {
+    // Store media settings in session storage
+    sessionStorage.setItem('cameraOn', isCameraOn);
+    sessionStorage.setItem('micOn', isMicOn);
+    sessionStorage.setItem('speakerOn', isSpeakerOn);
+    
+    // Redirect to video call page
+    window.location.href = '<?php echo URLROOT; ?>/Pages/doctorVideoCall';
+}
 </script>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

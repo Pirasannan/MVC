@@ -1,0 +1,117 @@
+/* Fix margins and spacing to match other dashboards */
+.dashboard-container.patient .section-content {
+    padding: 24px;
+}
+
+/* Simple Profile Information Items - Like other dashboards */
+.profile-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.profile-info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.info-value {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+/* Simple Status Badges */
+.status-badge.active {
+    background: #10b981;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.blood-type-badge {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #fecaca;
+}
+
+.allergy-badge {
+    background: #fff7ed;
+    color: #ea580c;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-right: 4px;
+    border: 1px solid #fed7aa;
+}
+
+/* Simple Activity Items - Like appointment items */
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-info {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.activity-details {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.activity-date {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* Simple Setting Items */
+.setting-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.setting-description {
+    color: #6b7280;
+    font-size: 13px;
+}

@@ -1,0 +1,479 @@
+/* Doctor Profile Container - Following existing dashboard layout patterns */
+.dashboard-container.doctor .profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Profile Information Section - Matches existing content-section styling */
+.dashboard-container.doctor .profile-info {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.dashboard-container.doctor .profile-info .section-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-container.doctor .profile-info .section-header.centered {
+    justify-content: center;
+    text-align: center;
+}
+
+.dashboard-container.doctor .profile-info .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-container.doctor .profile-info .section-content {
+    padding: 24px;
+}
+
+/* Profile Avatar Section - Centered and professional */
+.dashboard-container.doctor .profile-avatar-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+
+.dashboard-container.doctor .profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: #4a90e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-container.doctor .profile-avatar-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dashboard-container.doctor .profile-avatar-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Profile Details Grid - Following existing grid patterns */
+.dashboard-container.doctor .profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.dashboard-container.doctor .profile-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-container.doctor .profile-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dashboard-container.doctor .profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dashboard-container.doctor .profile-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dashboard-container.doctor .profile-field span {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1f2937;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+/* Profile Edit Button Row - Centered button after profile info */
+.dashboard-container.doctor .profile-edit-row {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0 0 0;
+    margin-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.dashboard-container.doctor .edit-profile-btn {
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    transition: all 0.2s ease;
+}
+
+.dashboard-container.doctor .edit-profile-btn:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2563eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+}
+
+/* Role Badge - Matches existing button styling */
+.dashboard-container.doctor .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #4a90e2;
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dashboard-container.doctor .role-badge.doctor::before {
+    content: '👨‍⚕️';
+    font-size: 14px;
+}
+
+/* Profile Stats - Following existing stats-row pattern */
+.dashboard-container.doctor .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.dashboard-container.doctor .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.dashboard-container.doctor .stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.dashboard-container.doctor .stat-card:first-child {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+}
+
+.dashboard-container.doctor .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.dashboard-container.doctor .stat-card:first-child .stat-number {
+    color: white;
+}
+
+.dashboard-container.doctor .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dashboard-container.doctor .stat-card:first-child .stat-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Account Settings - Matches existing section styling */
+.dashboard-container.doctor .account-settings {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.dashboard-container.doctor .account-settings .section-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-container.doctor .account-settings .section-content {
+    padding: 0;
+}
+
+.dashboard-container.doctor .settings-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-container.doctor .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-container.doctor .setting-item:last-child {
+    border-bottom: none;
+}
+
+.dashboard-container.doctor .setting-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dashboard-container.doctor .setting-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Action Buttons - Following existing button styling */
+.dashboard-container.doctor .action-button {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.dashboard-container.doctor .action-button.primary {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.dashboard-container.doctor .action-button.primary:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2563eb 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+.dashboard-container.doctor .action-button:hover {
+    background: #357abd;
+}
+
+.dashboard-container.doctor .action-button.secondary {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.dashboard-container.doctor .action-button.secondary:hover {
+    background: #e5e7eb;
+}
+
+.dashboard-container.doctor .action-button.danger {
+    background: #ef4444;
+    color: white;
+}
+
+.dashboard-container.doctor .action-button.danger:hover {
+    background: #dc2626;
+}
+
+/* Verification Section - Matches existing styling */
+.dashboard-container.doctor .verification-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.dashboard-container.doctor .verification-section .section-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-container.doctor .verification-section .section-content {
+    padding: 24px;
+}
+
+/* Verification Photo Sizing - Fix large photo issue */
+.dashboard-container.doctor .verification-photo-container {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.dashboard-container.doctor .verification-photo {
+    max-width: 300px;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.dashboard-container.doctor .verification-photo:hover {
+    transform: scale(1.02);
+}
+
+/* Verification Status Styling */
+.dashboard-container.doctor .verification-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid;
+    margin-bottom: 20px;
+}
+
+.dashboard-container.doctor .verification-status.pending {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.dashboard-container.doctor .verification-status.verified {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
+.dashboard-container.doctor .verification-status.rejected {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.dashboard-container.doctor .status-icon {
+    font-size: 24px;
+    margin-top: 2px;
+}
+
+.dashboard-container.doctor .verification-status.pending .status-icon {
+    color: #f59e0b;
+}
+
+.dashboard-container.doctor .verification-status.verified .status-icon {
+    color: #10b981;
+}
+
+.dashboard-container.doctor .verification-status.rejected .status-icon {
+    color: #ef4444;
+}
+
+.dashboard-container.doctor .status-content h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dashboard-container.doctor .status-content p {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.dashboard-container.doctor .verification-details {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.dashboard-container.doctor .detail-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.dashboard-container.doctor .detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.dashboard-container.doctor .detail-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 12px;
+    min-width: 70px;
+}
+
+.dashboard-container.doctor .detail-value {
+    color: #1f2937;
+    font-size: 12px;
+}
+
+.dashboard-container.doctor .verification-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Responsive Design - Following existing patterns */
+@media (max-width: 768px) {
+    .dashboard-container.doctor .profile-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .dashboard-container.doctor .profile-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .dashboard-container.doctor .profile-avatar-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .dashboard-container.doctor .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container.doctor .profile-stats {
+        grid-template-columns: 1fr;
+    }
+}

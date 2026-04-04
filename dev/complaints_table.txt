@@ -1,0 +1,36 @@
+-- Reports/Complaints Table SQL
+-- This table stores all reported messages, complaints, and issues in the system
+-- Works with the unified Users table structure
+
+CREATE TABLE reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reporter_type ENUM('Patient', 'Doctor', 'Admin') NOT NULL,
+    reporter_id INT NOT NULL,
+    reported_type ENUM('Patient', 'Doctor', 'Admin', 'System') NOT NULL,
+    reported_id INT NULL,
+    report_type VARCHAR(100) NOT NULL,
+    reason TEXT NOT NULL,
+    description TEXT,
+    status ENUM('pending', 'under_review', 'resolved', 'dismissed') DEFAULT 'pending',
+    resolution TEXT NULL,
+    resolved_by INT NULL,
+    resolved_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_reporter (reporter_type, reporter_id),
+    INDEX idx_reported (reported_type, reported_id),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at),
+    FOREIGN KEY (reporter_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (reported_id) REFERENCES Users(id) ON DELETE SET NULL,
+    FOREIGN KEY (resolved_by) REFERENCES Users(id) ON DELETE SET NULL
+);
+
+-- Sample data for testing (optional)
+-- Note: These user IDs should exist in your Users table
+INSERT INTO reports (reporter_type, reporter_id, reported_type, reported_id, report_type, reason, description, status) VALUES
+('Patient', 1, 'Doctor', 2, 'Inappropriate Content', 'Unprofessional language during consultation', 'Doctor used inappropriate language during video call', 'pending'),
+('Doctor', 2, 'Patient', 3, 'Spam Messages', 'Repeated spam messages', 'Patient sent multiple irrelevant messages', 'pending'),
+('Patient', 3, 'Doctor', 4, 'Harassment', 'Inappropriate consultation behavior', 'Doctor made inappropriate comments during consultation', 'under_review'),
+('Doctor', 4, 'Patient', 5, 'Fraudulent Activity', 'Fake medical documents', 'Patient submitted fake medical documents', 'pending'),
+('Patient', 5, 'System', NULL, 'Technical Issue', 'Video call connectivity problems', 'Unable to connect to video calls consistently', 'resolved');

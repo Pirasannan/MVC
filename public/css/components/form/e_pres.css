@@ -1,5 +1,15 @@
 
 /* Override dashboard container styles for e-prescription */
+#specialInstructions {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100px;
+    max-height: 300px; /* Limit maximum height */
+    resize: vertical;
+    overflow-y: auto; /* Add scrollbar if content exceeds max-height */
+}
+
 .dashboard-container.doctor {
     display: flex;
     justify-content: center;
@@ -51,9 +61,11 @@
 .section {
     margin-bottom: 25px;
     padding: 20px;
+    padding-bottom: 70px;
     border: 1px solid #e1e8ed;
     border-radius: 6px;
     background: #fafbfc;
+    overflow: visible;
 }
 
 .section-header {
@@ -152,6 +164,8 @@ textarea {
     resize: vertical;
     font-family: inherit;
     line-height: 1.5;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .preview-card {

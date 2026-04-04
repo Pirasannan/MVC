@@ -27,10 +27,14 @@
 @import url('./components/dashboard/responsive.css');
 @import url('./components/dashboard/extras.css');
 @import url('./components/dashboard/popup.css');
+@import url('./components/video_consultation/video_consultation.css');
+@import url('./components/video_consultation/precall.css');
+@import url('./components/video_consultation/videocall.css');
+
+@import url('./components/verification/verification_style.css');
 
 
-@import url('./components/dashboard/extras.css');
-
+@import url('./components/pm.css');
 
 
 

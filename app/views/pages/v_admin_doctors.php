@@ -23,49 +23,26 @@
                         <h2 class="section-title">Pending Verifications</h2>
                     </div>
                     <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Rajesh Kumar</div>
-                                <div class="appointment-date">Cardiology | SLMC Reg: 12345</div>
-                                <div class="prescribed-by">Submitted: 2025-10-15 | Documents: NIC, Medical License</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Nisha Perera</div>
-                                <div class="appointment-date">General Practice | SLMC Reg: 23456</div>
-                                <div class="prescribed-by">Submitted: 2025-10-16 | Documents: NIC, Medical License</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Amara Fernando</div>
-                                <div class="appointment-date">Pediatrics | SLMC Reg: 34567</div>
-                                <div class="prescribed-by">Submitted: 2025-10-17 | Documents: NIC, Medical License</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Kasun Silva</div>
-                                <div class="appointment-date">Internal Medicine | SLMC Reg: 45678</div>
-                                <div class="prescribed-by">Submitted: 2025-10-17 | Documents: NIC, Medical License</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
+                        <?php $pendingDoctors = $data['pendingDoctors'] ?? []; ?>
+                        <?php if (!empty($pendingDoctors)): ?>
+                            <?php foreach ($pendingDoctors as $doctor): ?>
+                                <div class="appointment-item">
+                                    <div class="appointment-info">
+                                        <div class="doctor-name"><?php echo htmlspecialchars($doctor->name ?? ''); ?></div>
+                                        <div class="appointment-date">Status: <?php echo htmlspecialchars($doctor->status ?? 'inactive'); ?></div>
+                                        <div class="prescribed-by">Joined: <?php echo htmlspecialchars($doctor->created_at ?? ''); ?></div>
+                                    </div>
+                                    <div class="appointment-status">
+                                        <span class="status-badge pending">Pending Review</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state">No pending verifications.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">Review Documents</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminDoctorVerification"><button class="action-button">Review Documents</button></a>
                     </div>
                 </div>
 
@@ -75,49 +52,26 @@
                         <h2 class="section-title">Verified Doctors</h2>
                     </div>
                     <div class="section-content">
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Sarah Johnson</div>
-                                <div class="medication-details">Cardiology | City Care Medical Center</div>
-                                <div class="prescribed-by">SLMC Reg: 11223 | Verified: 2025-09-20</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Michael Chen</div>
-                                <div class="medication-details">General Practice | Wellness Medical Clinic</div>
-                                <div class="prescribed-by">SLMC Reg: 22334 | Verified: 2025-09-18</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Emily Davis</div>
-                                <div class="medication-details">Pediatrics | HealthFirst GP Center</div>
-                                <div class="prescribed-by">SLMC Reg: 33445 | Verified: 2025-09-15</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Sunil Jayawardena</div>
-                                <div class="medication-details">Internal Medicine | Central Care Clinic</div>
-                                <div class="prescribed-by">SLMC Reg: 44556 | Verified: 2025-10-10</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
+                        <?php $verifiedDoctors = $data['verifiedDoctors'] ?? []; ?>
+                        <?php if (!empty($verifiedDoctors)): ?>
+                            <?php foreach ($verifiedDoctors as $doctor): ?>
+                                <div class="medication-item">
+                                    <div class="medication-info">
+                                        <div class="medication-name"><?php echo htmlspecialchars($doctor->name ?? ''); ?></div>
+                                        <div class="medication-details">Role: Doctor</div>
+                                        <div class="prescribed-by">Updated: <?php echo htmlspecialchars($doctor->updated_at ?? ''); ?></div>
+                                    </div>
+                                    <div class="medication-date">
+                                        <span class="status-badge confirmed">Active</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state">No verified doctors.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">View All Doctors</button>
+                    <a href="<?php echo URLROOT; ?>/Pages/adminAllDoctors"><button class="action-button">View All Doctors</button></a>
                     </div>
                 </div>
             </div>
@@ -125,86 +79,31 @@
             <!-- Additional Content Sections Row -->
             <div class="content-sections">
                 <!-- Rejected Applications Section -->
-                <div class="content-section">
+                <div class="content-section full-width">
                     <div class="section-header">
                         <h2 class="section-title">Rejected Applications</h2>
                     </div>
                     <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Anil Rodrigo</div>
-                                <div class="appointment-date">General Practice | SLMC Reg: 56789</div>
-                                <div class="prescribed-by">Reason: Incomplete documentation | Rejected: 2025-10-12</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge rejected">Rejected</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Priya Gunawardena</div>
-                                <div class="appointment-date">Dermatology | SLMC Reg: 67890</div>
-                                <div class="prescribed-by">Reason: License verification failed | Rejected: 2025-10-08</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge rejected">Rejected</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Rohan Wijesinghe</div>
-                                <div class="appointment-date">Orthopedics | SLMC Reg: 78901</div>
-                                <div class="prescribed-by">Reason: Invalid SLMC registration | Rejected: 2025-10-05</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge rejected">Rejected</span>
-                            </div>
-                        </div>
+                        <?php $rejectedDoctors = $data['rejectedDoctors'] ?? []; ?>
+                        <?php if (!empty($rejectedDoctors)): ?>
+                            <?php foreach ($rejectedDoctors as $doctor): ?>
+                                <div class="appointment-item">
+                                    <div class="appointment-info">
+                                        <div class="doctor-name"><?php echo htmlspecialchars($doctor->name ?? ''); ?></div>
+                                        <div class="appointment-date">Updated: <?php echo htmlspecialchars($doctor->updated_at ?? ''); ?></div>
+                                        <div class="prescribed-by">Status: Suspended</div>
+                                    </div>
+                                    <div class="appointment-status">
+                                        <span class="status-badge rejected">Rejected</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state">No rejected applications.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">View Rejection Details</button>
-                    </div>
-                </div>
-
-                <!-- Inactive/Suspended Doctors Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Inactive/Suspended Accounts</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Chaminda Perera</div>
-                                <div class="medication-details">General Practice | Wellness Medical Clinic</div>
-                                <div class="prescribed-by">Reason: Account deactivated by user | Date: 2025-09-25</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge pending">Inactive</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Lakshmi Fernando</div>
-                                <div class="medication-details">Pediatrics | Central Care Clinic</div>
-                                <div class="prescribed-by">Reason: Policy violation - inappropriate conduct | Date: 2025-10-01</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge scheduled">Suspended</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Dr. Dinesh Rathnayake</div>
-                                <div class="medication-details">Internal Medicine | HealthFirst GP Center</div>
-                                <div class="prescribed-by">Reason: No activity for 90 days | Date: 2025-09-10</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge pending">Inactive</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button">Manage Accounts</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminRejectedDoctors"><button class="action-button">View Rejection Details</button></a>                    
                     </div>
                 </div>
             </div>

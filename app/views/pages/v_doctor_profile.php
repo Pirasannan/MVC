@@ -1,10 +1,11 @@
 <?php 
-require APPROOT.'/views/inc/header.php'; 
-$current_page = 'doctorProfile';
+    require APPROOT.'/views/inc/header.php'; 
+    $current_page = 'doctorProfile';
 ?>
+<link rel='stylesheet' href='<?php echo URLROOT; ?>/css/components/profile/doctor_profile.css'>
 
-
-<div class="dashboard-container">        <!-- Sidebar Navigation -->
+<div class="dashboard-container doctor">
+    <!-- Sidebar Navigation -->
     <?php require APPROOT.'/views/inc/components/doctorSidebar.php'; ?>
 
     <!-- Main Content Area -->
@@ -12,115 +13,151 @@ $current_page = 'doctorProfile';
         <!-- Top Header -->
         <?php require APPROOT.'/views/inc/components/doctorHeader.php'; ?>
 
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Stats Cards Row -->
-                <div class="stats-row">
-                    <div class="stat-card primary">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Upcoming Appointments</h3>
-                            <div class="stat-number">1</div>
-                        </div>
+        <!-- Profile Content -->
+        <div class="dashboard-content">
+            <div class="profile-container">
+                
+                <!-- Profile Information Section -->
+                <div class="content-section profile-info">
+                    <div class="section-header centered">
+                        <h2 class="section-title">Profile Information</h2>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Active Medications</h3>
-                            <div class="stat-number">3</div>
+                    <div class="section-content">
+                        <div class="profile-details">
+                            <div class="profile-row">
+                                <div class="profile-field">
+                                    <label>Full Name:</label>
+                                    <span><?php echo htmlspecialchars($data['user_name']); ?></span>
+                                </div>
+                                <div class="profile-field">
+                                    <label>Email:</label>
+                                    <span><?php echo htmlspecialchars($data['user_email']); ?></span>
+                                </div>
+                            </div>
+                            <div class="profile-row">
+                                <div class="profile-field">
+                                    <label>User ID:</label>
+                                    <span><?php echo $data['user_id']; ?></span>
+                                </div>
+                                <div class="profile-field">
+                                    <label>Role:</label>
+                                    <span class="role-badge doctor">Doctor</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">$56456.00</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Medical Reports</h3>
-                            <div class="stat-number">$26456.00</div>
+                        
+                        <!-- Edit Profile Button Row -->
+                        <div class="profile-edit-row">
+                            <button class="action-button primary edit-profile-btn">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Content Sections Row -->
-                <div class="content-sections">
-                    <!-- Appointments Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Upcoming Appointments</h2>
-                        </div>
-                        <div class="section-content">
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Sarah Johnson</div>
-                                    <div class="appointment-date">2024-01-15 at 10:00 AM</div>
+                <!-- Profile Verification Section -->
+             <div class="content-section verification-section">
+    <div class="section-header centered">
+        <h2 class="section-title">
+            <i class="fas fa-shield-alt"></i> Profile Verification
+        </h2>
+    </div>
+    <div class="section-content">
+                        <?php if (!$data['verification']): ?>
+                            <!-- No verification -->
+                            <div class="verification-status no-verification">
+                                <div class="status-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
                                 </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge scheduled">Scheduled</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Michael Chen</div>
-                                    <div class="appointment-date">2024-01-20 at 2:30 PM</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge confirmed">Confirmed</span>
+                                <div class="status-content">
+                                    <h4>Profile Not Verified</h4>
+                                    <p>Complete your profile verification to gain full access to the platform.</p>
+                                    <div class="verification-actions">
+                                        <a href="<?php echo URLROOT; ?>/Verification/index" class="action-button primary">
+                                            <i class="fas fa-upload"></i> Start Verification
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Emily Davis</div>
-                                    <div class="appointment-date">2024-01-25 at 11:15 AM</div>
+                        <?php else: ?>
+                            <!-- Has verification -->
+                            <?php
+                            $status = $data['verification']->verification_status;
+                            $statusClass = '';
+                            $statusIcon = '';
+                            $statusText = '';
+                            $statusMessage = '';
+                            
+                            switch($status) {
+                                case 'pending':
+                                    $statusClass = 'pending';
+                                    $statusIcon = 'clock';
+                                    $statusText = 'Verification Pending';
+                                    $statusMessage = 'Your verification is under review. You will be notified once processed.';
+                                    break;
+                                case 'verified':
+                                    $statusClass = 'verified';
+                                    $statusIcon = 'check-circle';
+                                    $statusText = 'Profile Verified';
+                                    $statusMessage = 'Your profile has been successfully verified!';
+                                    break;
+                                case 'rejected':
+                                    $statusClass = 'rejected';
+                                    $statusIcon = 'times-circle';
+                                    $statusText = 'Verification Rejected';
+                                    $statusMessage = 'Your verification was rejected. Please upload a new document.';
+                                    break;
+                            }
+                            ?>
+                            
+                            <div class="verification-status <?php echo $statusClass; ?>">
+                                <div class="status-icon">
+                                    <i class="fas fa-<?php echo $statusIcon; ?>"></i>
                                 </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge pending">Pending</span>
+                                <div class="status-content">
+                                    <h4><?php echo $statusText; ?></h4>
+                                    <p><?php echo $statusMessage; ?></p>
+                                    
+                                    <div class="verification-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Uploaded:</span>
+                                            <span class="detail-value"><?php echo date('M d, Y H:i', strtotime($data['verification']->uploaded_at)); ?></span>
+                                        </div>
+                                        
+                                        <?php if ($data['verification']->verified_at): ?>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Verified:</span>
+                                            <span class="detail-value"><?php echo date('M d, Y H:i', strtotime($data['verification']->verified_at)); ?></span>
+                                        </div>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($data['verification']->rejection_reason): ?>
+                                        <div class="detail-item rejection-reason">
+                                            <span class="detail-label">Reason:</span>
+                                            <span class="detail-value"><?php echo htmlspecialchars($data['verification']->rejection_reason); ?></span>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <div class="verification-actions">
+                                        <a href="<?php echo URLROOT; ?>/Verification/viewPhoto" class="action-button secondary">
+                                            <i class="fas fa-eye"></i> View Photo
+                                        </a>
+                                        <a href="<?php echo URLROOT; ?>/Verification/index" class="action-button">
+                                            <i class="fas fa-cog"></i> Manage
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="section-footer">
-                            <button class="action-button">Book New Appointment</button>
-                        </div>
-                    </div>
-
-                    <!-- Medical Status Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Current Medications</h2>
-                        </div>
-                        <div class="section-content">
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Hypertension</div>
-                                    <div class="medication-details">Lisinopril - 10mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2024-01-10</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Diabetes</div>
-                                    <div class="medication-details">Metformin - 500mg, Twice daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Michael Chen</div>
-                                </div>
-                                <div class="medication-date">2024-01-05</div>
-                            </div>
-                            <div class="medication-item">
-                                <div class="medication-info">
-                                    <div class="medication-name">Cholesterol</div>
-                                    <div class="medication-details">Atorvastatin - 20mg, Once daily</div>
-                                    <div class="prescribed-by">Prescribed by Dr. Sarah Johnson</div>
-                                </div>
-                                <div class="medication-date">2023-12-28</div>
-                            </div>
-                        </div>
-                        <div class="section-footer">
-                            <button class="action-button secondary">View All Prescriptions</button>
-                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
+</div>
+
+
+
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

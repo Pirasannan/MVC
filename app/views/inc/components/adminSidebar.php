@@ -13,8 +13,8 @@
                     'Dashboard' => 'adminDashboard',
                     'Doctors' => 'adminDoctors',
                     'Patients' => 'adminPatients',
-                    'Records' => 'adminRecords',
                     'Notifications' => 'adminNotifications',
+                    'Messages' => 'adminMessages',
                     'Profile' => 'adminProfile'
                 ];
 

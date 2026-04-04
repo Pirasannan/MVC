@@ -1,3 +1,14 @@
+.create_eprescription {
+align-self: center;
+font-size: 13px;
+color: #ffffff;
+text-decoration: none;
+line-height: 20px;
+border-radius: 6px;
+background: transparent;
+transition: color .12s ease, background .12s ease, transform .08s ease;
+}
+
 .create_eprescription.action-button {
     display: flex;
     justify-content: center;
@@ -28,7 +39,7 @@
     text-decoration: none;
     color: #FFFFFF; /* White text */
     padding: 10px 20px; /* Matches the padding from the image */
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 4px; /* Rounded corners */
     font-size: 14px; /* Matches the font size */
     font-weight: 500; /* Matches the font weight */
     cursor: pointer;

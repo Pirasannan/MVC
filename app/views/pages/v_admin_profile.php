@@ -57,57 +57,14 @@
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">Update Information</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminProfileUpdate"><button class="action-button">Update Information</button></a>
                     </div>
                 </div>
-
-                <!-- Security Settings Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Security Settings</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Change Password</div>
-                                <div class="medication-details">Last changed: 2025-09-18</div>
-                                <div class="prescribed-by">Recommendation: Change password every 90 days</div>
-                            </div>
-                            <div class="medication-date">
-                                <button class="action-button secondary" style="padding: 8px 16px; font-size: 14px;">Change</button>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Two-Factor Authentication</div>
-                                <div class="medication-details">Status: Enabled</div>
-                                <div class="prescribed-by">Method: SMS to +94 77 XXX 4567</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Active Sessions</div>
-                                <div class="medication-details">Current Device: Chrome on Windows</div>
-                                <div class="prescribed-by">Last Login: 2025-10-18 at 9:30 AM</div>
-                            </div>
-                            <div class="medication-date">
-                                <button class="action-button secondary" style="padding: 8px 16px; font-size: 14px;">View All</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button">Security Overview</button>
-                    </div>
-                </div>
-            </div>
 
             <!-- Additional Content Sections Row -->
             <div class="content-sections">
                 <!-- Admin Activity Log Section -->
-                <div class="content-section">
+                <div class="content-section full-width">
                     <div class="section-header">
                         <h2 class="section-title">Recent Activity</h2>
                     </div>
@@ -144,49 +101,9 @@
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">View Full Activity Log</button>
-                    </div>
-                </div>
-
-                <!-- Account Settings Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Account Settings</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Email Notifications</div>
-                                <div class="medication-details">Receive alerts for critical system events</div>
-                                <div class="prescribed-by">Status: Enabled for urgent notifications only</div>
-                            </div>
-                            <div class="medication-date">
-                                <button class="action-button secondary" style="padding: 8px 16px; font-size: 14px;">Manage</button>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Admin Privileges</div>
-                                <div class="medication-details">Role: Super Admin</div>
-                                <div class="prescribed-by">Full access to all system functions and user management</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Account Status</div>
-                                <div class="medication-details">Account created: 2024-03-15</div>
-                                <div class="prescribed-by">Last profile update: 2025-09-18</div>
-                            </div>
-                            <div class="medication-date">
-                                <span class="status-badge confirmed">Active</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button secondary">Advanced Settings</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminActivityLog">
+                            <button class="action-button">View Full Activity Log</button>
+                        </a>
                     </div>
                 </div>
             </div>

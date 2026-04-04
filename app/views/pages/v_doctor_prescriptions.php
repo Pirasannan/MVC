@@ -39,17 +39,21 @@ $current_page = 'doctorPrescriptions';
                 </div>
             <?php endif; ?>
 
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
                 <!-- Content Sections Row -->
                 <div class="content-sections">
-                    <!-- Appointments Section -->
-                    <div class="content-section">
-
-
-                    <!-- Medical Status Section -->
-                    <div class="content-section">
-                        <div class="section-header">
-                            <h2 class="section-title">Issued Prescriptions</h2>
-                            <a class="create_eprescription action-button" href="<?php echo URLROOT; ?>/Pages/createprescription">Create ePrescription</a>
+                    <!-- Prescriptions Section -->
+                    <div class="content-section full-width">
+                        <div class="prescription-header">
+                            <div class="section-header-content">
+                                <h2 class="section-title">Issued Prescriptions</h2>
+                                <div class="header-actions">
+                                    <a class="create-prescription-btn" href="<?php echo URLROOT; ?>/Pages/createprescription" >
+                                        <i class="fas fa-plus"></i> Create ePrescription
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         <div class="section-content" id="doctor-prescription-list">
                             <?php if (!empty($data['prescriptions'])): ?>
@@ -70,30 +74,47 @@ $current_page = 'doctorPrescriptions';
                                             <?php endif; ?>
                                         </div>
                                         <div class="medication-date">
-                                            <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?><br>
+                                            <div class="prescription-date">
+                                                <?= htmlspecialchars(date('Y-m-d', strtotime($p->created_at))) ?>
+                                            </div>
                                             <?php if (!empty($p->updated_at)): ?>
-                                                <small>Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?></small>
+                                                <div class="updated-date">
+                                                    Updated: <?= htmlspecialchars(date('Y-m-d', strtotime($p->updated_at))) ?>
+                                                </div>
                                             <?php endif; ?>
-                                            <div style="margin-top:8px;">
-                                                <a class="action-button-edit" href="<?= URLROOT ?>/Doctor/editPrescription/<?= (int)$p->id ?>" onclick="event.stopPropagation()">Edit</a>
+                                            <?php if ($p->is_deleted === 'deleted'): ?>
+                                                <div class="deleted-date">
+                                                    Deleted: <?= htmlspecialchars(date('Y-m-d H:i', strtotime($p->updated_at ?: $p->created_at))) ?>
+                                                </div>
+                                            <?php endif; ?>
+                                            <div class="prescription-actions">
                                                 <?php if ($p->is_deleted !== 'deleted'): ?>
-                                                    <button class="action-button-delete" onclick="confirmDeletePrescription(event, <?= (int)$p->id ?>)">Delete</button>
+                                                    <a class="action-button-edit" href="<?= URLROOT ?>/Doctor/editPrescription/<?= (int)$p->id ?>" onclick="event.stopPropagation()">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <button class="action-button-delete" onclick="confirmDeletePrescription(event, <?= (int)$p->id ?>)">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <p align="center" >No issued prescriptions found.</p>
+                                <div class="empty-state">
+                                    <i class="fas fa-prescription-bottle-alt" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                    <p>No issued prescriptions found.</p>
+                                    <p style="font-size: 14px; margin-top: 8px;">Create your first ePrescription to get started.</p>
+                                </div>
                             <?php endif; ?>
                         </div>
                         
                         <!-- View All Button -->
-                <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
-                    <div class="section-footer">
-                        <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
-                    </div>
-                <?php endif; ?>
+                        <?php if (!empty($data['prescriptions']) && count($data['prescriptions']) > 3): ?>
+                            <div class="section-footer">
+                                <button class="action-button secondary" id="view-all-btn" onclick="toggleAllPrescriptions()">View All Prescriptions</button>
+                            </div>
+                        <?php endif; ?>
                 
                     </div>
                 </div>
@@ -102,10 +123,10 @@ $current_page = 'doctorPrescriptions';
     </div>
 
 <!-- Include Prescription Modal -->
-<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?>
+<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?> 
 
-<!-- Delete confirmation popup -->
-<div id="deletePrescriptionPopup" class="popup-overlay">
+<!-- Delete confirmation popup-->
+<div id="deletePrescriptionPopup" class="popup-overlay" style="display: none;">
   <div class="popup-box">
     <h3>Confirm Delete</h3>
     <p>Are you sure you want to delete this prescription? This action cannot be undone.</p>
@@ -116,51 +137,7 @@ $current_page = 'doctorPrescriptions';
   </div>
 </div>
 
-<script>
-function openPrescriptionModal(event) {
-    // Only open modal if the click is not on a button or link
-    if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || event.target.closest('a') || event.target.closest('button')) {
-        return;
-    }
-    
-    const modal = document.getElementById('prescriptionPopup');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
 
-// Show more prescriptions
-function toggleAllPrescriptions() {
-    const list = document.getElementById('doctor-prescription-list');
-    const btn = document.getElementById('view-all-btn');
-    if (list && btn) {
-        list.classList.toggle('expanded');
-        btn.textContent = list.classList.contains('expanded') 
-            ? 'Show Less' 
-            : 'View All Prescriptions';
-    }
-}
-
-// Delete prescription confirmation
-function confirmDeletePrescription(event, prescriptionId) {
-    event.stopPropagation();
-    document.getElementById('deletePrescriptionPopup').style.display = 'flex';
-    
-    // Store the prescription ID for deletion
-    document.getElementById('confirmDelete').setAttribute('data-prescription-id', prescriptionId);
-}
-
-// Handle delete confirmation popup
-document.getElementById("cancelDelete").addEventListener("click", function() {
-    document.getElementById("deletePrescriptionPopup").style.display = "none";
-});
-
-document.getElementById("confirmDelete").addEventListener("click", function() {
-    const prescriptionId = this.getAttribute('data-prescription-id');
-    if (prescriptionId) {
-        window.location.href = "<?php echo URLROOT; ?>/Doctor/deletePrescription/" + prescriptionId;
-    }
-});
-</script>
+<!-- Modal functionality is handled by modal-manager.js -->
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

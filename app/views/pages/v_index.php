@@ -105,7 +105,7 @@
                             <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            Screen sharing for medical images
+                            Low latency video calls
                         </li>
                     </ul>
                 </div>
@@ -133,7 +133,7 @@
                             <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            Drug interaction checks
+                            Prescription history
                         </li>
                     </ul>
                 </div>
@@ -179,7 +179,7 @@
                             <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            SMS & email notifications
+                            Appointment notifications
                         </li>
                         <li>
                             <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -403,7 +403,7 @@
         </div>
     </section>
 
-    <!-- Resources Section -->
+    <!-- Resources Section
     <section id="resources" class="section section-alt">
         <div class="container">
             <div class="section-header">
@@ -455,7 +455,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- CTA Section -->
     <section class="cta">

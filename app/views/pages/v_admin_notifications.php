@@ -27,12 +27,11 @@
                             <div class="appointment-info">
                                 <div class="doctor-name">Notification Type</div>
                                 <div class="appointment-date">
-                                    <select style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
-                                        <option>Select recipient group</option>
-                                        <option>All Users</option>
-                                        <option>All Doctors</option>
-                                        <option>All Patients</option>
-                                        <option>All Clinics</option>
+                                    <select id="recipientType" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                                        <option value="all">All Users</option>
+                                        <option value="doctor">All Doctors</option>
+                                        <option value="patient">All Patients</option>
+                                        <option value="admin">All Admins</option>
                                     </select>
                                 </div>
                             </div>
@@ -41,7 +40,7 @@
                             <div class="appointment-info">
                                 <div class="doctor-name">Notification Title</div>
                                 <div class="appointment-date">
-                                    <input type="text" placeholder="Enter notification title" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                                    <input type="text" id="notificationTitle" placeholder="Enter notification title" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
                                 </div>
                             </div>
                         </div>
@@ -49,13 +48,13 @@
                             <div class="appointment-info">
                                 <div class="doctor-name">Message Content</div>
                                 <div class="appointment-date">
-                                    <textarea placeholder="Enter notification message" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px; min-height: 100px;"></textarea>
+                                    <textarea id="notificationMessage" placeholder="Enter notification message" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px; min-height: 100px;"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">Send Notification</button>
+                        <button id="sendNotificationBtn" class="action-button">Send Notification</button>
                     </div>
                 </div>
 
@@ -107,7 +106,9 @@
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button">Review All Reports</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminReports">
+                            <button class="action-button">Review All Reports</button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -120,39 +121,29 @@
                         <h2 class="section-title">Recent System Notifications</h2>
                     </div>
                     <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Scheduled Maintenance Notice</div>
-                                <div class="appointment-date">Recipients: All Users</div>
-                                <div class="prescribed-by">Message: System will be under maintenance on Oct 20, 2025 from 2:00 AM - 4:00 AM</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge confirmed">Sent</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">New Feature Announcement</div>
-                                <div class="appointment-date">Recipients: All Doctors</div>
-                                <div class="prescribed-by">Message: New prescription template feature now available in your dashboard</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge confirmed">Sent</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Security Update Alert</div>
-                                <div class="appointment-date">Recipients: All Users</div>
-                                <div class="prescribed-by">Message: Please update your password for enhanced security</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge confirmed">Sent</span>
-                            </div>
-                        </div>
+                        <?php $recentNotifications = $data['recentNotifications'] ?? []; ?>
+                        
+                        <?php if (!empty($recentNotifications)): ?>
+                            <?php foreach ($recentNotifications as $notification): ?>
+                                <div class="appointment-item">
+                                    <div class="appointment-info">
+                                        <div class="doctor-name"><?php echo htmlspecialchars($notification->title); ?></div>
+                                        <div class="appointment-date">Recipients: <?php echo ucfirst($notification->recipient_type); ?><?php echo $notification->recipient_id ? ' (ID: ' . $notification->recipient_id . ')' : ''; ?></div>
+                                        <div class="prescribed-by">Message: <?php echo htmlspecialchars($notification->message); ?></div>
+                                    </div>
+                                    <div class="appointment-status">
+                                        <span class="status-badge confirmed">Sent</span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state">No notifications sent yet.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button secondary">View All Notifications</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminAllNotifications">
+                            <button class="action-button secondary">View All Notifications</button>
+                        </a>
                     </div>
                 </div>
 
@@ -188,7 +179,9 @@
                         </div>
                     </div>
                     <div class="section-footer">
-                        <button class="action-button secondary">View Resolution History</button>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminResolvedReports">
+                            <button class="action-button secondary">View Resolution History</button>
+                        </a>
                     </div>
                 </div>
             </div>

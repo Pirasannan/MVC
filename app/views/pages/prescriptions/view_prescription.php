@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/components/form/view_prescription.css?v=<?php echo filemtime(APPROOT.'/public/css/components/form/view_prescription.css'); ?>">
 
 <!-- Prescription View Popup -->
-<div class="prescription-overlay" id="prescriptionPopup">
+<div class="prescription-overlay" id="prescriptionPopup" style="display: none;">
   <div class="prescription-modal">
     <div class="modal-header">
       <h2>E-Prescription</h2>
@@ -84,28 +84,5 @@
   </div>
 </div>
 
-<script>
-function closePrescriptionModal() {
-  // Find the prescription overlay and hide it
-  const overlay = document.querySelector('.prescription-overlay');
-  if (overlay) {
-    overlay.style.display = 'none';
-  }
-}
-
-// Close modal when clicking outside
-document.addEventListener('click', function(e) {
-  const overlay = document.querySelector('.prescription-overlay');
-  if (e.target === overlay) {
-    closePrescriptionModal();
-  }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closePrescriptionModal();
-  }
-});
-</script>
+<!-- Modal functionality is handled by modal-manager.js -->
 

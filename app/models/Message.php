@@ -16,8 +16,8 @@ class Message {
                 c.last_message_time,
                 m.message as last_message,
                 CASE 
-                    WHEN c.user1_id = :user_id THEN u2.user_name
-                    ELSE u1.user_name
+                    WHEN c.user1_id = :user_id THEN u2.name
+                    ELSE u1.name
                 END as user_name,
                 CASE 
                     WHEN c.user1_id = :user_id THEN c.user2_id
@@ -29,16 +29,15 @@ class Message {
                  AND is_read = 0) as unread_count,
                 (m.sender_id = :user_id) as is_sent
             FROM conversations c
-            LEFT JOIN users u1 ON c.user1_id = u1.user_id
-            LEFT JOIN users u2 ON c.user2_id = u2.user_id
+            LEFT JOIN Users u1 ON c.user1_id = u1.id
+            LEFT JOIN Users u2 ON c.user2_id = u2.id
             LEFT JOIN messages m ON c.conversation_id = m.conversation_id 
                 AND m.created_at = c.last_message_time
             WHERE c.user1_id = :user_id OR c.user2_id = :user_id
             ORDER BY c.last_message_time DESC
         ');
-        
+
         $this->db->bind(':user_id', $userId);
-        
         return $this->db->resultSet();
     }
 
@@ -56,9 +55,8 @@ class Message {
             WHERE conversation_id = :conversation_id
             ORDER BY created_at ASC
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
-        
         return $this->db->resultSet();
     }
 
@@ -77,10 +75,9 @@ class Message {
             AND message_id > :last_message_id
             ORDER BY created_at ASC
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
         $this->db->bind(':last_message_id', $lastMessageId);
-        
         return $this->db->resultSet();
     }
 
@@ -90,19 +87,21 @@ class Message {
             INSERT INTO messages (conversation_id, sender_id, message, created_at)
             VALUES (:conversation_id, :sender_id, :message, NOW())
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
         $this->db->bind(':sender_id', $senderId);
         $this->db->bind(':message', $messageText);
-        
+
         if ($this->db->execute()) {
-            // Update conversation last_message_time
-            $this->updateConversationTime($conversationId);
-            // Get last insert ID from PDO
-            $lastId = $this->db->getConnection()->lastInsertId();
-            return $lastId;
+            // Do not fail message delivery if the conversation timestamp update fails.
+            try {
+                $this->updateConversationTime($conversationId);
+            } catch (Exception $e) {
+                // ignore non-critical update failure
+            }
+            return $this->db->getConnection()->lastInsertId();
         }
-        
+
         return false;
     }
 
@@ -113,7 +112,7 @@ class Message {
             SET last_message_time = NOW()
             WHERE conversation_id = :conversation_id
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
         $this->db->execute();
     }
@@ -127,10 +126,9 @@ class Message {
             AND sender_id != :user_id
             AND is_read = 0
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
         $this->db->bind(':user_id', $userId);
-        
         return $this->db->execute();
     }
 
@@ -142,10 +140,9 @@ class Message {
             WHERE conversation_id = :conversation_id
             AND (user1_id = :user_id OR user2_id = :user_id)
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
         $this->db->bind(':user_id', $userId);
-        
         return $this->db->single() ? true : false;
     }
 
@@ -157,10 +154,9 @@ class Message {
             WHERE (user1_id = :user1_id AND user2_id = :user2_id)
             OR (user1_id = :user2_id AND user2_id = :user1_id)
         ');
-        
+
         $this->db->bind(':user1_id', $user1Id);
         $this->db->bind(':user2_id', $user2Id);
-        
         return $this->db->single();
     }
 
@@ -170,16 +166,14 @@ class Message {
             INSERT INTO conversations (user1_id, user2_id, created_at, last_message_time)
             VALUES (:user1_id, :user2_id, NOW(), NOW())
         ');
-        
+
         $this->db->bind(':user1_id', $user1Id);
         $this->db->bind(':user2_id', $user2Id);
-        
+
         if ($this->db->execute()) {
-            // Get last insert ID from PDO
-            $lastId = $this->db->getConnection()->lastInsertId();
-            return $lastId;
+            return $this->db->getConnection()->lastInsertId();
         }
-        
+
         return false;
     }
 
@@ -193,9 +187,8 @@ class Message {
             AND m.sender_id != :user_id
             AND m.is_read = 0
         ');
-        
+
         $this->db->bind(':user_id', $userId);
-        
         $result = $this->db->single();
         return $result ? $result->unread_count : 0;
     }
@@ -207,10 +200,9 @@ class Message {
             WHERE message_id = :message_id 
             AND sender_id = :user_id
         ');
-        
+
         $this->db->bind(':message_id', $messageId);
         $this->db->bind(':user_id', $userId);
-        
         return $this->db->execute();
     }
 
@@ -220,9 +212,8 @@ class Message {
             SELECT * FROM conversations 
             WHERE conversation_id = :conversation_id
         ');
-        
+
         $this->db->bind(':conversation_id', $conversationId);
-        
         return $this->db->single();
     }
 
@@ -233,9 +224,154 @@ class Message {
             SET is_read = 1
             WHERE message_id = :message_id
         ');
-        
+
         $this->db->bind(':message_id', $messageId);
-        
         return $this->db->execute();
+    }
+
+    // Ensure doctor/patient pairs can chat only if they had at least one approved/completed appointment
+    public function hasAppointmentHistoryBetweenUsers($user1Id, $user2Id) {
+        $this->db->query('
+            SELECT COUNT(*) as total
+            FROM appointments
+            WHERE status IN ("approved", "completed")
+              AND (
+                    (patient_id = :user1_id AND doctor_id = :user2_id)
+                 OR (patient_id = :user2_id AND doctor_id = :user1_id)
+              )
+        ');
+
+        $this->db->bind(':user1_id', $user1Id);
+        $this->db->bind(':user2_id', $user2Id);
+
+        $row = $this->db->single();
+        return $row && (int)$row->total > 0;
+    }
+
+    // Get chat-eligible contacts based on past appointment history
+    public function getEligibleContacts($userId, $userRole, $searchTerm = '') {
+        $normalizedRole = strtolower((string)$userRole);
+
+        if ($normalizedRole === 'patient') {
+            $sql = '
+                SELECT DISTINCT
+                    u.id AS user_id,
+                    u.name AS user_name,
+                    LOWER(u.role) AS user_role,
+                    u.email
+                FROM appointments a
+                INNER JOIN Users u ON u.id = a.doctor_id
+                WHERE a.patient_id = :user_id
+                  AND a.status IN ("approved", "completed")
+                  AND u.status = "active"
+            ';
+
+            if ($searchTerm !== '') {
+                $sql .= ' AND (u.name LIKE :search OR u.email LIKE :search)';
+            }
+
+            $sql .= ' ORDER BY u.name ASC LIMIT 50';
+        } elseif ($normalizedRole === 'doctor') {
+            $sql = '
+                SELECT DISTINCT
+                    u.id AS user_id,
+                    u.name AS user_name,
+                    LOWER(u.role) AS user_role,
+                    u.email
+                FROM appointments a
+                INNER JOIN Users u ON u.id = a.patient_id
+                WHERE a.doctor_id = :user_id
+                  AND a.status IN ("approved", "completed")
+                  AND u.status = "active"
+            ';
+
+            if ($searchTerm !== '') {
+                $sql .= ' AND (u.name LIKE :search OR u.email LIKE :search)';
+            }
+
+            $sql .= ' ORDER BY u.name ASC LIMIT 50';
+        } else {
+            $sql = '
+                SELECT
+                    id AS user_id,
+                    name AS user_name,
+                    LOWER(role) AS user_role,
+                    email
+                FROM Users
+                WHERE id != :user_id
+                  AND LOWER(role) IN ("doctor", "patient")
+                  AND status = "active"
+            ';
+
+            if ($searchTerm !== '') {
+                $sql .= ' AND (name LIKE :search OR email LIKE :search)';
+            }
+
+            $sql .= ' ORDER BY name ASC LIMIT 50';
+        }
+
+        $this->db->query($sql);
+        $this->db->bind(':user_id', $userId);
+
+        if ($searchTerm !== '') {
+            $this->db->bind(':search', '%' . $searchTerm . '%');
+        }
+
+        return $this->db->resultSet();
+    }
+
+    // Get all active doctors and patients except the current admin user
+    public function getAdminBroadcastRecipients($adminUserId, $excludeUserId = null) {
+        $sql = '
+            SELECT id
+            FROM Users
+            WHERE id != :admin_user_id
+              AND LOWER(TRIM(role)) IN ("doctor", "patient")
+              AND LOWER(TRIM(status)) = "active"
+        ';
+
+        if ($excludeUserId !== null) {
+            $sql .= ' AND id != :exclude_user_id';
+        }
+
+        $sql .= ' ORDER BY id ASC';
+
+        $this->db->query($sql);
+        $this->db->bind(':admin_user_id', $adminUserId);
+        if ($excludeUserId !== null) {
+            $this->db->bind(':exclude_user_id', (int)$excludeUserId);
+        }
+        return $this->db->resultSet();
+    }
+
+    // Send one admin message to all active doctors and patients
+    public function broadcastAdminMessage($adminUserId, $messageText, $excludeUserId = null) {
+        $recipients = $this->getAdminBroadcastRecipients($adminUserId, $excludeUserId);
+        $sentMessageIds = [];
+
+        foreach ($recipients as $recipient) {
+            $recipientId = (int)($recipient->id ?? 0);
+            if ($recipientId <= 0) {
+                continue;
+            }
+
+            $conversation = $this->findConversation($adminUserId, $recipientId);
+            $conversationId = $conversation ? (int)$conversation->conversation_id : 0;
+
+            if ($conversationId <= 0) {
+                $conversationId = (int)$this->createConversation($adminUserId, $recipientId);
+            }
+
+            if ($conversationId <= 0) {
+                continue;
+            }
+
+            $messageId = $this->sendMessage($conversationId, $adminUserId, $messageText);
+            if ($messageId) {
+                $sentMessageIds[] = (int)$messageId;
+            }
+        }
+
+        return $sentMessageIds;
     }
 }

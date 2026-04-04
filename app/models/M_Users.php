@@ -90,14 +90,15 @@
 
         // Get user by ID
         public function getUserById($userId) {
-            $this->db->query('SELECT user_id, user_name, user_role, email FROM users WHERE user_id = :user_id');
+            $this->db->query('SELECT id AS user_id, name AS user_name, LOWER(role) AS user_role, email FROM Users WHERE id = :user_id');
             $this->db->bind(':user_id', $userId);
             return $this->db->single();
         }
 
         // Check if user is online (based on last activity within 5 minutes)
         public function isUserOnline($userId) {
-            $this->db->query('SELECT last_activity FROM users WHERE user_id = :user_id');
+            // Uses updated_at as activity signal in current Users schema.
+            $this->db->query('SELECT updated_at AS last_activity FROM Users WHERE id = :user_id');
             $this->db->bind(':user_id', $userId);
             $result = $this->db->single();
             
@@ -112,7 +113,7 @@
 
         // Update user last activity
         public function updateLastActivity($userId) {
-            $this->db->query('UPDATE users SET last_activity = NOW() WHERE user_id = :user_id');
+            $this->db->query('UPDATE Users SET updated_at = NOW() WHERE id = :user_id');
             $this->db->bind(':user_id', $userId);
             return $this->db->execute();
         }
@@ -120,10 +121,10 @@
         // Search users for messaging (exclude current user)
         public function searchUsersForMessaging($searchTerm, $currentUserId) {
             $this->db->query('
-                SELECT user_id, user_name, user_role, email 
-                FROM users 
-                WHERE (user_name LIKE :search OR email LIKE :search)
-                AND user_id != :current_user_id
+                SELECT id AS user_id, name AS user_name, LOWER(role) AS user_role, email 
+                FROM Users 
+                WHERE (name LIKE :search OR email LIKE :search)
+                AND id != :current_user_id
                 AND status = "active"
                 LIMIT 20
             ');

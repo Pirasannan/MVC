@@ -18,7 +18,7 @@ class Messages extends Controller {
         header('Content-Type: application/json');
         
         $userId = $_SESSION['user_id'];
-        $userType = $_SESSION['user_type'];
+        $userType = $_SESSION['user_role'] ?? '';
         
         try {
             $conversations = $this->messageModel->getConversations($userId, $userType);
@@ -48,7 +48,7 @@ class Messages extends Controller {
                     'user' => [
                         'id' => $user->user_id,
                         'name' => $user->user_name,
-                        'type' => $user->user_type,
+                        'type' => $user->user_role,
                         'is_online' => $this->userModel->isUserOnline($userId)
                     ]
                 ]);
@@ -106,28 +106,100 @@ class Messages extends Controller {
         }
         
         $input = json_decode(file_get_contents('php://input'), true);
-        $conversationId = $input['conversation_id'] ?? null;
-        $messageText = $input['message'] ?? null;
+        $conversationId = $_POST['conversation_id'] ?? ($input['conversation_id'] ?? null);
+        $messageText = $_POST['message'] ?? ($input['message'] ?? '');
         $userId = $_SESSION['user_id'];
+        $attachmentFile = $_FILES['attachment'] ?? null;
+        $attachmentData = null;
+
+        $messageText = trim((string)$messageText);
+        $hasAttachment = $attachmentFile && isset($attachmentFile['tmp_name']) && !empty($attachmentFile['tmp_name']) && ($attachmentFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
         
-        if (!$conversationId || !$messageText) {
+        // Validation: Check required fields
+        if (!$conversationId || ($messageText === '' && !$hasAttachment)) {
             echo json_encode(['success' => false, 'message' => 'Missing required fields']);
             return;
         }
         
+        // Validation: Check message length (max 1000 characters)
+        if (strlen($messageText) > 1000) {
+            echo json_encode(['success' => false, 'message' => 'Message too long (max 1000 characters)']);
+            return;
+        }
+        
         try {
-            // Verify user has access to this conversation
+            // Security: Verify user has access to this conversation
             if (!$this->messageModel->hasAccessToConversation($conversationId, $userId)) {
                 echo json_encode(['success' => false, 'message' => 'Access denied']);
                 return;
             }
+
+            // Optional attachment upload (images and PDFs)
+            if ($hasAttachment) {
+                $uploadResult = $this->uploadChatAttachment($attachmentFile, $userId);
+                if (!$uploadResult['success']) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Attachment upload failed: ' . implode(', ', $uploadResult['errors'])
+                    ]);
+                    return;
+                }
+                $attachmentData = $uploadResult['attachment'];
+            }
+
+            $storedMessage = $messageText;
+            if ($attachmentData) {
+                $storedMessage = json_encode([
+                    'text' => $messageText,
+                    'attachment' => $attachmentData
+                ], JSON_UNESCAPED_SLASHES);
+            } else {
+                // Store raw text; the frontend escapes it on render.
+                $storedMessage = $messageText;
+            }
             
-            $messageId = $this->messageModel->sendMessage($conversationId, $userId, $messageText);
-            
+            $isAdminSender = strtolower((string)($_SESSION['user_role'] ?? '')) === 'admin';
+
+            if ($isAdminSender) {
+                $conversation = $this->messageModel->getConversationById($conversationId);
+                $targetUserId = null;
+                if ($conversation) {
+                    $targetUserId = ((int)$conversation->user1_id === (int)$userId)
+                        ? (int)$conversation->user2_id
+                        : (int)$conversation->user1_id;
+                }
+
+                // Always deliver to the selected chat first.
+                $primaryMessageId = $this->messageModel->sendMessage($conversationId, $userId, $storedMessage);
+                if (!$primaryMessageId) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Failed to send admin message'
+                    ]);
+                    return;
+                }
+
+                // Then fan out to all other active doctors/patients.
+                $broadcastMessageIds = $this->messageModel->broadcastAdminMessage($userId, $storedMessage, $targetUserId);
+
+                echo json_encode([
+                    'success' => true,
+                    'message_id' => $primaryMessageId,
+                    'broadcast_count' => count($broadcastMessageIds) + 1,
+                    'message' => $storedMessage,
+                    'attachment' => $attachmentData
+                ]);
+                return;
+            }
+
+            $messageId = $this->messageModel->sendMessage($conversationId, $userId, $storedMessage);
+
             if ($messageId) {
                 echo json_encode([
                     'success' => true,
-                    'message_id' => $messageId
+                    'message_id' => $messageId,
+                    'message' => $storedMessage,
+                    'attachment' => $attachmentData
                 ]);
             } else {
                 echo json_encode([
@@ -140,6 +212,97 @@ class Messages extends Controller {
                 'success' => false,
                 'message' => 'Error sending message'
             ]);
+        }
+    }
+
+    // Upload chat attachment (images and PDFs)
+    private function uploadChatAttachment($file, $userId) {
+        $result = [
+            'success' => false,
+            'attachment' => null,
+            'errors' => []
+        ];
+
+        try {
+            if (!isset($file['tmp_name']) || empty($file['tmp_name'])) {
+                $result['errors'][] = 'No attachment uploaded';
+                return $result;
+            }
+
+            if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                $result['errors'][] = 'Upload error';
+                return $result;
+            }
+
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+            $maxFileSize = 10485760; // 10MB
+
+            $originalName = $file['name'] ?? 'attachment';
+            $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+            if (!in_array($extension, $allowedExtensions, true)) {
+                $result['errors'][] = 'Only JPG, PNG, and PDF files are allowed';
+                return $result;
+            }
+
+            if (($file['size'] ?? 0) > $maxFileSize) {
+                $result['errors'][] = 'File is too large. Maximum allowed size is 10MB';
+                return $result;
+            }
+
+            $mimeType = $file['type'] ?? '';
+            if (function_exists('finfo_open')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                if ($finfo) {
+                    $detected = finfo_file($finfo, $file['tmp_name']);
+                    if ($detected) {
+                        $mimeType = $detected;
+                    }
+                    finfo_close($finfo);
+                }
+            }
+
+            if (!in_array($mimeType, $allowedMimeTypes, true)) {
+                $result['errors'][] = 'Invalid file type';
+                return $result;
+            }
+
+            $baseDir = dirname(APPROOT) . '/public/uploads/chat_attachments/' . $userId . '/';
+            if (!is_dir($baseDir) && !mkdir($baseDir, 0755, true)) {
+                $result['errors'][] = 'Failed to create attachment directory';
+                return $result;
+            }
+
+            $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
+            $safeName = trim($safeName, '._-');
+            if ($safeName === '') {
+                $safeName = 'attachment';
+            }
+
+            $storedName = 'chat_' . time() . '_' . bin2hex(random_bytes(6)) . '_' . $safeName . '.' . $extension;
+            $targetPath = $baseDir . $storedName;
+
+            if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
+                $result['errors'][] = 'Failed to save attachment';
+                return $result;
+            }
+
+            chmod($targetPath, 0644);
+
+            $relativePath = 'uploads/chat_attachments/' . $userId . '/' . $storedName;
+            $result['success'] = true;
+            $result['attachment'] = [
+                'url' => URLROOT . '/' . $relativePath,
+                'path' => $relativePath,
+                'name' => $originalName,
+                'type' => $mimeType,
+                'size' => (int)($file['size'] ?? 0)
+            ];
+            return $result;
+        } catch (Exception $e) {
+            $result['errors'][] = 'Upload error';
+            return $result;
         }
     }
 
@@ -214,7 +377,19 @@ class Messages extends Controller {
             return;
         }
         
+        // Validation: Cannot message yourself
+        if ($userId == $recipientId) {
+            echo json_encode(['success' => false, 'message' => 'Cannot message yourself']);
+            return;
+        }
+        
         try {
+            // Security: Verify role-based authorization before creating conversation
+            if (!$this->canUsersMessage($userId, $recipientId)) {
+                echo json_encode(['success' => false, 'message' => 'Unauthorized - users cannot message each other']);
+                return;
+            }
+            
             // Check if conversation already exists
             $existingConversation = $this->messageModel->findConversation($userId, $recipientId);
             
@@ -253,17 +428,11 @@ class Messages extends Controller {
         
         $searchTerm = $_GET['search'] ?? '';
         $userId = $_SESSION['user_id'];
-        
-        if (strlen($searchTerm) < 2) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Search term too short'
-            ]);
-            return;
-        }
+        $userRole = $_SESSION['user_role'] ?? '';
         
         try {
-            $users = $this->userModel->searchUsersForMessaging($searchTerm, $userId);
+            // Restrict search to users this person can message.
+            $users = $this->messageModel->getEligibleContacts($userId, $userRole, trim($searchTerm));
             
             echo json_encode([
                 'success' => true,
@@ -273,6 +442,29 @@ class Messages extends Controller {
             echo json_encode([
                 'success' => false,
                 'message' => 'Error searching users'
+            ]);
+        }
+    }
+
+    // Get contacts the current user is allowed to start chatting with
+    public function getEligibleContacts() {
+        header('Content-Type: application/json');
+
+        $userId = $_SESSION['user_id'];
+        $userRole = $_SESSION['user_role'] ?? '';
+        $searchTerm = trim($_GET['search'] ?? '');
+
+        try {
+            $contacts = $this->messageModel->getEligibleContacts($userId, $userRole, $searchTerm);
+
+            echo json_encode([
+                'success' => true,
+                'contacts' => $contacts
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error loading eligible contacts'
             ]);
         }
     }
@@ -347,6 +539,87 @@ class Messages extends Controller {
             echo json_encode([
                 'success' => false
             ]);
+        }
+    }
+    
+    // Verify messaging authorization based on user roles
+    // Doctor ↔ Patient, Doctor ↔ Admin, Admin ↔ Patient allowed
+    private function verifyMessagingAuthorization($conversationId, $currentUserId) {
+        // Get conversation info
+        $conversation = $this->messageModel->getConversationById($conversationId);
+        
+        if (!$conversation) {
+            return false;
+        }
+        
+        // Get both users' roles
+        $user1 = $this->userModel->getUserById($conversation->user1_id);
+        $user2 = $this->userModel->getUserById($conversation->user2_id);
+        
+        if (!$user1 || !$user2) {
+            return false;
+        }
+        
+        return $this->canUsersMessage((int)$conversation->user1_id, (int)$conversation->user2_id);
+    }
+    
+    // Check if two users can message each other based on their roles
+    private function canUsersMessage($userId1, $userId2) {
+        $user1 = $this->userModel->getUserById($userId1);
+        $user2 = $this->userModel->getUserById($userId2);
+        
+        if (!$user1 || !$user2) {
+            return false;
+        }
+
+        $role1 = strtolower($user1->user_role ?? '');
+        $role2 = strtolower($user2->user_role ?? '');
+
+        // Doctor/patient chat is allowed only if they already have approved/completed appointment history.
+        $isDoctorPatientPair =
+            ($role1 === 'doctor' && $role2 === 'patient') ||
+            ($role1 === 'patient' && $role2 === 'doctor');
+
+        if ($isDoctorPatientPair) {
+            return $this->messageModel->hasAppointmentHistoryBetweenUsers($userId1, $userId2);
+        }
+
+        // Keep admin flows available as before.
+        $isAdminDoctorPair =
+            ($role1 === 'admin' && $role2 === 'doctor') ||
+            ($role1 === 'doctor' && $role2 === 'admin');
+
+        if ($isAdminDoctorPair) {
+            return true;
+        }
+
+        $isAdminPatientPair =
+            ($role1 === 'admin' && $role2 === 'patient') ||
+            ($role1 === 'patient' && $role2 === 'admin');
+
+        if ($isAdminPatientPair) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // Index method - View messages page
+    public function index() {
+        $userRole = $_SESSION['user_role'] ?? 'patient';
+        
+        // Route to appropriate view based on role
+        switch (strtolower($userRole)) {
+            case 'admin':
+                $this->view('pages/v_admin_messages');
+                break;
+            case 'doctor':
+                $this->view('pages/v_doctor_messages');
+                break;
+            case 'patient':
+            default:
+                $this->view('pages/v_patient_messages');
+                break;
         }
     }
 }

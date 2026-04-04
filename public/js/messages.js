@@ -5,10 +5,23 @@ let currentUserId = null;
 let currentUserType = null;
 let selectedConversationId = null;
 let messagePollingInterval = null;
+let conversationPollingInterval = null;
+let lastMessageId = 0; // Track the last message ID for polling
+let eligibleContacts = [];
+let conversationsCache = [];
+let sidebarSearchTerm = '';
+let selectedAttachmentFile = null;
 
 // Initialize messaging when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeMessaging();
+});
+
+window.addEventListener('focus', refreshActiveConversation);
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+        refreshActiveConversation();
+    }
 });
 
 // Initialize messaging system
@@ -25,6 +38,8 @@ function initializeMessaging() {
     
     // Load conversations
     loadConversations();
+    loadEligibleContacts();
+    startConversationPolling();
     
     // Auto-resize textarea
     const messageInput = document.getElementById('messageInput');
@@ -32,6 +47,8 @@ function initializeMessaging() {
         messageInput.addEventListener('input', autoResizeTextarea);
         messageInput.addEventListener('keypress', handleEnterKey);
     }
+
+    setupAttachmentHandlers();
 }
 
 // Setup event listeners
@@ -49,6 +66,51 @@ function setupEventListeners() {
     }
 }
 
+// Setup attachment chooser and preview handlers
+function setupAttachmentHandlers() {
+    const attachButton = document.getElementById('attachButton');
+    const attachmentInput = document.getElementById('chatAttachmentInput');
+    const removeAttachmentBtn = document.getElementById('removeAttachmentBtn');
+
+    if (attachButton && attachmentInput) {
+        attachButton.addEventListener('click', () => attachmentInput.click());
+        attachmentInput.addEventListener('change', handleAttachmentSelection);
+    }
+
+    if (removeAttachmentBtn) {
+        removeAttachmentBtn.addEventListener('click', clearSelectedAttachment);
+    }
+}
+
+function handleAttachmentSelection(event) {
+    const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    selectedAttachmentFile = file;
+    renderAttachmentPreview(file);
+}
+
+function renderAttachmentPreview(file) {
+    const preview = document.getElementById('attachmentPreview');
+    const previewName = document.getElementById('attachmentPreviewName');
+
+    if (!preview || !previewName) return;
+
+    if (!file) {
+        preview.style.display = 'none';
+        previewName.textContent = '';
+        return;
+    }
+
+    preview.style.display = 'flex';
+    previewName.textContent = file.name;
+}
+
+function clearSelectedAttachment() {
+    selectedAttachmentFile = null;
+    const attachmentInput = document.getElementById('chatAttachmentInput');
+    if (attachmentInput) attachmentInput.value = '';
+    renderAttachmentPreview(null);
+}
+
 // Load conversations list
 async function loadConversations() {
     try {
@@ -56,31 +118,136 @@ async function loadConversations() {
         const data = await response.json();
         
         if (data.success) {
-            displayConversations(data.conversations);
+            conversationsCache = data.conversations || [];
+            renderSidebarList();
         } else {
+            conversationsCache = [];
             showNoConversations();
         }
     } catch (error) {
         console.error('Error loading conversations:', error);
+        conversationsCache = [];
         showNoConversations();
     }
 }
 
-// Display conversations in sidebar
-function displayConversations(conversations) {
+// Load contacts user is allowed to start chatting with
+async function loadEligibleContacts(searchTerm = '') {
+    try {
+        const query = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
+        const response = await fetch(`${URLROOT}/Messages/getEligibleContacts${query}`);
+        const data = await response.json();
+
+        if (data.success) {
+            eligibleContacts = data.contacts || [];
+            renderSidebarList();
+        } else {
+            eligibleContacts = [];
+            renderSidebarList();
+        }
+    } catch (error) {
+        console.error('Error loading eligible contacts:', error);
+        eligibleContacts = [];
+        renderSidebarList();
+    }
+}
+
+function renderSidebarList(searchTerm = sidebarSearchTerm) {
     const conversationsList = document.getElementById('conversationsList');
-    
-    if (!conversations || conversations.length === 0) {
-        showNoConversations();
+    const conversationsSidebar = document.querySelector('.chat-conversations-sidebar');
+
+    if (!conversationsList) {
         return;
     }
 
+    sidebarSearchTerm = (searchTerm || '').toLowerCase().trim();
+
+    const conversationUserIds = new Set(
+        (conversationsCache || []).map(conv => String(conv.user_id))
+    );
+
+    const filteredContacts = (eligibleContacts || []).filter(contact => {
+        if (conversationUserIds.has(String(contact.user_id))) {
+            return false;
+        }
+
+        if (!sidebarSearchTerm) {
+            return true;
+        }
+
+        const name = (contact.user_name || '').toLowerCase();
+        const email = (contact.email || '').toLowerCase();
+        const role = (contact.user_role || '').toLowerCase();
+        return name.includes(sidebarSearchTerm) || email.includes(sidebarSearchTerm) || role.includes(sidebarSearchTerm);
+    });
+
+    const filteredConversations = (conversationsCache || []).filter(conv => {
+        if (!sidebarSearchTerm) {
+            return true;
+        }
+
+        const name = (conv.user_name || '').toLowerCase();
+        const message = (formatMessagePreview(conv.last_message) || '').toLowerCase();
+        return name.includes(sidebarSearchTerm) || message.includes(sidebarSearchTerm);
+    });
+
     conversationsList.innerHTML = '';
-    
-    conversations.forEach(conv => {
+
+    filteredContacts.forEach(contact => {
+        const item = createEligibleContactItem(contact);
+        conversationsList.appendChild(item);
+    });
+
+    filteredConversations.forEach(conv => {
         const conversationItem = createConversationItem(conv);
         conversationsList.appendChild(conversationItem);
+
+        if (String(selectedConversationId) === String(conv.conversation_id)) {
+            conversationItem.classList.add('active');
+        }
     });
+
+    if (conversationsSidebar) {
+        if (filteredContacts.length === 0 && filteredConversations.length === 0) {
+            conversationsSidebar.classList.add('empty-conversations');
+        } else {
+            conversationsSidebar.classList.remove('empty-conversations');
+        }
+    }
+}
+
+function createEligibleContactItem(contact) {
+    const div = document.createElement('div');
+    div.className = 'eligible-contact-item';
+
+    const initials = contact.user_name ? contact.user_name.substring(0, 2).toUpperCase() : 'U';
+    const role = (contact.user_role || '').toString();
+
+    div.innerHTML = `
+        <div class="eligible-contact-main">
+            <div class="eligible-contact-avatar"><span>${initials}</span></div>
+            <div class="eligible-contact-info">
+                <div class="eligible-contact-name">${escapeHtml(contact.user_name || 'Unknown User')}</div>
+                <div class="eligible-contact-role">${escapeHtml(role)}</div>
+            </div>
+        </div>
+        <button class="start-chat-btn" type="button">Chat</button>
+    `;
+
+    const button = div.querySelector('.start-chat-btn');
+    button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        startChatWithUser(contact.user_id);
+    });
+
+    div.addEventListener('click', () => startChatWithUser(contact.user_id));
+    return div;
+}
+
+// Display conversations in sidebar
+function displayConversations(conversations) {
+    conversationsCache = conversations || [];
+    renderSidebarList();
 }
 
 // Create conversation item element
@@ -89,10 +256,14 @@ function createConversationItem(conv) {
     div.className = `conversation-item ${conv.unread_count > 0 ? 'unread' : ''}`;
     div.dataset.conversationId = conv.conversation_id;
     div.dataset.userId = conv.user_id;
-    div.onclick = () => selectConversation(conv.conversation_id, conv.user_id);
+    div.dataset.userName = conv.user_name || '';
+    div.onclick = () => selectConversation(conv.conversation_id, conv.user_id, {
+        name: conv.user_name || '',
+        role: conv.user_role || ''
+    });
     
     const initials = conv.user_name ? conv.user_name.substring(0, 2).toUpperCase() : 'U';
-    const lastMessagePreview = conv.last_message ? truncateText(conv.last_message, 40) : 'No messages yet';
+    const lastMessagePreview = formatMessagePreview(conv.last_message);
     const timeAgo = conv.last_message_time ? formatTimeAgo(conv.last_message_time) : '';
     
     div.innerHTML = `
@@ -115,21 +286,38 @@ function createConversationItem(conv) {
     return div;
 }
 
+function formatMessagePreview(rawMessage) {
+    if (!rawMessage) return 'No messages yet';
+
+    const parsed = parseMessagePayload(rawMessage);
+    if (parsed.attachment && !parsed.text) {
+        return `[Attachment] ${parsed.attachment.name || 'file'}`;
+    }
+
+    if (parsed.attachment && parsed.text) {
+        return truncateText(parsed.text, 40);
+    }
+
+    return truncateText(parsed.text || rawMessage, 40);
+}
+
 // Show no conversations state
 function showNoConversations() {
     const conversationsList = document.getElementById('conversationsList');
-    conversationsList.innerHTML = `
-        <div class="no-conversations">
-            <div class="no-conversations-icon">💬</div>
-            <p>No conversations yet</p>
-            <small>Start a new conversation</small>
-        </div>
-    `;
+    const conversationsSidebar = document.querySelector('.chat-conversations-sidebar');
+
+    if (conversationsSidebar) {
+        conversationsSidebar.classList.add('empty-conversations');
+    }
+
+    conversationsCache = [];
+    conversationsList.innerHTML = '';
 }
 
 // Select a conversation
-async function selectConversation(conversationId, userId) {
+async function selectConversation(conversationId, userId, previewUser = null) {
     selectedConversationId = conversationId;
+    lastMessageId = 0;
     
     // Update active state
     document.querySelectorAll('.conversation-item').forEach(item => {
@@ -144,6 +332,11 @@ async function selectConversation(conversationId, userId) {
     // Show chat interface
     document.getElementById('chatEmptyState').style.display = 'none';
     document.getElementById('chatInterface').style.display = 'flex';
+
+    // Show known chat user details immediately while API data loads.
+    if (previewUser && previewUser.name) {
+        applyChatHeaderUser(previewUser);
+    }
     
     // Load user info and messages
     await loadChatUser(userId);
@@ -166,25 +359,23 @@ async function loadChatUser(userId) {
         const data = await response.json();
         
         if (data.success) {
-            const user = data.user;
-            const initials = user.name ? user.name.substring(0, 2).toUpperCase() : 'U';
-            
-            document.getElementById('avatarInitials').textContent = initials;
-            document.getElementById('chatUserName').textContent = user.name || 'Unknown User';
-            
-            // Update online status
-            const statusElement = document.getElementById('chatUserStatus');
-            if (user.is_online) {
-                statusElement.classList.remove('offline');
-                document.getElementById('statusText').textContent = 'Online';
-            } else {
-                statusElement.classList.add('offline');
-                document.getElementById('statusText').textContent = 'Offline';
-            }
+            applyChatHeaderUser(data.user || null);
         }
     } catch (error) {
         console.error('Error loading user info:', error);
     }
+}
+
+function applyChatHeaderUser(user) {
+    const safeUser = user || {};
+    const userName = safeUser.name || safeUser.user_name || 'Unknown User';
+    const initials = userName.substring(0, 2).toUpperCase();
+
+    const avatarEl = document.getElementById('avatarInitials');
+    const nameEl = document.getElementById('chatUserName');
+
+    if (avatarEl) avatarEl.textContent = initials;
+    if (nameEl) nameEl.textContent = userName;
 }
 
 // Load messages for conversation
@@ -208,9 +399,11 @@ async function loadMessages(conversationId) {
 function displayMessages(messages) {
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.innerHTML = '';
+    lastMessageId = 0;
     
     if (!messages || messages.length === 0) {
         showEmptyMessages();
+        lastMessageId = 0;
         return;
     }
     
@@ -228,6 +421,11 @@ function displayMessages(messages) {
         // Add message bubble
         const messageBubble = createMessageBubble(message);
         messagesDisplay.appendChild(messageBubble);
+        
+        // Track the highest message ID
+        if (message.message_id > lastMessageId) {
+            lastMessageId = message.message_id;
+        }
     });
     
     // Scroll to bottom
@@ -246,14 +444,27 @@ function createDateSeparator(dateString) {
 function createMessageBubble(message) {
     const div = document.createElement('div');
     const isSent = message.sender_id == currentUserId;
-    div.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+    const isPending = !!message.pending;
+    div.className = `message-bubble ${isSent ? 'sent' : 'received'}${isPending ? ' pending' : ''}`;
+    if (message.message_id !== undefined && message.message_id !== null) {
+        div.dataset.messageId = String(message.message_id);
+    }
+    const fingerprint = buildMessageFingerprint(message);
+    if (fingerprint) {
+        div.dataset.messageFingerprint = fingerprint;
+    }
     
     const time = formatTime(message.created_at);
-    const statusIcon = isSent ? (message.is_read ? '✓✓' : '✓') : '';
+    const statusIcon = isPending ? '' : (isSent ? (message.is_read ? '✓✓' : '✓') : '');
+    const parsed = parseMessagePayload(message.message);
+    const attachment = message.attachment || parsed.attachment || null;
+    const text = parsed.text || '';
+    const attachmentHtml = attachment ? renderAttachmentMarkup(attachment) : '';
     
     div.innerHTML = `
         <div class="message-content">
-            <p class="message-text">${escapeHtml(message.message)}</p>
+            ${text ? `<p class="message-text">${escapeHtml(text)}</p>` : ''}
+            ${attachmentHtml}
             <div class="message-meta">
                 <span class="message-time">${time}</span>
                 ${statusIcon ? `<span class="message-status-icon">${statusIcon}</span>` : ''}
@@ -264,13 +475,91 @@ function createMessageBubble(message) {
     return div;
 }
 
+function parseMessagePayload(rawMessage) {
+    if (!rawMessage) {
+        return { text: '', attachment: null };
+    }
+
+    if (typeof rawMessage === 'object') {
+        return {
+            text: rawMessage.text || '',
+            attachment: rawMessage.attachment || null
+        };
+    }
+
+    if (typeof rawMessage === 'string') {
+        try {
+            const parsed = JSON.parse(rawMessage);
+            if (parsed && typeof parsed === 'object' && (parsed.text !== undefined || parsed.attachment !== undefined)) {
+                return {
+                    text: parsed.text || '',
+                    attachment: parsed.attachment || null
+                };
+            }
+        } catch (error) {
+            // Plain text message
+        }
+
+        return { text: rawMessage, attachment: null };
+    }
+
+    return { text: '', attachment: null };
+}
+
+function getFileTypeLabel(fileName, mimeType) {
+    const mimeTypeLower = (mimeType || '').toLowerCase();
+    const fileNameLower = (fileName || '').toLowerCase();
+    
+    if (mimeTypeLower.includes('pdf') || fileNameLower.endsWith('.pdf')) {
+        return 'PDF document';
+    }
+    if (mimeTypeLower.includes('image/jpeg') || fileNameLower.endsWith('.jpg') || fileNameLower.endsWith('.jpeg')) {
+        return 'JPEG image';
+    }
+    if (mimeTypeLower.includes('image/png') || fileNameLower.endsWith('.png')) {
+        return 'PNG image';
+    }
+    
+    const extension = fileNameLower.split('.').pop();
+    return extension ? `${extension.toUpperCase()} file` : 'File attachment';
+}
+
+function renderAttachmentMarkup(attachment) {
+    if (!attachment) return '';
+
+    const fileUrl = attachment.url || attachment.file_url || attachment.path || '';
+    const fileName = attachment.name || attachment.file_name || 'attachment';
+    const mimeType = (attachment.type || attachment.mime_type || '').toLowerCase();
+    const isImage = mimeType.startsWith('image/');
+    const safeUrl = escapeHtml(fileUrl);
+    const safeName = escapeHtml(fileName);
+    const fileTypeLabel = getFileTypeLabel(fileName, mimeType);
+
+    if (isImage) {
+        return `
+            <a class="message-attachment-image-link" href="${safeUrl}" target="_blank" rel="noopener">
+                <img class="message-attachment-image" src="${safeUrl}" alt="${safeName}">
+            </a>
+        `;
+    }
+
+    return `
+        <a class="message-attachment-file" href="${safeUrl}" target="_blank" rel="noopener" download>
+            <span class="message-attachment-file-icon">FILE</span>
+            <span class="message-attachment-file-info">
+                <span class="message-attachment-file-name">${safeName}</span>
+                <span class="message-attachment-file-type">${fileTypeLabel}</span>
+            </span>
+        </a>
+    `;
+}
+
 // Show empty messages state
 function showEmptyMessages() {
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #8696a0; text-align: center;">
             <div>
-                <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📭</div>
                 <p style="margin: 0; font-size: 14px;">No messages yet</p>
                 <small style="font-size: 12px;">Send a message to start the conversation</small>
             </div>
@@ -281,53 +570,155 @@ function showEmptyMessages() {
 // Send message
 async function sendMessage() {
     const messageInput = document.getElementById('messageInput');
-    const messageText = messageInput.value.trim();
+    const rawMessageText = messageInput.value;
+    const messageText = rawMessageText.trim();
     
-    if (!messageText || !selectedConversationId) {
+    // Validation: Check if conversation is selected
+    if (!selectedConversationId) {
         return;
     }
     
+    // Validation: Check if message text or attachment exists
+    if (!messageText && !selectedAttachmentFile) {
+        return;
+    }
+    
+    // Validation: Check message length (max 1000 characters)
+    if (messageText.length > 1000) {
+        alert('Message is too long. Maximum 1000 characters allowed.');
+        return;
+    }
+
+    const optimisticMessage = {
+        message_id: `temp-${Date.now()}`,
+        sender_id: currentUserId,
+        message: selectedAttachmentFile
+            ? JSON.stringify({
+                text: messageText,
+                attachment: {
+                    name: selectedAttachmentFile.name,
+                    type: selectedAttachmentFile.type || ''
+                }
+            })
+            : messageText,
+        attachment: selectedAttachmentFile ? {
+            name: selectedAttachmentFile.name,
+            type: selectedAttachmentFile.type || ''
+        } : null,
+        created_at: new Date().toISOString(),
+        is_read: false,
+        pending: true
+    };
+
+    // Clear the input immediately so the sent text does not remain in the textarea.
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+    const pendingBubble = addMessageToDisplay(optimisticMessage, true);
+    
     try {
+        const formData = new FormData();
+        formData.append('conversation_id', selectedConversationId);
+        formData.append('message', messageText);
+
+        if (selectedAttachmentFile) {
+            formData.append('attachment', selectedAttachmentFile);
+        }
+
         const response = await fetch(`${URLROOT}/Messages/sendMessage`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                conversation_id: selectedConversationId,
-                message: messageText
-            })
+            body: formData
         });
-        
-        const data = await response.json();
+
+        const responseText = await response.text();
+        let data = null;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('Non-JSON response from sendMessage:', responseText);
+            if (pendingBubble) {
+                pendingBubble.classList.remove('pending');
+            }
+            loadMessages(selectedConversationId);
+            return;
+        }
         
         if (data.success) {
-            // Clear input
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
+            clearSelectedAttachment();
+
+            if (pendingBubble) {
+                pendingBubble.classList.remove('pending');
+                pendingBubble.dataset.messageId = String(data.message_id || pendingBubble.dataset.messageId || '');
+                pendingBubble.dataset.messageFingerprint = buildMessageFingerprint({
+                    sender_id: currentUserId,
+                    message: data.message || messageText,
+                    attachment: data.attachment || optimisticMessage.attachment,
+                    created_at: optimisticMessage.created_at
+                });
+                const statusIcon = pendingBubble.querySelector('.message-status-icon');
+                if (statusIcon) {
+                    statusIcon.textContent = '✓';
+                }
+            }
             
-            // Add message to display
-            addMessageToDisplay({
-                sender_id: currentUserId,
-                message: messageText,
-                created_at: new Date().toISOString(),
-                is_read: false
-            });
+            // Update lastMessageId
+            if (data.message_id > lastMessageId) {
+                lastMessageId = data.message_id;
+            }
             
+            // Refresh the active chat so the server state stays in sync immediately.
+            refreshActiveConversation();
+
             // Refresh conversations list
             loadConversations();
         } else {
-            alert('Failed to send message');
+            console.error('Failed to send message:', data.message || 'Unknown error');
+            if (pendingBubble) {
+                pendingBubble.classList.remove('pending');
+            }
+            loadConversations();
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        alert('Error sending message');
+        if (pendingBubble) {
+            pendingBubble.classList.remove('pending');
+        }
+        loadConversations();
     }
 }
 
 // Add message to display
-function addMessageToDisplay(message) {
+function addMessageToDisplay(message, isOptimistic = false) {
     const messagesDisplay = document.getElementById('messagesDisplay');
+    const messageId = message && message.message_id !== undefined && message.message_id !== null
+        ? String(message.message_id)
+        : '';
+    const fingerprint = buildMessageFingerprint(message);
+
+    if (messageId) {
+        const existingBubble = messagesDisplay.querySelector(`.message-bubble[data-message-id="${CSS.escape(messageId)}"]`);
+        if (existingBubble) {
+            return existingBubble;
+        }
+    }
+
+    if (fingerprint) {
+        const existingFingerprintBubble = messagesDisplay.querySelector(`.message-bubble[data-message-fingerprint="${CSS.escape(fingerprint)}"]`);
+        if (existingFingerprintBubble) {
+            if (messageId) {
+                existingFingerprintBubble.dataset.messageId = messageId;
+            }
+
+            if (message.sender_id == currentUserId) {
+                existingFingerprintBubble.classList.remove('pending');
+                const statusIcon = existingFingerprintBubble.querySelector('.message-status-icon');
+                if (statusIcon) {
+                    statusIcon.textContent = '✓';
+                }
+            }
+
+            return existingFingerprintBubble;
+        }
+    }
     
     // Remove empty state if exists
     const emptyState = messagesDisplay.querySelector('[style*="No messages yet"]');
@@ -338,6 +729,25 @@ function addMessageToDisplay(message) {
     const messageBubble = createMessageBubble(message);
     messagesDisplay.appendChild(messageBubble);
     scrollToBottom();
+
+    return isOptimistic ? messageBubble : undefined;
+}
+
+function buildMessageFingerprint(message) {
+    if (!message) return '';
+
+    const parsed = parseMessagePayload(message.message);
+    const text = (parsed.text || '').trim();
+    const attachment = message.attachment || parsed.attachment || null;
+    const attachmentName = attachment ? (attachment.name || attachment.file_name || attachment.path || '') : '';
+    const attachmentType = attachment ? (attachment.type || attachment.mime_type || '') : '';
+    const senderId = message.sender_id !== undefined && message.sender_id !== null ? String(message.sender_id) : '';
+
+    if (!senderId && !text && !attachmentName) {
+        return '';
+    }
+
+    return [senderId, text, attachmentName, attachmentType].join('|');
 }
 
 // Start polling for new messages
@@ -355,21 +765,49 @@ function startMessagePolling() {
     }, 3000);
 }
 
+// Refresh the currently selected conversation from the server.
+function refreshActiveConversation() {
+    if (selectedConversationId) {
+        checkForNewMessages();
+        markConversationAsRead(selectedConversationId);
+    }
+    loadConversations();
+}
+
+// Keep conversation list updated so receiver sees new chats/messages without page refresh.
+function startConversationPolling() {
+    if (conversationPollingInterval) {
+        clearInterval(conversationPollingInterval);
+    }
+
+    conversationPollingInterval = setInterval(() => {
+        loadConversations();
+    }, 3000);
+}
+
 // Check for new messages
 async function checkForNewMessages() {
     if (!selectedConversationId) return;
     
     try {
-        const response = await fetch(`${URLROOT}/Messages/getNewMessages/${selectedConversationId}`);
+        const response = await fetch(`${URLROOT}/Messages/getNewMessages/${selectedConversationId}?last_message_id=${lastMessageId}`);
         const data = await response.json();
         
         if (data.success && data.messages && data.messages.length > 0) {
             data.messages.forEach(message => {
                 addMessageToDisplay(message);
+                
+                // Update lastMessageId
+                if (message.message_id > lastMessageId) {
+                    lastMessageId = message.message_id;
+                }
             });
             
             // Mark as read
             markConversationAsRead(selectedConversationId);
+            
+            // Refresh conversations list to update preview
+            loadConversations();
         }
     } catch (error) {
         console.error('Error checking for new messages:', error);
@@ -397,19 +835,41 @@ async function markConversationAsRead(conversationId) {
 
 // Search conversations
 function searchConversations(event) {
-    const searchTerm = event.target.value.toLowerCase();
-    const conversationItems = document.querySelectorAll('.conversation-item');
-    
-    conversationItems.forEach(item => {
-        const name = item.querySelector('.conversation-name').textContent.toLowerCase();
-        const message = item.querySelector('.conversation-message').textContent.toLowerCase();
-        
-        if (name.includes(searchTerm) || message.includes(searchTerm)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
+    renderSidebarList(event.target.value || '');
+}
+
+// Start chat with selected eligible user (creates conversation if needed)
+async function startChatWithUser(recipientId) {
+    if (!recipientId) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${URLROOT}/Messages/createConversation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ recipient_id: recipientId })
+        });
+
+        const data = await response.json();
+        if (!data.success || !data.conversation_id) {
+            alert(data.message || 'Unable to start conversation');
+            return;
         }
-    });
+
+        const contact = eligibleContacts.find(c => String(c.user_id) === String(recipientId));
+
+        await loadConversations();
+        await selectConversation(data.conversation_id, recipientId, {
+            name: contact ? (contact.user_name || '') : '',
+            role: contact ? (contact.user_role || '') : ''
+        });
+    } catch (error) {
+        console.error('Error starting chat:', error);
+        alert('Error starting chat');
+    }
 }
 
 // Auto resize textarea
@@ -490,5 +950,9 @@ function escapeHtml(text) {
 window.addEventListener('beforeunload', function() {
     if (messagePollingInterval) {
         clearInterval(messagePollingInterval);
+    }
+
+    if (conversationPollingInterval) {
+        clearInterval(conversationPollingInterval);
     }
 });

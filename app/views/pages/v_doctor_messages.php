@@ -29,6 +29,11 @@
                 Profile
             </a>
         </nav>
+
+        <div class="sidebar-bottom">
+            <a href="<?php echo URLROOT; ?>/Users/logout" class="nav-item-bottom" id="logoutBtn">Logout</a>
+            <a href="<?php echo URLROOT; ?>/Pages/doctorSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
+        </div>
     </aside>
 
     <main class="main-content">

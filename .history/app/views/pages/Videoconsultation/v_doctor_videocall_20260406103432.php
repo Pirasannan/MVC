@@ -57,7 +57,7 @@ $apt = $data['appointment'];
     <div class="videocall-main">
         <!-- Remote video (patient) -->
         <div class="remote-video-container" id="remoteVideoWrapper">
-            <video id="remote-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:contain;"></video>
+            <video id="remote-video" autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>
             <div class="video-overlay" id="remoteOverlay">
                 <div class="participant-name"><?= htmlspecialchars($apt->patient_name) ?></div>
                 <div class="connection-status" id="connectionStatus">Waiting for patient…</div>
@@ -184,7 +184,7 @@ $apt = $data['appointment'];
 
 <script type="module">
 import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1';
-const TrackType = { UNSPECIFIED: 0, AUDIO: 1, VIDEO: 2, SCREEN_SHARE: 3 };
+const TrackType = { VIDEO: 1, AUDIO: 2 };
 
 /* ── Stream credentials from PHP ── */
 const API_KEY   = '<?= htmlspecialchars($data['stream_api_key'],  ENT_QUOTES) ?>';
@@ -274,18 +274,14 @@ function bindRemoteParticipant(participant) {
     const sid    = participant.sessionId;
     const remoteVideoEl = document.getElementById('remote-video');
 
-    // Video — only skip if we already hold a valid unbind function.
-    // Map.has() returns true even for null values, so use typeof check to
-    // allow retrying when the first call returned null (track not yet published).
-    if (typeof videoBindings.get(sid) !== 'function') {
+    // Video
+    if (!videoBindings.has(sid)) {
         const unbind = streamCall.bindVideoElement(remoteVideoEl, sid, 'videoTrack');
-        if (typeof unbind === 'function') {
-            videoBindings.set(sid, unbind);
-        }
+        videoBindings.set(sid, unbind ?? null);
     }
 
-    // Audio — same retry guard
-    if (typeof audioBindings.get(sid) !== 'function') {
+    // Audio — must be a separate <audio> element (not the <video> element)
+    if (!audioBindings.has(sid)) {
         let audioEl = document.getElementById(`audio-${sid}`);
         if (!audioEl) {
             audioEl = document.createElement('audio');
@@ -294,9 +290,7 @@ function bindRemoteParticipant(participant) {
             document.body.appendChild(audioEl);
         }
         const unbind = streamCall.bindAudioElement(audioEl, sid);
-        if (typeof unbind === 'function') {
-            audioBindings.set(sid, unbind);
-        }
+        audioBindings.set(sid, unbind ?? null);
     }
 }
 
@@ -386,6 +380,8 @@ async function init() {
             } else {
                 overlay.style.display = '';
                 if (connStatus) connStatus.textContent = 'Waiting for patient\u2026';
+                const remoteEl = document.getElementById('remote-video');
+                if (remoteEl) remoteEl.srcObject = null;
             }
         });
 

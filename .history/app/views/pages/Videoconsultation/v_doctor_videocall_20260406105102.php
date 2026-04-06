@@ -183,8 +183,7 @@ $apt = $data['appointment'];
 </div>
 
 <script type="module">
-import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1';
-const TrackType = { UNSPECIFIED: 0, AUDIO: 1, VIDEO: 2, SCREEN_SHARE: 3 };
+import { StreamVideoClient, TrackType } from 'https://esm.sh/@stream-io/video-client@1';
 
 /* ── Stream credentials from PHP ── */
 const API_KEY   = '<?= htmlspecialchars($data['stream_api_key'],  ENT_QUOTES) ?>';

@@ -57,7 +57,7 @@ $apt = $data['appointment'];
     <div class="videocall-main">
         <!-- Remote video (patient) -->
         <div class="remote-video-container" id="remoteVideoWrapper">
-            <video id="remote-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:contain;"></video>
+            <video id="remote-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;"></video>
             <div class="video-overlay" id="remoteOverlay">
                 <div class="participant-name"><?= htmlspecialchars($apt->patient_name) ?></div>
                 <div class="connection-status" id="connectionStatus">Waiting for patient…</div>
@@ -164,27 +164,10 @@ $apt = $data['appointment'];
             </div>
         </div>
     </div>
-
-    <!-- Participants Panel -->
-    <div class="participants-panel" id="participantsPanel">
-        <div class="panel-header">
-            <h4>Participants <span id="participantCount" style="font-size:14px;color:#64748b;font-weight:400;">(0)</span></h4>
-            <button class="close-btn" onclick="toggleParticipants()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-            </button>
-        </div>
-        <div class="participants-list" id="participantsList">
-            <p style="color:#94a3b8;text-align:center;margin-top:20px;font-size:13px;">Connecting…</p>
-        </div>
-    </div>
 </div>
 
 <script type="module">
 import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1';
-const TrackType = { UNSPECIFIED: 0, AUDIO: 1, VIDEO: 2, SCREEN_SHARE: 3 };
 
 /* ── Stream credentials from PHP ── */
 const API_KEY   = '<?= htmlspecialchars($data['stream_api_key'],  ENT_QUOTES) ?>';
@@ -195,21 +178,14 @@ const USER_NAME = '<?= htmlspecialchars($data['stream_user_name'], ENT_QUOTES) ?
 const BACK_URL  = '<?= URLROOT ?>/Appointments/doctor';
 
 /* ── State ── */
-let callTimerRef   = null;
-let streamCall     = null;
-let streamClient   = null;
+let micEnabled    = true;
+let cameraEnabled = true;
+let callTimerRef  = null;
+let streamCall    = null;
+let streamClient  = null;
 let participantSub = null;
-
-/*
- * The Stream Video SDK requires call.bindVideoElement() / call.bindAudioElement()
- * to manage WebRTC track subscriptions internally. Manually setting srcObject
- * against participant.videoStream is insufficient — the SDK must wire up the
- * track negotiation itself.
- *
- * Each bind call returns an unbind() function that must be called on cleanup.
- */
-const videoBindings = new Map(); // sessionId → unbind()
-const audioBindings = new Map(); // sessionId → unbind()
+let remoteVideoSub = null;
+let activeRemoteSessionId = null;
 
 /* ── Call timer ── */
 function startCallTimer() {
@@ -223,94 +199,12 @@ function startCallTimer() {
     }, 1000);
 }
 
-/* ── Render participants sidebar ── */
-function renderParticipantsSidebar(participants) {
-    const list    = document.getElementById('participantsList');
-    const countEl = document.getElementById('participantCount');
-    if (!list) return;
-    countEl.textContent = `(${participants.length})`;
-    list.innerHTML = '';
-    participants.forEach(p => {
-        const hasVideo = Array.isArray(p.publishedTracks) && p.publishedTracks.includes(TrackType.VIDEO);
-        const hasAudio = Array.isArray(p.publishedTracks) && p.publishedTracks.includes(TrackType.AUDIO);
-        const isLocal  = !!p.isLocalParticipant;
-        const dispName = (p.name || p.userId || 'Unknown') + (isLocal ? ' (You)' : '');
-        const initials = (p.name || '?').slice(0, 2).toUpperCase();
-        const trackList = (p.publishedTracks || []).join(', ') || '—';
-        const card = document.createElement('div');
-        card.className = 'ptcpt-card';
-        card.innerHTML = `
-            <div class="ptcpt-avatar${isLocal ? ' local' : ''}">${initials}</div>
-            <div class="ptcpt-body">
-                <div class="ptcpt-name">${dispName}</div>
-                <div class="ptcpt-icons">
-                    <span class="ptcpt-icon ${hasAudio ? 'on' : 'off'}">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            ${hasAudio
-                                ? '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'
-                                : '<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'
-                            }
-                        </svg>
-                        ${hasAudio ? 'Mic on' : 'Muted'}
-                    </span>
-                    <span class="ptcpt-icon ${hasVideo ? 'on' : 'off'}">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            ${hasVideo
-                                ? '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>'
-                                : '<path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/><line x1="1" y1="1" x2="23" y2="23"/>'
-                            }
-                        </svg>
-                        ${hasVideo ? 'Cam on' : 'Cam off'}
-                    </span>
-                </div>
-                <div class="ptcpt-debug">tracks:[${trackList}] | bound-video:${videoBindings.has(p.sessionId) ? 'YES' : 'NO'} | bound-audio:${audioBindings.has(p.sessionId) ? 'YES' : 'NO'}</div>
-            </div>`;
-        list.appendChild(card);
-    });
-}
-
-/* ── Bind / unbind a remote participant using the SDK methods ── */
-function bindRemoteParticipant(participant) {
-    const sid    = participant.sessionId;
-    const remoteVideoEl = document.getElementById('remote-video');
-
-    // Video — only skip if we already hold a valid unbind function.
-    // Map.has() returns true even for null values, so use typeof check to
-    // allow retrying when the first call returned null (track not yet published).
-    if (typeof videoBindings.get(sid) !== 'function') {
-        const unbind = streamCall.bindVideoElement(remoteVideoEl, sid, 'videoTrack');
-        if (typeof unbind === 'function') {
-            videoBindings.set(sid, unbind);
-        }
+/* ── Bind a MediaStream to a <video> element ── */
+function bindStream(videoEl, stream) {
+    if (videoEl && stream && videoEl.srcObject !== stream) {
+        videoEl.srcObject = stream;
+        videoEl.play().catch(() => {});
     }
-
-    // Audio — same retry guard
-    if (typeof audioBindings.get(sid) !== 'function') {
-        let audioEl = document.getElementById(`audio-${sid}`);
-        if (!audioEl) {
-            audioEl = document.createElement('audio');
-            audioEl.id        = `audio-${sid}`;
-            audioEl.autoplay  = true;
-            document.body.appendChild(audioEl);
-        }
-        const unbind = streamCall.bindAudioElement(audioEl, sid);
-        if (typeof unbind === 'function') {
-            audioBindings.set(sid, unbind);
-        }
-    }
-}
-
-function unbindRemoteParticipant(sessionId) {
-    const unbindVideo = videoBindings.get(sessionId);
-    if (typeof unbindVideo === 'function') unbindVideo();
-    videoBindings.delete(sessionId);
-
-    const unbindAudio = audioBindings.get(sessionId);
-    if (typeof unbindAudio === 'function') unbindAudio();
-    audioBindings.delete(sessionId);
-
-    const audioEl = document.getElementById(`audio-${sessionId}`);
-    if (audioEl) audioEl.remove();
 }
 
 /* ── Initialise Stream Video ── */
@@ -324,72 +218,72 @@ async function init() {
 
         streamCall = streamClient.call('<?= STREAM_CALL_TYPE ?>', CALL_ID);
 
-        // Doctor creates the call room (idempotent — safe to call again)
+        // Doctor creates the call room (idempotent – safe to call again)
         await streamCall.join({ create: true });
 
         await streamCall.camera.enable();
         await streamCall.microphone.enable();
 
-        /* Local video — camera.state.mediaStream$ is always correct for local preview */
+        /* Local video */
         streamCall.camera.state.mediaStream$.subscribe(stream => {
-            const localEl = document.getElementById('local-video');
-            if (localEl && stream && localEl.srcObject !== stream) {
-                localEl.srcObject = stream;
-                localEl.play().catch(() => {});
-            }
+            bindStream(document.getElementById('local-video'), stream);
         });
 
-        /* ── Button state driven by SDK status$ (no manual bool tracking) ── */
-        streamCall.microphone.state.status$.subscribe(status => {
-            const on  = status === 'enabled';
-            const btn = document.getElementById('micBtn');
-            btn.classList.toggle('active', on);
-            btn.querySelector('svg').innerHTML = on
-                ? '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'
-                : '<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>';
-            // Force sidebar refresh so local participant's mic badge updates
-            renderParticipantsSidebar(streamCall.state.participants);
-        });
-
-        streamCall.camera.state.status$.subscribe(status => {
-            const on  = status === 'enabled';
-            const btn = document.getElementById('cameraBtn');
-            btn.classList.toggle('active', on);
-            btn.querySelector('svg').innerHTML = on
-                ? '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>'
-                : '<path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/><line x1="1" y1="1" x2="23" y2="23"/>';
-            // Force sidebar refresh so local participant's cam badge updates
-            renderParticipantsSidebar(streamCall.state.participants);
-        });
-
-        /* All participants → sidebar + remote binding */
-        const overlay    = document.getElementById('remoteOverlay');
+        /* Remote participants */
+        const overlay = document.getElementById('remoteOverlay');
         const connStatus = document.getElementById('connectionStatus');
 
-        participantSub = streamCall.state.participants$.subscribe(participants => {
-            renderParticipantsSidebar(participants);
-
-            const remoteParticipants = participants.filter(p => !p.isLocalParticipant);
-
-            // Bind any new remote participants
-            remoteParticipants.forEach(p => bindRemoteParticipant(p));
-
-            // Unbind participants who have left
-            const currentIds = new Set(remoteParticipants.map(p => p.sessionId));
-            [...videoBindings.keys()].forEach(sid => {
-                if (!currentIds.has(sid)) unbindRemoteParticipant(sid);
-            });
-
-            if (remoteParticipants.length > 0) {
+        participantSub = streamCall.state.remoteParticipants$.subscribe(participants => {
+            const remoteEl = document.getElementById('remote-video');
+            if (participants.length > 0) {
                 overlay.style.display = 'none';
+                const p = participants[0];
+                console.debug('[DoctorCall] remote participant update', {
+                    sessionId: p.sessionId,
+                    hasVideoStream$: !!p.videoStream$,
+                    hasVideoStream: !!p.videoStream,
+                });
+
+                if (p.sessionId !== activeRemoteSessionId) {
+                    if (remoteVideoSub) {
+                        remoteVideoSub.unsubscribe();
+                        remoteVideoSub = null;
+                    }
+                    activeRemoteSessionId = p.sessionId;
+                    if (remoteEl) remoteEl.srcObject = null;
+                }
+
+                // Retry subscription whenever we have a participant update and
+                // no active subscription yet (videoStream$ may appear after join).
+                if (!remoteVideoSub && p.videoStream$ && typeof p.videoStream$.subscribe === 'function') {
+                    remoteVideoSub = p.videoStream$.subscribe(stream => {
+                        console.debug('[DoctorCall] remote videoStream$ emission', {
+                            hasStream: !!stream,
+                            trackCount: stream && typeof stream.getTracks === 'function' ? stream.getTracks().length : 0,
+                        });
+                        if (stream) bindStream(remoteEl, stream);
+                    });
+                }
+
+                if (!remoteVideoSub && p.videoStream) {
+                    bindStream(remoteEl, p.videoStream);
+                }
                 if (connStatus) connStatus.textContent = 'Connected';
             } else {
                 overlay.style.display = '';
+                if (remoteVideoSub) {
+                    remoteVideoSub.unsubscribe();
+                    remoteVideoSub = null;
+                }
+                activeRemoteSessionId = null;
+                if (remoteEl) remoteEl.srcObject = null;
                 if (connStatus) connStatus.textContent = 'Waiting for patient\u2026';
             }
         });
 
         startCallTimer();
+        document.getElementById('callTimer').closest('.call-status') &&
+            (document.getElementById('callTimer').closest('.call-duration').querySelector('.call-status').textContent = 'Live');
 
     } catch (err) {
         console.error('Stream Video init error:', err);
@@ -398,32 +292,36 @@ async function init() {
 }
 
 /* ── Mic toggle ── */
-document.getElementById('micBtn').addEventListener('click', () => {
-    streamCall?.microphone.toggle();
+document.getElementById('micBtn').addEventListener('click', async () => {
+    if (!streamCall) return;
+    await streamCall.microphone.toggle();
+    micEnabled = !micEnabled;
+    document.getElementById('micBtn').classList.toggle('active', micEnabled);
 });
 
 /* ── Camera toggle ── */
-document.getElementById('cameraBtn').addEventListener('click', () => {
-    streamCall?.camera.toggle();
+document.getElementById('cameraBtn').addEventListener('click', async () => {
+    if (!streamCall) return;
+    await streamCall.camera.toggle();
+    cameraEnabled = !cameraEnabled;
+    document.getElementById('cameraBtn').classList.toggle('active', cameraEnabled);
 });
 
 /* ── End call ── */
 document.getElementById('endCallBtn').addEventListener('click', async () => {
     if (!confirm('End the call?')) return;
-    if (callTimerRef)   clearInterval(callTimerRef);
+    if (callTimerRef) clearInterval(callTimerRef);
     if (participantSub) participantSub.unsubscribe();
-    // Unbind all remote participants
-    [...videoBindings.keys()].forEach(sid => unbindRemoteParticipant(sid));
-    if (streamCall)     await streamCall.leave();
-    if (streamClient)   await streamClient.disconnectUser();
+    if (remoteVideoSub) remoteVideoSub.unsubscribe();
+    if (streamCall)   await streamCall.leave();
+    if (streamClient) await streamClient.disconnectUser();
     window.location.href = BACK_URL;
 });
 
 /* ── Utility panels ── */
-window.toggleChat         = () => document.getElementById('chatPanel').classList.toggle('active');
-window.toggleNotes        = () => document.getElementById('notesPanel').classList.toggle('active');
-window.toggleParticipants = () => document.getElementById('participantsPanel').classList.toggle('active');
-window.saveNotes          = () => alert('Notes saved!');
+window.toggleChat  = () => document.getElementById('chatPanel').classList.toggle('active');
+window.toggleNotes = () => document.getElementById('notesPanel').classList.toggle('active');
+window.saveNotes   = () => alert('Notes saved!');
 
 init();
 </script>

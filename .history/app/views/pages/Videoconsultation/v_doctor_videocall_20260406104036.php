@@ -57,7 +57,7 @@ $apt = $data['appointment'];
     <div class="videocall-main">
         <!-- Remote video (patient) -->
         <div class="remote-video-container" id="remoteVideoWrapper">
-            <video id="remote-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:contain;"></video>
+            <video id="remote-video" autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>
             <div class="video-overlay" id="remoteOverlay">
                 <div class="participant-name"><?= htmlspecialchars($apt->patient_name) ?></div>
                 <div class="connection-status" id="connectionStatus">Waiting for patient…</div>
@@ -184,7 +184,7 @@ $apt = $data['appointment'];
 
 <script type="module">
 import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1';
-const TrackType = { UNSPECIFIED: 0, AUDIO: 1, VIDEO: 2, SCREEN_SHARE: 3 };
+const TrackType = { VIDEO: 1, AUDIO: 2 };
 
 /* ── Stream credentials from PHP ── */
 const API_KEY   = '<?= htmlspecialchars($data['stream_api_key'],  ENT_QUOTES) ?>';
@@ -327,6 +327,10 @@ async function init() {
         // Doctor creates the call room (idempotent — safe to call again)
         await streamCall.join({ create: true });
 
+        // Tell the SDK which region to track for visibility-based SFU subscriptions.
+        // Without this, the SFU may not forward remote tracks to this participant.
+        streamCall.setViewport(document.querySelector('.videocall-main'));
+
         await streamCall.camera.enable();
         await streamCall.microphone.enable();
 
@@ -386,6 +390,8 @@ async function init() {
             } else {
                 overlay.style.display = '';
                 if (connStatus) connStatus.textContent = 'Waiting for patient\u2026';
+                const remoteEl = document.getElementById('remote-video');
+                if (remoteEl) remoteEl.srcObject = null;
             }
         });
 

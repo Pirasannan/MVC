@@ -57,7 +57,7 @@ $apt = $data['appointment'];
     <div class="videocall-main">
         <!-- Remote video (patient) -->
         <div class="remote-video-container" id="remoteVideoWrapper">
-            <video id="remote-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:contain;"></video>
+            <video id="remote-video" autoplay playsinline style="width:100%;height:100%;object-fit:cover;"></video>
             <div class="video-overlay" id="remoteOverlay">
                 <div class="participant-name"><?= htmlspecialchars($apt->patient_name) ?></div>
                 <div class="connection-status" id="connectionStatus">Waiting for patient…</div>
@@ -184,7 +184,7 @@ $apt = $data['appointment'];
 
 <script type="module">
 import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1';
-const TrackType = { UNSPECIFIED: 0, AUDIO: 1, VIDEO: 2, SCREEN_SHARE: 3 };
+const TrackType = { VIDEO: 1, AUDIO: 2 };
 
 /* ── Stream credentials from PHP ── */
 const API_KEY   = '<?= htmlspecialchars($data['stream_api_key'],  ENT_QUOTES) ?>';
@@ -195,6 +195,8 @@ const USER_NAME = '<?= htmlspecialchars($data['stream_user_name'], ENT_QUOTES) ?
 const BACK_URL  = '<?= URLROOT ?>/Appointments/doctor';
 
 /* ── State ── */
+let micEnabled     = true;
+let cameraEnabled  = true;
 let callTimerRef   = null;
 let streamCall     = null;
 let streamClient   = null;
@@ -274,18 +276,14 @@ function bindRemoteParticipant(participant) {
     const sid    = participant.sessionId;
     const remoteVideoEl = document.getElementById('remote-video');
 
-    // Video — only skip if we already hold a valid unbind function.
-    // Map.has() returns true even for null values, so use typeof check to
-    // allow retrying when the first call returned null (track not yet published).
-    if (typeof videoBindings.get(sid) !== 'function') {
+    // Video
+    if (!videoBindings.has(sid)) {
         const unbind = streamCall.bindVideoElement(remoteVideoEl, sid, 'videoTrack');
-        if (typeof unbind === 'function') {
-            videoBindings.set(sid, unbind);
-        }
+        videoBindings.set(sid, unbind ?? null);
     }
 
-    // Audio — same retry guard
-    if (typeof audioBindings.get(sid) !== 'function') {
+    // Audio — must be a separate <audio> element (not the <video> element)
+    if (!audioBindings.has(sid)) {
         let audioEl = document.getElementById(`audio-${sid}`);
         if (!audioEl) {
             audioEl = document.createElement('audio');
@@ -294,9 +292,7 @@ function bindRemoteParticipant(participant) {
             document.body.appendChild(audioEl);
         }
         const unbind = streamCall.bindAudioElement(audioEl, sid);
-        if (typeof unbind === 'function') {
-            audioBindings.set(sid, unbind);
-        }
+        audioBindings.set(sid, unbind ?? null);
     }
 }
 
@@ -339,29 +335,6 @@ async function init() {
             }
         });
 
-        /* ── Button state driven by SDK status$ (no manual bool tracking) ── */
-        streamCall.microphone.state.status$.subscribe(status => {
-            const on  = status === 'enabled';
-            const btn = document.getElementById('micBtn');
-            btn.classList.toggle('active', on);
-            btn.querySelector('svg').innerHTML = on
-                ? '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>'
-                : '<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>';
-            // Force sidebar refresh so local participant's mic badge updates
-            renderParticipantsSidebar(streamCall.state.participants);
-        });
-
-        streamCall.camera.state.status$.subscribe(status => {
-            const on  = status === 'enabled';
-            const btn = document.getElementById('cameraBtn');
-            btn.classList.toggle('active', on);
-            btn.querySelector('svg').innerHTML = on
-                ? '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>'
-                : '<path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m5.66 0H14a2 2 0 0 1 2 2v3.34l1 1L23 7v10"/><line x1="1" y1="1" x2="23" y2="23"/>';
-            // Force sidebar refresh so local participant's cam badge updates
-            renderParticipantsSidebar(streamCall.state.participants);
-        });
-
         /* All participants → sidebar + remote binding */
         const overlay    = document.getElementById('remoteOverlay');
         const connStatus = document.getElementById('connectionStatus');
@@ -386,6 +359,8 @@ async function init() {
             } else {
                 overlay.style.display = '';
                 if (connStatus) connStatus.textContent = 'Waiting for patient\u2026';
+                const remoteEl = document.getElementById('remote-video');
+                if (remoteEl) remoteEl.srcObject = null;
             }
         });
 
@@ -398,13 +373,19 @@ async function init() {
 }
 
 /* ── Mic toggle ── */
-document.getElementById('micBtn').addEventListener('click', () => {
-    streamCall?.microphone.toggle();
+document.getElementById('micBtn').addEventListener('click', async () => {
+    if (!streamCall) return;
+    await streamCall.microphone.toggle();
+    micEnabled = !micEnabled;
+    document.getElementById('micBtn').classList.toggle('active', micEnabled);
 });
 
 /* ── Camera toggle ── */
-document.getElementById('cameraBtn').addEventListener('click', () => {
-    streamCall?.camera.toggle();
+document.getElementById('cameraBtn').addEventListener('click', async () => {
+    if (!streamCall) return;
+    await streamCall.camera.toggle();
+    cameraEnabled = !cameraEnabled;
+    document.getElementById('cameraBtn').classList.toggle('active', cameraEnabled);
 });
 
 /* ── End call ── */

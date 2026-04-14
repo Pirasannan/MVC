@@ -106,6 +106,9 @@ class Messages extends Controller {
         }
         
         $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = [];
+        }
         $conversationId = $_POST['conversation_id'] ?? ($input['conversation_id'] ?? null);
         $messageText = $_POST['message'] ?? ($input['message'] ?? '');
         $userId = $_SESSION['user_id'];
@@ -215,6 +218,79 @@ class Messages extends Controller {
         }
     }
 
+    // Update a message
+    public function updateMessage() {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = [];
+        }
+        $messageId = $_POST['message_id'] ?? ($input['message_id'] ?? null);
+        $messageText = $_POST['message'] ?? ($input['message'] ?? '');
+        $userId = $_SESSION['user_id'];
+
+        $messageText = trim((string)$messageText);
+
+        if (!$messageId) {
+            echo json_encode(['success' => false, 'message' => 'Missing message ID']);
+            return;
+        }
+
+        try {
+            $existingMessage = $this->messageModel->getMessageById($messageId);
+            if (!$existingMessage) {
+                echo json_encode(['success' => false, 'message' => 'Message not found']);
+                return;
+            }
+
+            if ((int)$existingMessage->sender_id !== (int)$userId) {
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                return;
+            }
+
+            if (!$this->messageModel->hasAccessToConversation($existingMessage->conversation_id, $userId)) {
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                return;
+            }
+
+            $parsedMessage = $this->decodeMessagePayload($existingMessage->message);
+            $hasAttachment = !empty($parsedMessage['attachment']);
+
+            if ($messageText === '' && !$hasAttachment) {
+                echo json_encode(['success' => false, 'message' => 'Message cannot be empty']);
+                return;
+            }
+
+            if (strlen($messageText) > 1000) {
+                echo json_encode(['success' => false, 'message' => 'Message too long (max 1000 characters)']);
+                return;
+            }
+
+            $storedMessage = $this->buildMessagePayload($messageText, $parsedMessage['attachment'] ?? null);
+            $result = $this->messageModel->updateMessage($messageId, $userId, $storedMessage);
+
+            echo json_encode([
+                'success' => $result,
+                'message' => $result ? 'Message updated' : 'Failed to update message',
+                'message_id' => (int)$messageId,
+                'conversation_id' => (int)$existingMessage->conversation_id,
+                'message_text' => $messageText,
+                'attachment' => $parsedMessage['attachment'] ?? null
+            ]);
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error updating message'
+            ]);
+        }
+    }
+
     // Upload chat attachment (images and PDFs)
     private function uploadChatAttachment($file, $userId) {
         $result = [
@@ -306,6 +382,65 @@ class Messages extends Controller {
         }
     }
 
+    private function decodeMessagePayload($message) {
+        if (is_array($message)) {
+            return [
+                'text' => (string)($message['text'] ?? ''),
+                'attachment' => $message['attachment'] ?? null
+            ];
+        }
+
+        if (!is_string($message) || $message === '') {
+            return ['text' => '', 'attachment' => null];
+        }
+
+        $decoded = json_decode($message, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'text' => (string)($decoded['text'] ?? ''),
+                'attachment' => $decoded['attachment'] ?? null
+            ];
+        }
+
+        return ['text' => $message, 'attachment' => null];
+    }
+
+    private function buildMessagePayload($messageText, $attachment = null) {
+        $messageText = trim((string)$messageText);
+
+        if (!empty($attachment)) {
+            return json_encode([
+                'text' => $messageText,
+                'attachment' => $attachment
+            ], JSON_UNESCAPED_SLASHES);
+        }
+
+        return $messageText;
+    }
+
+    private function deleteAttachmentFile($attachment = null) {
+        if (!is_array($attachment)) {
+            return;
+        }
+
+        $relativePath = $attachment['path'] ?? '';
+        if ($relativePath === '' && !empty($attachment['url'])) {
+            $urlPath = parse_url($attachment['url'], PHP_URL_PATH);
+            if (is_string($urlPath)) {
+                $relativePath = ltrim($urlPath, '/');
+            }
+        }
+
+        if ($relativePath === '' || strpos($relativePath, 'uploads/chat_attachments/') !== 0) {
+            return;
+        }
+
+        $absolutePath = dirname(APPROOT) . '/public/' . $relativePath;
+        if (is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+    }
+
     // Get new messages since last check
     public function getNewMessages($conversationId) {
         header('Content-Type: application/json');
@@ -369,6 +504,9 @@ class Messages extends Controller {
         }
         
         $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = [];
+        }
         $recipientId = $input['recipient_id'] ?? null;
         $userId = $_SESSION['user_id'];
         
@@ -479,6 +617,9 @@ class Messages extends Controller {
         }
         
         $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = [];
+        }
         $messageId = $input['message_id'] ?? null;
         $userId = $_SESSION['user_id'];
         
@@ -488,7 +629,29 @@ class Messages extends Controller {
         }
         
         try {
+            $existingMessage = $this->messageModel->getMessageById($messageId);
+            if (!$existingMessage) {
+                echo json_encode(['success' => false, 'message' => 'Message not found']);
+                return;
+            }
+
+            if ((int)$existingMessage->sender_id !== (int)$userId) {
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                return;
+            }
+
+            if (!$this->messageModel->hasAccessToConversation($existingMessage->conversation_id, $userId)) {
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                return;
+            }
+
+            $parsedMessage = $this->decodeMessagePayload($existingMessage->message);
+            $this->deleteAttachmentFile($parsedMessage['attachment'] ?? null);
+
             $result = $this->messageModel->deleteMessage($messageId, $userId);
+            if ($result) {
+                $this->messageModel->refreshConversationLastMessageTime($existingMessage->conversation_id);
+            }
             
             echo json_encode([
                 'success' => $result,

@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS messages (
     message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_conversation (conversation_id),

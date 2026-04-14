@@ -105,6 +105,24 @@ class Message {
         return false;
     }
 
+    // Get a single message by ID
+    public function getMessageById($messageId) {
+        $this->db->query('
+            SELECT
+                message_id,
+                conversation_id,
+                sender_id,
+                message,
+                created_at
+            FROM messages
+            WHERE message_id = :message_id
+            LIMIT 1
+        ');
+
+        $this->db->bind(':message_id', $messageId);
+        return $this->db->single();
+    }
+
     // Update conversation last message time
     private function updateConversationTime($conversationId) {
         $this->db->query('
@@ -203,6 +221,46 @@ class Message {
 
         $this->db->bind(':message_id', $messageId);
         $this->db->bind(':user_id', $userId);
+        if (!$this->db->execute()) {
+            return false;
+        }
+
+        return $this->db->rowCount() > 0;
+    }
+
+    // Update a message (only sender can update)
+    public function updateMessage($messageId, $userId, $messageText) {
+        $this->db->query('
+            UPDATE messages
+            SET message = :message
+            WHERE message_id = :message_id
+            AND sender_id = :user_id
+        ');
+
+        $this->db->bind(':message_id', $messageId);
+        $this->db->bind(':user_id', $userId);
+        $this->db->bind(':message', $messageText);
+        if (!$this->db->execute()) {
+            return false;
+        }
+
+        return $this->db->rowCount() > 0;
+    }
+
+    // Recalculate the latest message timestamp after a delete
+    public function refreshConversationLastMessageTime($conversationId) {
+        $this->db->query('
+            UPDATE conversations
+            SET last_message_time = COALESCE(
+                (SELECT MAX(created_at) FROM messages WHERE conversation_id = :conversation_id_max),
+                (SELECT created_at FROM conversations WHERE conversation_id = :conversation_id_created)
+            )
+            WHERE conversation_id = :conversation_id_where
+        ');
+
+        $this->db->bind(':conversation_id_max', $conversationId);
+        $this->db->bind(':conversation_id_created', $conversationId);
+        $this->db->bind(':conversation_id_where', $conversationId);
         return $this->db->execute();
     }
 

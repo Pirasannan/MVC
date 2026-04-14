@@ -276,7 +276,6 @@ function createConversationItem(conv) {
                 <span class="conversation-time">${timeAgo}</span>
             </div>
             <div class="conversation-preview">
-                ${conv.is_sent ? '<span class="message-status">✓</span>' : ''}
                 <span class="conversation-message">${escapeHtml(lastMessagePreview)}</span>
                 ${conv.unread_count > 0 ? `<span class="unread-badge">${conv.unread_count}</span>` : ''}
             </div>
@@ -455,22 +454,48 @@ function createMessageBubble(message) {
     }
     
     const time = formatTime(message.created_at);
-    const statusIcon = isPending ? '' : (isSent ? (message.is_read ? '✓✓' : '✓') : '');
     const parsed = parseMessagePayload(message.message);
     const attachment = message.attachment || parsed.attachment || null;
     const text = parsed.text || '';
     const attachmentHtml = attachment ? renderAttachmentMarkup(attachment) : '';
+    const messageId = message.message_id !== undefined && message.message_id !== null ? String(message.message_id) : '';
+    const canManageMessage = isSent && !isPending && messageId && !messageId.startsWith('temp-');
+    const actionButtonsHtml = isSent ? `
+        <div class="message-actions">
+            <button type="button" class="message-action-btn message-edit-btn" ${canManageMessage ? '' : 'disabled'}>Edit</button>
+            <button type="button" class="message-action-btn message-delete-btn" ${canManageMessage ? '' : 'disabled'}>Delete</button>
+        </div>
+    ` : '';
     
     div.innerHTML = `
         <div class="message-content">
+            ${actionButtonsHtml}
             ${text ? `<p class="message-text">${escapeHtml(text)}</p>` : ''}
             ${attachmentHtml}
             <div class="message-meta">
                 <span class="message-time">${time}</span>
-                ${statusIcon ? `<span class="message-status-icon">${statusIcon}</span>` : ''}
             </div>
         </div>
     `;
+
+    if (isSent) {
+        const editButton = div.querySelector('.message-edit-btn');
+        const deleteButton = div.querySelector('.message-delete-btn');
+
+        if (editButton) {
+            editButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                handleEditMessage(message);
+            });
+        }
+
+        if (deleteButton) {
+            deleteButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                handleDeleteMessage(message);
+            });
+        }
+    }
     
     return div;
 }
@@ -552,6 +577,97 @@ function renderAttachmentMarkup(attachment) {
             </span>
         </a>
     `;
+}
+
+function handleEditMessage(message) {
+    const currentPayload = parseMessagePayload(message.message);
+    const currentText = currentPayload.text || '';
+    const newText = window.prompt('Edit message', currentText);
+
+    if (newText === null) {
+        return;
+    }
+
+    const trimmedText = newText.trim();
+    if (!trimmedText && !currentPayload.attachment) {
+        alert('Message cannot be empty.');
+        return;
+    }
+
+    updateMessage(message.message_id, trimmedText);
+}
+
+async function updateMessage(messageId, messageText) {
+    if (!messageId || !selectedConversationId) {
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('message_id', messageId);
+        formData.append('message', messageText);
+
+        const response = await fetch(`${URLROOT}/Messages/updateMessage`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            await loadMessages(selectedConversationId);
+            loadConversations();
+        } else {
+            alert(data.message || 'Failed to update message');
+        }
+    } catch (error) {
+        console.error('Error updating message:', error);
+        alert('Error updating message');
+    }
+}
+
+function handleDeleteMessage(message) {
+    const confirmed = window.confirm('Delete this message?');
+    if (!confirmed) {
+        return;
+    }
+
+    deleteMessage(message.message_id);
+}
+
+async function deleteMessage(messageId) {
+    if (!messageId || !selectedConversationId) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${URLROOT}/Messages/deleteMessage`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message_id: messageId })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            await loadMessages(selectedConversationId);
+            loadConversations();
+        } else {
+            alert(data.message || 'Failed to delete message');
+        }
+    } catch (error) {
+        console.error('Error deleting message:', error);
+        alert('Error deleting message');
+    }
+}
+
+function setMessageActionsDisabled(messageBubble, disabled) {
+    if (!messageBubble) return;
+
+    const actionButtons = messageBubble.querySelectorAll('.message-action-btn');
+    actionButtons.forEach(button => {
+        button.disabled = disabled;
+    });
 }
 
 // Show empty messages state
@@ -647,6 +763,7 @@ async function sendMessage() {
 
             if (pendingBubble) {
                 pendingBubble.classList.remove('pending');
+                optimisticMessage.message_id = data.message_id || optimisticMessage.message_id;
                 pendingBubble.dataset.messageId = String(data.message_id || pendingBubble.dataset.messageId || '');
                 pendingBubble.dataset.messageFingerprint = buildMessageFingerprint({
                     sender_id: currentUserId,
@@ -654,10 +771,7 @@ async function sendMessage() {
                     attachment: data.attachment || optimisticMessage.attachment,
                     created_at: optimisticMessage.created_at
                 });
-                const statusIcon = pendingBubble.querySelector('.message-status-icon');
-                if (statusIcon) {
-                    statusIcon.textContent = '✓';
-                }
+                setMessageActionsDisabled(pendingBubble, false);
             }
             
             // Update lastMessageId
@@ -710,10 +824,6 @@ function addMessageToDisplay(message, isOptimistic = false) {
 
             if (message.sender_id == currentUserId) {
                 existingFingerprintBubble.classList.remove('pending');
-                const statusIcon = existingFingerprintBubble.querySelector('.message-status-icon');
-                if (statusIcon) {
-                    statusIcon.textContent = '✓';
-                }
             }
 
             return existingFingerprintBubble;

@@ -774,14 +774,14 @@ class Messages extends Controller {
         // Route to appropriate view based on role
         switch (strtolower($userRole)) {
             case 'admin':
-                $this->view('pages/v_admin_messages');
+                $this->view('pages/messages/v_admin_messages');
                 break;
             case 'doctor':
-                $this->view('pages/v_doctor_messages');
+                $this->view('pages/messages/v_doctor_messages');
                 break;
             case 'patient':
             default:
-                $this->view('pages/v_patient_messages');
+                $this->view('pages/messages/v_patient_messages');
                 break;
         }
     }

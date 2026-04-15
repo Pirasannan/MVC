@@ -611,7 +611,7 @@ class Pages extends Controller{
             'conversations' => $mockConversations
         ];
         
-        $this->view('pages/v_doctor_messages', $data);
+        $this->view('pages/messages/v_doctor_messages', $data);
     }
 
     public function doctorMedicalrecords() {
@@ -776,7 +776,7 @@ class Pages extends Controller{
             'user_name' => $_SESSION['user_name']
         ];
         
-        $this->view('pages/v_admin_messages', $data);
+        $this->view('pages/messages/v_admin_messages', $data);
     }
 
     public function patientMessages() {
@@ -790,7 +790,7 @@ class Pages extends Controller{
             'user_name' => $_SESSION['user_name']
         ];
         
-        $this->view('pages/v_patient_messages', $data);
+        $this->view('pages/messages/v_patient_messages', $data);
     }
 
 }   

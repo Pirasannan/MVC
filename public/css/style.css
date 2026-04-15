@@ -27,6 +27,8 @@
 @import url('./components/dashboard/responsive.css');
 @import url('./components/dashboard/extras.css');
 @import url('./components/dashboard/popup.css');
+
+/* Video Call components */
 @import url('./components/video_consultation/video_consultation.css');
 @import url('./components/video_consultation/precall.css');
 @import url('./components/video_consultation/videocall.css');

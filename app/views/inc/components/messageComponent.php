@@ -46,7 +46,7 @@
             </div>
 
             <!-- Messages Display Area -->
-            <div class="messages-display" id="messagesDisplay">
+            <div class="messages-list messages-display" id="messagesDisplay">
                 <!-- Messages will be dynamically loaded here -->
             </div>
 

@@ -25,7 +25,8 @@
 .dashboard-container.patient .main-content {
     display: flex;
     flex-direction: column;
-    min-height: 100dvh;
+    height: 100vh;
+    min-height: 0;
     overflow: hidden;
 }
 
@@ -40,6 +41,7 @@
 .dashboard-container.patient .main-content .message-container {
     flex: 1;
     min-height: 0;
+    overflow: hidden;
 }
 
 .chat-conversations-sidebar {
@@ -285,10 +287,14 @@
     color: #374151;
 }
 
+.messages-list,
 .messages-display {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+}
+
+.messages-display {
     padding: 16px;
     background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
 }

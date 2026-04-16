@@ -714,7 +714,7 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_doctor_medicalrecords', []);
+        redirect('MedicalRecords/doctor');
     }
 
     Public function doctorprofile() {
@@ -837,7 +837,7 @@ class Pages extends Controller{
          redirect('Pages/index');
          return;
         }
-        $this->view('pages/v_patient_medicalrecords', []);
+        redirect('MedicalRecords/patient');
     }
 
     public function patientAppointments() {

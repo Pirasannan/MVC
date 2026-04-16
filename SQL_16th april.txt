@@ -1,0 +1,35 @@
+
+-For OTP Verification
+
+    CREATE TABLE IF NOT EXISTS `password_resets` (
+        `id`         INT          AUTO_INCREMENT PRIMARY KEY,
+        `email`      VARCHAR(255) NOT NULL,
+        `otp`        VARCHAR(6)   NOT NULL,
+        `expires_at` DATETIME     NOT NULL,
+        `used`       TINYINT(1)   DEFAULT 0,
+        `created_at` DATETIME     DEFAULT CURRENT_TIMESTAMP,
+        INDEX `idx_email` (`email`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+for medical records
+
+ CREATE TABLE IF NOT EXISTS `medical_records` (
+    `id`            INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `patient_id`    INT(10) UNSIGNED NOT NULL,
+    `record_name`   VARCHAR(255)     NOT NULL,
+    `record_type`   ENUM('lab','scan','prescription','hospital','vaccination') NOT NULL,
+    `doctor_name`   VARCHAR(255)     NOT NULL DEFAULT '',
+    `description`   TEXT,
+    `file_name`     VARCHAR(255)     NOT NULL,
+    `original_name` VARCHAR(255)     NOT NULL,
+    `file_size`     INT UNSIGNED     NOT NULL,
+    `mime_type`     VARCHAR(100)     NOT NULL,
+    `uploaded_at`   DATETIME         DEFAULT CURRENT_TIMESTAMP,
+    INDEX `idx_patient_id`  (`patient_id`),
+    INDEX `idx_record_type` (`record_type`),
+    INDEX `idx_uploaded_at` (`uploaded_at`),
+    CONSTRAINT `fk_mr_patient`
+        FOREIGN KEY (`patient_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,8 +1,0 @@
-# Deny direct access to uploaded files
-Options -Indexes
-<Files *.php>
-    Deny from all
-</Files>
-<Files *.html>
-    Deny from all
-</Files>

@@ -312,77 +312,6 @@ class Pages extends Controller{
         }
     }
 
-    public function adminMessages() {
-        
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            return redirect('Pages/index');
-        }
-        
-        // Handle POST requests (sending announcements, moderating messages)
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_POST['action'])) {
-                switch ($_POST['action']) {
-                    case 'send_announcement':
-                        $_SESSION['message'] = 'Announcement sent successfully! (Demo Mode)';
-                        break;
-                        
-                    case 'moderate_message':
-                        $_SESSION['message'] = 'Message moderated successfully! (Demo Mode)';
-                        break;
-                }
-            }
-        }
-        
-        // Mock data for demo purposes (replace with database calls when ready)
-        $mockRecentMessages = [
-            (object)[
-                'id' => 1,
-                'doctor_name' => 'Sarah Johnson',
-                'patient_name' => 'Michael Chen',
-                'subject' => 'Prescription Follow-up',
-                'message_text' => 'Thank you for the prescription. I have a question about the dosage timing and when I should take it with meals.',
-                'sent_at' => '2024-10-23 10:30:00',
-                'status' => 'delivered'
-            ],
-            (object)[
-                'id' => 2,
-                'doctor_name' => 'Robert Wilson',
-                'patient_name' => 'Emma Davis',
-                'subject' => 'Lab Results Discussion',
-                'message_text' => 'The lab results look good. When should I schedule my next appointment for follow-up?',
-                'sent_at' => '2024-10-22 14:15:00',
-                'status' => 'read'
-            ],
-            (object)[
-                'id' => 3,
-                'doctor_name' => 'Michael Chen',
-                'patient_name' => 'Lisa Anderson',
-                'subject' => 'Medication Side Effects',
-                'message_text' => 'I am experiencing some side effects from the new medication. Should I continue taking it?',
-                'sent_at' => '2024-10-21 16:45:00',
-                'status' => 'pending'
-            ],
-            (object)[
-                'id' => 4,
-                'doctor_name' => 'Emily Davis',
-                'patient_name' => 'David Brown',
-                'subject' => 'Appointment Confirmation',
-                'message_text' => 'Thank you for the quick response. I feel much better now and would like to schedule a follow-up.',
-                'sent_at' => '2024-10-20 11:20:00',
-                'status' => 'sent'
-            ]
-        ];
-        
-        $data = [
-            'total_messages' => 156,
-            'active_conversations' => 42,
-            'messages_today' => 18,
-            'recent_messages' => $mockRecentMessages
-        ];
-        
-        $this->view('pages/v_admin_messages', $data);
-    }
-
     public function adminAllDoctors() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             return redirect('Pages/index');
@@ -617,26 +546,10 @@ class Pages extends Controller{
         ]);
     }
 
-    Public function doctorMessages() {
+    public function doctorMessages() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
-            return redirect('Pages/index');
-        }
-        
-        $doctorId = $_SESSION['user_id'];
-        
-        // Handle POST requests (sending messages, marking as read)
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (isset($_POST['action'])) {
-                switch ($_POST['action']) {
-                    case 'send_message':
-                        $_SESSION['message'] = 'Message sent successfully! (Demo Mode)';
-                        break;
-                        
-                    case 'mark_read':
-                        $_SESSION['message'] = 'Messages marked as read! (Demo Mode)';
-                        break;
-                }
-            }
+            redirect('Pages/index');
+            return;
         }
         
         // Mock data for demo purposes (replace with database calls when ready)
@@ -644,69 +557,40 @@ class Pages extends Controller{
             (object)[
                 'patient_id' => 1,
                 'patient_name' => 'Sarah Johnson',
-                'patient_email' => 'sarah.johnson@email.com',
                 'last_message' => 'Thank you for the prescription. I have a question about the dosage timing.',
-                'last_message_time' => '2024-10-23 10:30:00',
-                'is_read' => false,
-                'sender_type' => 'patient',
+                'last_message_time' => '2024-01-25 10:30:00',
                 'unread_count' => 2
             ],
             (object)[
                 'patient_id' => 2,
                 'patient_name' => 'Michael Chen',
-                'patient_email' => 'michael.chen@email.com',
                 'last_message' => 'The lab results look good. When should I schedule my next appointment?',
-                'last_message_time' => '2024-10-22 14:15:00',
-                'is_read' => true,
-                'sender_type' => 'patient',
+                'last_message_time' => '2024-01-24 14:15:00',
                 'unread_count' => 0
             ],
             (object)[
                 'patient_id' => 3,
                 'patient_name' => 'Emma Davis',
-                'patient_email' => 'emma.davis@email.com',
                 'last_message' => 'I am experiencing some side effects from the new medication.',
-                'last_message_time' => '2024-10-21 16:45:00',
-                'is_read' => false,
-                'sender_type' => 'patient',
+                'last_message_time' => '2024-01-23 16:45:00',
                 'unread_count' => 1
             ],
             (object)[
                 'patient_id' => 4,
                 'patient_name' => 'Robert Wilson',
-                'patient_email' => 'robert.wilson@email.com',
                 'last_message' => 'Thank you for the quick response. I feel much better now.',
-                'last_message_time' => '2024-10-20 11:20:00',
-                'is_read' => true,
-                'sender_type' => 'doctor',
+                'last_message_time' => '2024-01-22 11:20:00',
                 'unread_count' => 0
             ]
         ];
         
-        $mockPatients = [
-            (object)['id' => 1, 'name' => 'Sarah Johnson', 'email' => 'sarah.johnson@email.com'],
-            (object)['id' => 2, 'name' => 'Michael Chen', 'email' => 'michael.chen@email.com'],
-            (object)['id' => 3, 'name' => 'Emma Davis', 'email' => 'emma.davis@email.com'],
-            (object)['id' => 4, 'name' => 'Robert Wilson', 'email' => 'robert.wilson@email.com'],
-            (object)['id' => 5, 'name' => 'Lisa Anderson', 'email' => 'lisa.anderson@email.com'],
-            (object)['id' => 6, 'name' => 'David Brown', 'email' => 'david.brown@email.com']
-        ];
-        
-        // Calculate unread count from mock data
-        $unreadCount = 0;
-        foreach ($mockConversations as $conv) {
-            $unreadCount += $conv->unread_count;
-        }
-        
         $data = [
-            'user_id' => $doctorId,
+            'user_id' => $_SESSION['user_id'],
             'user_name' => $_SESSION['user_name'],
-            'unread_count' => $unreadCount,
-            'conversations' => $mockConversations,
-            'patients' => $mockPatients
+            'conversations' => $mockConversations
         ];
         
-        $this->view('pages/v_doctor_messages', $data);
+        $this->view('pages/messages/v_doctor_messages', $data);
     }
 
     public function doctorMedicalrecords() {
@@ -805,14 +689,6 @@ class Pages extends Controller{
         ]);
     }
     
-    public function patientMessages() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
-         redirect('Pages/index');
-         return;
-        }
-        $this->view('pages/v_patient_messages', []);
-    }
-    
     public function patientProfile() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
             return redirect('Pages/index');
@@ -868,7 +744,33 @@ class Pages extends Controller{
         $this->view('pages/v_patient_settings', []);
     }
 
+    public function adminMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'user_id' => $_SESSION['user_id'],
+            'user_name' => $_SESSION['user_name']
+        ];
+        
+        $this->view('pages/messages/v_admin_messages', $data);
+    }
 
+    public function patientMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'user_id' => $_SESSION['user_id'],
+            'user_name' => $_SESSION['user_name']
+        ];
+        
+        $this->view('pages/messages/v_patient_messages', $data);
+    }
 
 }   
 

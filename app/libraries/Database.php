@@ -90,4 +90,9 @@ class Database
     {
         return $this->statement->rowCount();
     }
+
+            //Get PDO connection for lastInsertId
+            public function getConnection(){
+                return $this->dbh;
+            }
 }

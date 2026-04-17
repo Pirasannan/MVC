@@ -250,6 +250,191 @@ class Users extends Controller {
     }
 
 
+    // ──────────────────────────────────────────────────────────
+    // FORGOT PASSWORD – 3-STEP OTP FLOW
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * STEP 1: Ask for email, validate it exists, generate OTP & save to DB.
+     * GET  /Users/forgotPassword  → show form
+     * POST /Users/forgotPassword  → process email
+     */
+    public function forgotPassword(){
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $data = [
+                'email'     => trim($_POST['email'] ?? ''),
+                'email_err' => ''
+            ];
+
+            // Validate email field
+            if(empty($data['email'])){
+                $data['email_err'] = 'Please enter your email address.';
+            } elseif(!filter_var($data['email'], FILTER_VALIDATE_EMAIL)){
+                $data['email_err'] = 'Please enter a valid email address.';
+            } else {
+                // Check user exists in DB
+                $user = $this->userModel->getUserByEmail($data['email']);
+                if(!$user){
+                    $data['email_err'] = 'No account found with that email address.';
+                }
+            }
+
+            if(!empty($data['email_err'])){
+                $this->view('users/v_forgot_password', $data);
+                return;
+            }
+
+            // Generate cryptographically secure 6-digit OTP
+            $otp       = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $expiresAt = date('Y-m-d H:i:s', time() + 15 * 60); // expires in 15 minutes
+
+            // Save OTP to DB (clears any previous OTP for this email)
+            if($this->userModel->saveOtp($data['email'], $otp, $expiresAt)){
+
+                // Send OTP via PHPMailer
+                $mailSent = Mailer::sendOtp(
+                    $data['email'],
+                    $user->name ?? $data['email'], // use their name if available
+                    $otp
+                );
+
+                if(!$mailSent){
+                    // Mail failed — show error on the same form
+                    $data['email_err'] = 'Failed to send OTP email. Please check your mail settings or try again.';
+                    $this->view('users/v_forgot_password', $data);
+                    return;
+                }
+
+                // Store email in session so Step 2 & 3 can use it
+                $_SESSION['reset_email']  = $data['email'];
+                $_SESSION['otp_verified'] = false;
+
+                redirect('Users/verifyOtp');
+
+            } else {
+                die('Something went wrong saving the OTP. Please try again.');
+            }
+
+        } else {
+            $data = ['email' => '', 'email_err' => ''];
+            $this->view('users/v_forgot_password', $data);
+        }
+    }
+
+    /**
+     * STEP 2: Show OTP input, validate OTP.
+     * GET  /Users/verifyOtp → show form
+     * POST /Users/verifyOtp → validate OTP
+     */
+    public function verifyOtp(){
+        // Guard: must have gone through step 1 first
+        if(empty($_SESSION['reset_email'])){
+            redirect('Users/forgotPassword');
+            return;
+        }
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $otp   = trim($_POST['otp'] ?? '');
+            $email = $_SESSION['reset_email'];
+
+            $data = [
+                'otp'     => $otp,
+                'otp_err' => ''
+            ];
+
+            if(empty($otp)){
+                $data['otp_err'] = 'Please enter the OTP.';
+            } elseif(!preg_match('/^\d{6}$/', $otp)){
+                $data['otp_err'] = 'OTP must be a 6-digit number.';
+            } else {
+                $result = $this->userModel->verifyOtp($email, $otp);
+                if(!$result){
+                    $data['otp_err'] = 'Invalid or expired OTP. Please try again.';
+                } else {
+                    // Mark OTP as used
+                    $this->userModel->markOtpUsed($email, $otp);
+                    $_SESSION['otp_verified'] = true;
+                    redirect('Users/resetPassword');
+                    return;
+                }
+            }
+
+            $this->view('users/v_verify_otp', $data);
+
+        } else {
+            $data = ['otp' => '', 'otp_err' => ''];
+            $this->view('users/v_verify_otp', $data);
+        }
+    }
+
+    /**
+     * STEP 3: Set new password.
+     * GET  /Users/resetPassword → show form
+     * POST /Users/resetPassword → update password
+     */
+    public function resetPassword(){
+        // Guard: must have verified OTP in step 2
+        if(empty($_SESSION['reset_email']) || empty($_SESSION['otp_verified']) || $_SESSION['otp_verified'] !== true){
+            redirect('Users/forgotPassword');
+            return;
+        }
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $data = [
+                'password'              => trim($_POST['password'] ?? ''),
+                'confirm_password'      => trim($_POST['confirm_password'] ?? ''),
+                'password_err'          => '',
+                'confirm_password_err'  => ''
+            ];
+
+            if(empty($data['password'])){
+                $data['password_err'] = 'Please enter a new password.';
+            } elseif(strlen($data['password']) < 7){
+                $data['password_err'] = 'Password must be at least 7 characters.';
+            }
+
+            if(empty($data['confirm_password'])){
+                $data['confirm_password_err'] = 'Please confirm your new password.';
+            } elseif($data['password'] !== $data['confirm_password']){
+                $data['confirm_password_err'] = 'Passwords do not match.';
+            }
+
+            if(!empty($data['password_err']) || !empty($data['confirm_password_err'])){
+                $this->view('users/v_reset_password', $data);
+                return;
+            }
+
+            // Hash and save new password
+            $hashed = password_hash($data['password'], PASSWORD_DEFAULT);
+            $email  = $_SESSION['reset_email'];
+
+            if($this->userModel->updatePassword($email, $hashed)){
+                // Clean up all reset-related session vars
+                unset($_SESSION['reset_email']);
+                unset($_SESSION['otp_verified']);
+
+                // Redirect to login with a success flag
+                $_SESSION['password_reset_success'] = true;
+                redirect('Users/login');
+            } else {
+                die('Something went wrong updating the password. Please try again.');
+            }
+
+        } else {
+            $data = [
+                'password'             => '',
+                'confirm_password'     => '',
+                'password_err'         => '',
+                'confirm_password_err' => ''
+            ];
+            $this->view('users/v_reset_password', $data);
+        }
+    }
+
+
 }
 
 ?>

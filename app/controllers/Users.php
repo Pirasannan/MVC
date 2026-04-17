@@ -123,6 +123,9 @@ class Users extends Controller {
             $_POST = array_map(function($value) {
                 return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
             }, $_POST);
+
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
             
             $data = [
                 'email' => trim($_POST['email']),
@@ -143,6 +146,7 @@ class Users extends Controller {
                 else{
                     //user is not found
                     $data['email_err'] = 'user not found';
+                    $this->userModel->logLoginEvent(null, $data['email'], false, 'user_not_found', $ipAddress, $userAgent);
                 }
             }
             
@@ -159,10 +163,14 @@ class Users extends Controller {
                 if($loggeduser){
                     //user is authenticated
 
+                    $this->userModel->logLoginEvent($loggeduser->id, $loggeduser->email, true, '', $ipAddress, $userAgent);
+
                     //create user sessions      
                     $this->createUserSessions($loggeduser);
                     
                 } else {
+                    $existingUser = $this->userModel->getUserByEmail($data['email']);
+                    $this->userModel->logLoginEvent($existingUser->id ?? null, $data['email'], false, 'invalid_password', $ipAddress, $userAgent);
                     $data['password_err'] = 'Password Incorrect';
                     
                     //load view with errors

@@ -261,6 +261,22 @@ class M_Admin {
         ];
     }
 
+    public function getLoginLogs($limit = 50) {
+        if (!$this->tableExists('activity_logs')) {
+            return [];
+        }
+
+        $limit = (int)$limit;
+        $this->db->query('SELECT al.id, al.action, al.description, al.ip_address, al.user_agent, al.created_at,
+                          u.name AS user_name, u.email AS user_email, u.role AS user_role
+                          FROM activity_logs al
+                          LEFT JOIN Users u ON al.user_id = u.id
+                          WHERE al.action IN ("login_success", "login_failed")
+                          ORDER BY al.created_at DESC
+                          LIMIT ' . $limit);
+        return $this->db->resultSet();
+    }
+
     // ==================== NOTIFICATIONS & REPORTS ====================
     
     public function getReportedMessages() {

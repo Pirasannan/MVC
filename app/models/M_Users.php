@@ -5,6 +5,14 @@
         public function __construct(){
             $this->db = new Database();
         }
+
+        private function tableExists($tableName){
+            $this->db->query('SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = :db AND table_name = :table LIMIT 1');
+            $this->db->bind(':db', DB_NAME);
+            $this->db->bind(':table', $tableName);
+            $result = $this->db->single();
+            return isset($result->total) && (int)$result->total > 0;
+        }
         
         public function register($data){
             $this->db->query('INSERT INTO Users(role, name, email, password, slmc) VALUES (:role, :name, :email, :password, :slmc)');
@@ -66,6 +74,12 @@
 
         }
 
+        public function getUserByEmail($email){
+            $this->db->query('SELECT * FROM Users WHERE email = :email');
+            $this->db->bind(':email', $email);
+            return $this->db->single();
+        }
+
         // Login User
         public function login($email, $password){
             $this->db->query('SELECT * FROM Users WHERE email = :email');
@@ -80,6 +94,26 @@
                 }
             }
             return false;
+        }
+
+        public function logLoginEvent($userId, $email, $success, $reason, $ipAddress, $userAgent){
+            if (!$this->tableExists('activity_logs')) {
+                return false;
+            }
+
+            $action = $success ? 'login_success' : 'login_failed';
+            $description = $success ? 'Login success' : ('Login failed: ' . $reason);
+            if (!empty($email)) {
+                $description .= ' (' . $email . ')';
+            }
+
+            $this->db->query('INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent, created_at) VALUES (:user_id, :action, :description, :ip_address, :user_agent, NOW())');
+            $this->db->bind(':user_id', $userId);
+            $this->db->bind(':action', $action);
+            $this->db->bind(':description', $description);
+            $this->db->bind(':ip_address', $ipAddress);
+            $this->db->bind(':user_agent', $userAgent);
+            return $this->db->execute();
         }
 
         //fetch all patients

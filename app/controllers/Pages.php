@@ -486,6 +486,18 @@ class Pages extends Controller{
         $this->view('pages/v_admin_system_activity_log', $data);
     }
 
+    public function adminLoginLogs() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'loginLogs' => $this->adminModel->getLoginLogs()
+        ];
+
+        $this->view('pages/v_admin_login_logs', $data);
+    }
+
     public function adminRecords() {
         
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {

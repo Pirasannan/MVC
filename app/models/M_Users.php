@@ -75,12 +75,6 @@ class M_Users
 
         }
 
-        public function getUserByEmail($email){
-            $this->db->query('SELECT * FROM Users WHERE email = :email');
-            $this->db->bind(':email', $email);
-            return $this->db->single();
-        }
-
         // Login User
         public function login($email, $password){
             $this->db->query('SELECT * FROM Users WHERE email = :email');

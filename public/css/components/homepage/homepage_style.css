@@ -3,7 +3,7 @@
 
 :root {
   /* Colors - Medical Blue Theme */
-  --primary: hsl(217, 91%, 60%);
+  --primary: hsl(217, 85%, 63%);
   --primary-dark: hsl(217, 91%, 50%);
   --primary-light: hsl(217, 91%, 70%);
   --primary-foreground: hsl(0, 0%, 100%);
@@ -96,7 +96,7 @@ button {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0 20px;
+  padding: 0 30px;
   margin-top: 30px;
 }
 
@@ -104,9 +104,9 @@ button {
 
 
 .logo-text {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--foreground);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--primary);
 }
 
 .nav {
@@ -172,6 +172,7 @@ button {
 }
 
 .btn-primary:hover {
+  background-image: none;
   background-color: var(--primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
@@ -190,10 +191,12 @@ button {
   background-color: transparent;
   color: var(--foreground);
   border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 
 .btn-outline:hover {
-  background-color: var(--muted);
+  background-color: var(--primary-dark);
+  color: var(--primary-foreground);
 }
 
 .btn-large {

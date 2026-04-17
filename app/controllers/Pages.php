@@ -3,20 +3,27 @@
 class Pages extends Controller{
     private $pagesModel;
     private $adminModel;
+    private $appointmentModel;
+    private $prescriptionModel;
+    private $messageModel;
     public function __construct() {
         
         $this->pagesModel = $this->model('M_Pages');
         $this->adminModel = $this->model('M_Admin');
+        $this->appointmentModel = $this->model('Appointment');
+        $this->prescriptionModel = $this->model('Prescription');
+        $this->messageModel = $this->model('Message');
     
     }
     
     
     public function index() {
-        $data = [];
-        $this->view('pages/v_index',$data);
+        $this->view('pages/v_index');
     }
 
-
+    public function error() {
+        $this->view('pages/error');
+    }
 
 
     public function adminProfile() {
@@ -61,35 +68,13 @@ class Pages extends Controller{
     }
 
     public function doctorPrecall() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
-            redirect('Pages/index');
-            return;
-        }
-        
-        $data = [
-            'patient_name' => 'Sarah Wilson',
-            'doctor_name' => 'Dr. John Smith',
-            'appointment_time' => 'Today at 2:30 PM',
-            'appointment_type' => 'Follow-up Consultation'
-        ];
-        
-        $this->view('pages/Videoconsultation/v_doctor_precall', $data);
+        // Precall now requires an appointment ID — use VideoCall/precall/{id}
+        redirect('Appointments/doctor');
     }
 
     public function patientPrecall() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
-            redirect('Pages/index');
-            return;
-        }
-        
-        $data = [
-            'patient_name' => 'Sarah Wilson',
-            'doctor_name' => 'Dr. John Smith',
-            'appointment_time' => 'Today at 2:30 PM',
-            'appointment_type' => 'Follow-up Consultation'
-        ];
-        
-        $this->view('pages/Videoconsultation/v_patient_precall', $data);
+        // Precall now requires an appointment ID — use VideoCall/precall/{id}
+        redirect('Appointments/my');
     }
 
     public function doctorVideoCall() {
@@ -535,7 +520,79 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_doctor_dashboard', []);
+
+        $doctorId = $_SESSION['user_id'] ?? null;
+        $dashboardData = $this->buildDoctorDashboardData($doctorId);
+        $dashboardData['title'] = 'Doctor Dashboard';
+
+        $this->view('pages/v_doctor_dashboard', $dashboardData);
+    }
+
+    private function buildDoctorDashboardData($doctorId) {
+        $today = new DateTimeImmutable('today');
+        $now = new DateTimeImmutable('now');
+
+        $appointments = $doctorId ? $this->appointmentModel->getByDoctor($doctorId) : [];
+        $prescriptions = $doctorId ? $this->prescriptionModel->getPrescriptionsByDoctor($doctorId) : [];
+
+        $todayAppointments = 0;
+        $upcomingAppointments = [];
+        $prescribedPatientIds = [];
+
+        foreach ($prescriptions as $prescription) {
+            if (($prescription->is_deleted ?? 'not_deleted') !== 'deleted') {
+                $prescribedPatientIds[$prescription->patient_id] = true;
+            }
+        }
+
+        foreach ($appointments as $appointment) {
+            $startsAt = new DateTimeImmutable($appointment->starts_at);
+            $status = strtolower((string)($appointment->status ?? ''));
+            $isActiveStatus = !in_array($status, ['cancelled', 'rejected'], true);
+
+            if ($startsAt->format('Y-m-d') === $today->format('Y-m-d') && $isActiveStatus) {
+                $todayAppointments++;
+            }
+
+            if ($startsAt >= $now && $isActiveStatus) {
+                $upcomingAppointments[] = $appointment;
+            }
+        }
+
+        usort($upcomingAppointments, function ($left, $right) {
+            return strtotime($left->starts_at) <=> strtotime($right->starts_at);
+        });
+
+        $recentPrescriptions = [];
+        foreach ($prescriptions as $prescription) {
+            if (($prescription->is_deleted ?? 'not_deleted') !== 'deleted') {
+                $recentPrescriptions[] = $prescription;
+            }
+        }
+        $recentPrescriptions = array_slice($recentPrescriptions, 0, 3);
+
+        $pendingPrescriptionPatients = [];
+        foreach ($appointments as $appointment) {
+            $startsAt = new DateTimeImmutable($appointment->starts_at);
+            $status = strtolower((string)($appointment->status ?? ''));
+
+            if ($startsAt > $now || !in_array($status, ['approved', 'completed'], true)) {
+                continue;
+            }
+
+            if (!isset($prescribedPatientIds[$appointment->patient_id])) {
+                $pendingPrescriptionPatients[$appointment->patient_id] = true;
+            }
+        }
+
+        return [
+            'todayAppointmentsCount' => $todayAppointments,
+            'prescribedPatientsCount' => count($prescribedPatientIds),
+            'unreadMessagesCount' => $doctorId ? (int) $this->messageModel->getUnreadCount($doctorId) : 0,
+            'pendingPrescriptionsCount' => count($pendingPrescriptionPatients),
+            'upcomingAppointments' => $upcomingAppointments,
+            'recentPrescriptions' => $recentPrescriptions,
+        ];
     }
 
     public function doctorPrescriptions() {
@@ -690,7 +747,64 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_patient_dashboard', []);
+
+        $patientId = $_SESSION['user_id'] ?? null;
+        $dashboardData = $this->buildPatientDashboardData($patientId);
+        $dashboardData['title'] = 'Patient Dashboard';
+
+        $this->view('pages/v_patient_dashboard', $dashboardData);
+    }
+
+    private function buildPatientDashboardData($patientId) {
+        $today = new DateTimeImmutable('today');
+        $now = new DateTimeImmutable('now');
+
+        $appointments = $patientId ? $this->appointmentModel->getByPatient($patientId) : [];
+        $todayAppointments = 0;
+        $upcomingAppointments = [];
+
+        foreach ($appointments as $appointment) {
+            $startsAt = new DateTimeImmutable($appointment->starts_at);
+            $status = strtolower((string)($appointment->status ?? ''));
+
+            if ($startsAt->format('Y-m-d') === $today->format('Y-m-d')) {
+                $todayAppointments++;
+            }
+
+            if ($startsAt >= $now && !in_array($status, ['cancelled', 'rejected', 'completed'], true)) {
+                $upcomingAppointments[] = $appointment;
+            }
+        }
+
+        usort($upcomingAppointments, function ($left, $right) {
+            return strtotime($left->starts_at) <=> strtotime($right->starts_at);
+        });
+
+        $prescriptions = $patientId ? $this->prescriptionModel->getPrescriptionsByPatient($patientId) : [];
+        $activeMedications = [];
+        $recentPrescriptions = array_slice($prescriptions, 0, 3);
+
+        foreach ($prescriptions as $prescription) {
+            $isDeleted = strtolower((string)($prescription->is_deleted ?? 'not_deleted')) === 'not_deleted';
+            $validUntil = !empty($prescription->valid_until)
+                ? new DateTimeImmutable($prescription->valid_until)
+                : null;
+
+            if ($isDeleted && (!$validUntil || $validUntil >= $today)) {
+                $activeMedications[] = $prescription;
+            }
+        }
+
+        $unreadMessages = $patientId ? (int) $this->messageModel->getUnreadCount($patientId) : 0;
+
+        return [
+            'todayAppointmentsCount' => $todayAppointments,
+            'activeMedicationsCount' => count($activeMedications),
+            'unreadMessagesCount' => $unreadMessages,
+            'recentPrescriptionsCount' => count($recentPrescriptions),
+            'upcomingAppointments' => $upcomingAppointments,
+            'recentPrescriptions' => $recentPrescriptions,
+        ];
     }
 
     public function patientPrescriptions() {

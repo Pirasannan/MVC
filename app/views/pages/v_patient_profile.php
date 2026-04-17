@@ -1,17 +1,17 @@
-<?php 
-require APPROOT.'/views/inc/header.php'; 
+<?php
+require APPROOT . '/views/inc/header.php';
 $current_page = 'patientProfile';
 ?>
 <link rel='stylesheet' href='<?php echo URLROOT; ?>/css/components/profile/patient_profile.css'>
 
 <div class="dashboard-container patient">
     <!-- Sidebar Navigation -->
-    <?php require APPROOT.'/views/inc/components/patientSidebar.php'; ?>
+    <?php require APPROOT . '/views/inc/components/patientSidebar.php'; ?>
 
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Top Header -->
-        <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
+        <?php require APPROOT . '/views/inc/components/patientHeader.php'; ?>
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
@@ -159,7 +159,8 @@ $current_page = 'patientProfile';
                     <div class="section-content payment-section-content">
                         <div class="payment-card-icons">
                             <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/visa.png" alt="Visa"></div>
-                            <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/mastercard.png" alt="MasterCard"></div>
+                            <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/mastercard.png"
+                                    alt="MasterCard"></div>
                         </div>
 
                         <div class="payment-field">
@@ -189,6 +190,37 @@ $current_page = 'patientProfile';
                     </div>
                 </div>
 
+                <!-- Account Security Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Account Security</h2>
+                    </div>
+                    <div class="section-content"
+                        style="display: flex; flex-direction: column; gap: 16px; padding: 24px;">
+
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div>
+                                <h4 style="margin: 0 0 4px 0; color: #1e293b; font-size: 15px; font-weight: 600;">Change
+                                    Password</h4>
+                            </div>
+                            <button class="btn-profile-security"
+                                onclick="location.href='<?php echo URLROOT; ?>/Users/requestProfileOtp?action=change_password'">Change Password</button>
+                        </div>
+
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background-color: #fff1f2; border-radius: 8px; border: 1px solid #fecdd3;">
+                            <div>
+                                <h4 style="margin: 0 0 4px 0; color: #9f1239; font-size: 15px; font-weight: 600;">
+                                    Deactivate Account</h4>
+                            </div>
+                            <button class="btn-profile-deactivate"
+                                onclick="if(confirm('Are you sure you want to deactivate your account?')) location.href='<?php echo URLROOT; ?>/Users/requestProfileOtp?action=deactivate'">Deactivate</button>
+                        </div>
+
+                    </div>
+                </div>
+
 
             </div>
         </div>
@@ -197,4 +229,4 @@ $current_page = 'patientProfile';
 
 
 
-<?php require APPROOT.'/views/inc/footer.php'; ?>
+<?php require APPROOT . '/views/inc/footer.php'; ?>

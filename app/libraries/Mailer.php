@@ -99,6 +99,21 @@ class Mailer
         return self::send($toEmail, $toName, $subject, $htmlBody);
     }
 
+    /**
+     * Send OTP email for Account Verification (Registration).
+     *
+     * @param string $toEmail  The user's registered email
+     * @param string $toName   The user's name (or email if name unknown)
+     * @param string $otp      The 6-digit OTP code
+     * @return bool
+     */
+    public static function sendRegistrationOtp(string $toEmail, string $toName, string $otp): bool
+    {
+        $subject = 'Verify Your MediLink Account';
+        $htmlBody = self::registrationOtpEmailTemplate($toName, $otp);
+        return self::send($toEmail, $toName, $subject, $htmlBody);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // E-MAIL TEMPLATES
     // ─────────────────────────────────────────────────────────────────────────
@@ -219,6 +234,80 @@ class Mailer
                             <!-- Footer -->
                             <tr>
                                 <td style="background:#f8fafc;padding:18px 40px;border-top:1px solid #e8edf3;text-align:center;">
+                                    <p style="margin:0;font-size:12px;color:#aaa;">© {$year} MediLink. All rights reserved.</p>
+                                    <p style="margin:4px 0 0;font-size:12px;color:#ccc;">This is an automated message, please do not reply.</p>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        HTML;
+    }
+
+    /**
+     * Verification OTP Email Template — styled, professional HTML email for registration.
+     */
+    private static function registrationOtpEmailTemplate(string $name, string $otp): string
+    {
+        $year = date('Y');
+        return <<<HTML
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Account Verification OTP</title>
+        </head>
+        <body style="margin:0;padding:0;background-color:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7fa;padding:40px 20px;">
+                <tr>
+                    <td align="center">
+                        <table width="560" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                            
+                            <!-- Header -->
+                            <tr>
+                                <td style="background:linear-gradient(135deg,#109CF1,#0b64f3);padding:32px 40px;text-align:center;">
+                                    <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:-0.5px;">MediLink</h1>
+                                    <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">Account Verification</p>
+                                </td>
+                            </tr>
+
+                            <!-- Body -->
+                            <tr>
+                                <td style="padding:40px;">
+                                    <p style="margin:0 0 16px;font-size:16px;color:#1a1a2e;">Hi <strong>{$name}</strong>,</p>
+                                    <p style="margin:0 0 28px;font-size:15px;color:#555;line-height:1.6;">
+                                        Thanks for signing up! Please use the verification code below to complete your registration. This code is valid for <strong>15 minutes</strong>.
+                                    </p>
+
+                                    <!-- OTP Box -->
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td align="center" style="padding:0 0 32px;">
+                                                <div style="display:inline-block;background:#f0f7ff;border:2px dashed #109CF1;border-radius:12px;padding:20px 48px;">
+                                                    <p style="margin:0 0 4px;font-size:12px;color:#109CF1;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Your Verification Code</p>
+                                                    <p style="margin:0;font-size:40px;font-weight:800;color:#109CF1;letter-spacing:10px;">{$otp}</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <p style="margin:0 0 16px;font-size:14px;color:#777;line-height:1.6;">
+                                        If you didn't attempt to register, you can safely ignore this email. Your details will not be saved.
+                                    </p>
+                                    <p style="margin:0;font-size:14px;color:#777;">
+                                        — The MediLink Team
+                                    </p>
+                                </td>
+                            </tr>
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background:#f8fafc;padding:20px 40px;border-top:1px solid #e8edf3;text-align:center;">
                                     <p style="margin:0;font-size:12px;color:#aaa;">© {$year} MediLink. All rights reserved.</p>
                                     <p style="margin:4px 0 0;font-size:12px;color:#ccc;">This is an automated message, please do not reply.</p>
                                 </td>

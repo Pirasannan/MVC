@@ -31,9 +31,13 @@ class MedicalRecords extends Controller {
         $records = $this->recordsModel->getRecordsByPatient($patient_id);
         $stats = $this->recordsModel->getStatsByPatient($patient_id);
 
+        $userModel = $this->model('M_Users');
+        $doctors = $userModel->getDoctors();
+
         $data = [
             'records' => $records,
             'stats' => $stats,
+            'doctors' => $doctors,
             'current_page' => 'patientMedicalrecords' // Retained for sidebar active state
         ];
 
@@ -46,9 +50,13 @@ class MedicalRecords extends Controller {
             redirect('Pages/index');
         }
 
-        // Currently returning empty or all records for future sharing implementation
+        $doctor_id = $_SESSION['user_id'];
+        $records = $this->recordsModel->getSharedRecordsByDoctor($doctor_id);
+        $stats = $this->recordsModel->getSharedStatsByDoctor($doctor_id);
+
         $data = [
-            'records' => [],
+            'records' => $records,
+            'stats' => $stats,
             'current_page' => 'doctorMedicalrecords' // Retained for sidebar active state
         ];
 
@@ -283,20 +291,58 @@ class MedicalRecords extends Controller {
         }
     }
 
-    // VIEW OR DOWNLOAD
-    public function view_file($id, $action = 'view') {
-        if ($_SESSION['user_role'] !== 'patient') {
-            die('Unauthorized');
+    // SHARE RECORD (AJAX POST)
+    public function share($id) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $_SESSION['user_role'] !== 'patient') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
         }
 
         $patient_id = $_SESSION['user_id'];
         $record = $this->recordsModel->getRecordById($id, $patient_id);
 
         if (!$record) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Record not found.']);
+            return;
+        }
+
+        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
+        $doctor_id = trim($_POST['doctor_id'] ?? '');
+
+        if (empty($doctor_id)) {
+            echo json_encode(['success' => false, 'message' => 'Please select a doctor.']);
+            return;
+        }
+
+        // Verify doctor exists
+        $userModel = $this->model('M_Users');
+        // Actually, no need to strictly verify via another query since foreign key constraint will do it, but to be clean:
+        if ($this->recordsModel->shareRecord($id, $doctor_id)) {
+            echo json_encode(['success' => true, 'message' => 'Record shared successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to share record.']);
+        }
+    }
+
+    // VIEW OR DOWNLOAD
+    public function view_file($id, $action = 'view') {
+        if ($_SESSION['user_role'] === 'patient') {
+            $patient_id = $_SESSION['user_id'];
+            $record = $this->recordsModel->getRecordById($id, $patient_id);
+        } elseif ($_SESSION['user_role'] === 'doctor') {
+            $doctor_id = $_SESSION['user_id'];
+            $record = $this->recordsModel->getSharedRecordByIdAndDoctor($id, $doctor_id);
+        } else {
+            die('Unauthorized');
+        }
+
+        if (!$record) {
             die('Record not found.');
         }
 
-        $filePath = APPROOT . '/../public/uploads/medical_records/' . $patient_id . '/' . $record->file_name;
+        $filePath = APPROOT . '/../public/uploads/medical_records/' . $record->patient_id . '/' . $record->file_name;
 
         if (!file_exists($filePath)) {
             die('File missing from server.');

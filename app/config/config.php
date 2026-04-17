@@ -36,9 +36,9 @@ define('STREAM_TOKEN_TTL_MINUTES', 60);
 // 3. Create an App Password for "Mail" → paste the 16-char code below
 define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
-define('MAIL_USERNAME', '2023cs146@stu.ucsc.cmb.ac.lk');   // ← Replace with your Gmail
-define('MAIL_PASSWORD', 'qqqe kpsx dvgw vxsb');    // ← Replace with your App Password
-define('MAIL_FROM', '2023cs146@stu.ucsc.cmb.ac.lk');   // ← Same Gmail usually
+define('MAIL_USERNAME', '2023cs146@stu.ucsc.cmb.ac.lk');
+define('MAIL_PASSWORD', 'qqqe kpsx dvgw vxsb');
+define('MAIL_FROM', '2023cs146@stu.ucsc.cmb.ac.lk');
 define('MAIL_FROM_NAME', 'MediLink');
 // ────────────────────────────────────────────────────────────────────────
 

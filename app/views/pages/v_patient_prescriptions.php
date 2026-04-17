@@ -26,7 +26,7 @@ $current_page = 'patientPrescriptions';
                 <div class="section-content" id="prescription-list">
                     <?php if (!empty($data['prescriptions'])): ?>
                         <?php foreach ($data['prescriptions'] as $p): ?>
-                            <div class="medication-item" onclick="openPrescriptionModal(event)">
+                            <div class="medication-item" onclick='openPrescriptionModal(event, <?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'>
                                 <div class="medication-info">
                                     <div class="medication-name"><?= htmlspecialchars($p->diagnosis) ?></div>
                                     <div class="medication-details">

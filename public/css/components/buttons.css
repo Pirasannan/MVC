@@ -546,6 +546,52 @@
     box-shadow: 0 6px 12px rgba(107, 114, 128, 0.3);
 }
 
+/* Account Security Profile Buttons
+   Same visual style as .action-button, but width: auto (not full-width) */
+.btn-profile-security,
+.btn-profile-deactivate {
+    display: inline-block !important;
+    width: auto !important;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    text-align: center;
+    text-decoration: none;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+}
+
+/* Change Password — matches primary action-button colour */
+.btn-profile-security {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+}
+
+.btn-profile-security:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Deactivate — danger outline variant */
+.btn-profile-deactivate {
+    background: transparent;
+    color: #e11d48;
+    border-color: #e11d48;
+}
+
+.btn-profile-deactivate:hover {
+    background: #fff1f2;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
 /* Form/Auth Text Buttons (Moved from components/form/button_style.css) */
 .create_acc,
 .forgot_pass,

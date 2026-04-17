@@ -80,8 +80,8 @@ class ModalManager {
   }
 
   // Prescription modal functions
-  openPrescriptionModal(event) {
-    console.log('openPrescriptionModal called');
+  openPrescriptionModal(event, data) {
+    console.log('openPrescriptionModal called', data);
     
     // Only open modal if the click is not on a button or link within the prescription item
     // Allow clicks on the prescription item itself, but block clicks on action buttons
@@ -91,6 +91,24 @@ class ModalManager {
         event.target.closest('button')) {
       console.log('Click blocked - button/link detected');
       return;
+    }
+
+    if (data) {
+        document.getElementById('vp-doctor-name').textContent = 'Dr. ' + (data.doctor_name || 'Name Unknown');
+        document.getElementById('vp-patient-name').textContent = data.patient_name || 'Patient #' + data.patient_id;
+        document.getElementById('vp-date').textContent = data.created_at ? data.created_at.split(' ')[0] : '';
+        document.getElementById('vp-prescription-id').textContent = 'RX-' + data.id;
+        document.getElementById('vp-diagnosis').textContent = data.diagnosis || '-';
+        document.getElementById('vp-drug').textContent = data.drug_name || '-';
+        document.getElementById('vp-formulation').textContent = data.formulation || '-';
+        document.getElementById('vp-route').textContent = data.route || '-';
+        document.getElementById('vp-dosage').textContent = ((data.dose_amount || '') + ' ' + (data.dose_unit || '')).trim() || '-';
+        document.getElementById('vp-frequency').textContent = data.frequency || '-';
+        document.getElementById('vp-duration').textContent = data.duration_type === 'Until stopped' ? 'Until stopped' : (data.duration_value ? data.duration_value + ' ' + data.duration_type : '-');
+        document.getElementById('vp-special-instructions').textContent = data.special_instructions || 'None';
+        document.getElementById('vp-pharmacy-note').textContent = data.pharmacy_note || 'None';
+        document.getElementById('vp-valid-until').textContent = data.valid_until || 'Not specified';
+        document.getElementById('vp-doctor-sign').textContent = 'Dr. ' + (data.doctor_name || '');
     }
     
     console.log('Opening prescription modal');
@@ -174,10 +192,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Global functions for backward compatibility
-function openPrescriptionModal(event) {
+function openPrescriptionModal(event, data) {
   console.log('Global openPrescriptionModal called');
   if (window.modalManager) {
-    window.modalManager.openPrescriptionModal(event);
+    window.modalManager.openPrescriptionModal(event, data);
   } else {
     console.error('Modal manager not initialized yet');
   }

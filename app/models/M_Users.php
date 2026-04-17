@@ -88,8 +88,15 @@ class M_Users
     //fetch all patients
     public function getPatients()
     {
-        $this->db->query("SELECT id, name FROM Users WHERE role = 'patient' AND status = 'active'");
+        $this->db->query("SELECT id, name FROM Users WHERE role = 'Patient' AND status = 'active'");
         return $this->db->resultSet(); //returns as array if patient objects
+    }
+
+    //fetch all doctors
+    public function getDoctors()
+    {
+        $this->db->query("SELECT id, name FROM Users WHERE role = 'Doctor' AND status = 'active'");
+        return $this->db->resultSet(); //returns as array if doctor objects
     }
 
     // FORGOT PASSWORD METHODS
@@ -137,7 +144,7 @@ class M_Users
                  LIMIT 1'
         );
         $this->db->bind(':email', $email);
-        $this->db->bind(':otp',   $otp);
+        $this->db->bind(':otp', $otp);
 
         $row = $this->db->single();
         return $row ? $row : false;
@@ -168,6 +175,13 @@ class M_Users
         return $this->db->execute();
     }
 
+
+    public function deactivateUser($email)
+    {
+        $this->db->query("UPDATE Users SET status = 'deactivated' WHERE email = :email");
+        $this->db->bind(':email', $email);
+        return $this->db->execute();
+    }
 
 }
 

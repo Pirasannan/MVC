@@ -111,6 +111,46 @@ class M_MedicalRecords {
         return $this->db->execute();
     }
 
+    // Share a record with a doctor
+    public function shareRecord($record_id, $doctor_id) {
+        $this->db->query('
+            INSERT INTO shared_medical_records (record_id, doctor_id) 
+            VALUES (:record_id, :doctor_id)
+            ON DUPLICATE KEY UPDATE shared_at = CURRENT_TIMESTAMP
+        ');
+        $this->db->bind(':record_id', $record_id);
+        $this->db->bind(':doctor_id', $doctor_id);
+
+        return $this->db->execute();
+    }
+
+    // Get shared records for a doctor
+    public function getSharedRecordsByDoctor($doctor_id) {
+        $this->db->query('
+            SELECT mr.*, smr.shared_at, u.name as patient_name
+            FROM shared_medical_records smr
+            JOIN medical_records mr ON smr.record_id = mr.id
+            JOIN Users u ON mr.patient_id = u.id
+            WHERE smr.doctor_id = :doctor_id
+            ORDER BY smr.shared_at DESC
+        ');
+        $this->db->bind(':doctor_id', $doctor_id);
+        return $this->db->resultSet();
+    }
+
+    // Get a specific shared record for a doctor
+    public function getSharedRecordByIdAndDoctor($record_id, $doctor_id) {
+        $this->db->query('
+            SELECT mr.* 
+            FROM shared_medical_records smr
+            JOIN medical_records mr ON smr.record_id = mr.id
+            WHERE smr.record_id = :record_id AND smr.doctor_id = :doctor_id
+        ');
+        $this->db->bind(':record_id', $record_id);
+        $this->db->bind(':doctor_id', $doctor_id);
+        return $this->db->single();
+    }
+
     // Get statistics for the dashboard
     public function getStatsByPatient($patient_id) {
         $this->db->query('
@@ -120,6 +160,38 @@ class M_MedicalRecords {
             GROUP BY record_type
         ');
         $this->db->bind(':patient_id', $patient_id);
+        $results = $this->db->resultSet();
+
+        // Format as key-value pairs
+        $stats = [
+            'lab' => 0,
+            'scan' => 0,
+            'prescription' => 0,
+            'hospital' => 0,
+            'vaccination' => 0,
+            'total' => 0
+        ];
+
+        foreach ($results as $row) {
+            if (array_key_exists($row->record_type, $stats)) {
+                $stats[$row->record_type] = $row->count;
+                $stats['total'] += $row->count;
+            }
+        }
+
+        return $stats;
+    }
+
+    // Get statistics for shared records for a doctor
+    public function getSharedStatsByDoctor($doctor_id) {
+        $this->db->query('
+            SELECT mr.record_type, COUNT(*) as count 
+            FROM shared_medical_records smr
+            JOIN medical_records mr ON smr.record_id = mr.id
+            WHERE smr.doctor_id = :doctor_id 
+            GROUP BY mr.record_type
+        ');
+        $this->db->bind(':doctor_id', $doctor_id);
         $results = $this->db->resultSet();
 
         // Format as key-value pairs

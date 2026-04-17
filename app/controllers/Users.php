@@ -83,15 +83,33 @@ class Users extends Controller {
                 return;
             }
 
-            // If we reach here, all validations passed - register the user
-            //Hash the password
-            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-                
-            //Register the user
-            if($this->userModel->register($data)){
-                redirect('Users/login');
+            // If we reach here, all validations passed - start registration OTP verification
+            // Generate cryptographically secure 6-digit OTP
+            $otp       = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $expiresAt = date('Y-m-d H:i:s', time() + 15 * 60); // expires in 15 minutes
+
+            // Save OTP to DB (clears any previous OTP for this email)
+            if($this->userModel->saveOtp($data['email'], $otp, $expiresAt)){
+                // Send OTP via PHPMailer
+                $mailSent = Mailer::sendRegistrationOtp(
+                    $data['email'],
+                    $data['name'], 
+                    $otp
+                );
+
+                if(!$mailSent){
+                    // Mail failed — show error on the same form
+                    $data['email_err'] = 'Failed to send OTP email. Please check your mail settings or try again.';
+                    $this->view('users/v_register', $data);
+                    return;
+                }
+
+                // Store registration data in session so Step 2 can use it
+                $_SESSION['pending_registration'] = $data;
+
+                redirect('Users/verifyRegistrationOtp');
             } else {
-                die('Something went wrong');
+                die('Something went wrong saving the OTP. Please try again.');
             }
         }
         else {
@@ -114,6 +132,69 @@ class Users extends Controller {
             //Load view
             $this->view('users/v_register', $data);
 
+        }
+    }
+
+    /**
+     * Verify the OTP sent during registration.
+     * GET  /Users/verifyRegistrationOtp → show form
+     * POST /Users/verifyRegistrationOtp → validate OTP and create account
+     */
+    public function verifyRegistrationOtp(){
+        // Guard: must have a pending registration
+        if(empty($_SESSION['pending_registration'])){
+            redirect('Users/register');
+            return;
+        }
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $otp   = trim($_POST['otp'] ?? '');
+            $email = $_SESSION['pending_registration']['email'];
+
+            $data = [
+                'otp'     => $otp,
+                'otp_err' => ''
+            ];
+
+            if(empty($otp)){
+                $data['otp_err'] = 'Please enter the verification code.';
+            } elseif(!preg_match('/^\d{6}$/', $otp)){
+                $data['otp_err'] = 'Verification code must be a 6-digit number.';
+            } else {
+                $result = $this->userModel->verifyOtp($email, $otp);
+                if(!$result){
+                    $data['otp_err'] = 'Invalid or expired code. Please try again.';
+                } else {
+                    // Mark OTP as used
+                    $this->userModel->markOtpUsed($email, $otp);
+                    
+                    // Retrieve pending user data
+                    $pendingData = $_SESSION['pending_registration'];
+                    
+                    // Hash the password
+                    $pendingData['password'] = password_hash($pendingData['password'], PASSWORD_DEFAULT);
+                    
+                    // Register the user
+                    if($this->userModel->register($pendingData)){
+                        // Clean up session var
+                        unset($_SESSION['pending_registration']);
+                        
+                        // Redirect to login with a success flag
+                        $_SESSION['registration_success'] = true;
+                        redirect('Users/login');
+                        return;
+                    } else {
+                        die('Something went wrong creating the account. Please try again.');
+                    }
+                }
+            }
+
+            $this->view('users/v_verify_registration_otp', $data);
+
+        } else {
+            $data = ['otp' => '', 'otp_err' => ''];
+            $this->view('users/v_verify_registration_otp', $data);
         }
     }
 
@@ -426,6 +507,175 @@ class Users extends Controller {
         }
     }
 
+
+    // ──────────────────────────────────────────────────────────
+    // PROFILE SECURITY (CHANGE PASSWORD & DEACTIVATE)
+    // ──────────────────────────────────────────────────────────
+
+    public function requestProfileOtp(){
+        if(!$this->isLoggedIn()){ redirect('Users/login'); return; }
+
+        $action = $_GET['action'] ?? '';
+        if(!in_array($action, ['change_password', 'deactivate'])) {
+            redirect('Pages/index');
+            return;
+        }
+
+        $email = $_SESSION['user_email'];
+        $name = $_SESSION['user_name'];
+
+        $otp       = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $expiresAt = date('Y-m-d H:i:s', time() + 15 * 60);
+
+        if($this->userModel->saveOtp($email, $otp, $expiresAt)){
+            $mailSent = Mailer::sendOtp($email, $name, $otp);
+            if(!$mailSent){
+                echo "<script>alert('Failed to send OTP email.'); window.history.back();</script>";
+                return;
+            }
+
+            $_SESSION['profile_action_email'] = $email;
+            $_SESSION['profile_action_type'] = $action;
+            $_SESSION['profile_otp_verified'] = false;
+
+            redirect('Users/verifyProfileOtp');
+        } else {
+            die('Something went wrong saving the OTP. Please try again.');
+        }
+    }
+
+    public function verifyProfileOtp(){
+        if(!$this->isLoggedIn() || empty($_SESSION['profile_action_type'])){ 
+            redirect('Users/login'); 
+            return; 
+        }
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $otp   = trim($_POST['otp'] ?? '');
+            $email = $_SESSION['profile_action_email'];
+
+            $data = [
+                'otp'     => $otp,
+                'otp_err' => ''
+            ];
+
+            if(empty($otp)){
+                $data['otp_err'] = 'Please enter the OTP.';
+            } elseif(!preg_match('/^\d{6}$/', $otp)){
+                $data['otp_err'] = 'OTP must be a 6-digit number.';
+            } else {
+                $result = $this->userModel->verifyOtp($email, $otp);
+                if(!$result){
+                    $data['otp_err'] = 'Invalid or expired OTP. Please try again.';
+                } else {
+                    $this->userModel->markOtpUsed($email, $otp);
+                    $_SESSION['profile_otp_verified'] = true;
+
+                    if($_SESSION['profile_action_type'] === 'change_password'){
+                        redirect('Users/changeProfilePassword');
+                    } else if ($_SESSION['profile_action_type'] === 'deactivate') {
+                        redirect('Users/deactivateAccount');
+                    }
+                    return;
+                }
+            }
+
+            $this->view('users/v_verify_profile_otp', $data);
+
+        } else {
+            $data = ['otp' => '', 'otp_err' => ''];
+            $this->view('users/v_verify_profile_otp', $data);
+        }
+    }
+
+    public function changeProfilePassword(){
+        if(!$this->isLoggedIn() || empty($_SESSION['profile_otp_verified']) || $_SESSION['profile_otp_verified'] !== true){
+            redirect('Users/login');
+            return;
+        }
+
+        if($_SESSION['profile_action_type'] !== 'change_password') {
+            redirect('Pages/index');
+            return;
+        }
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $data = [
+                'password'              => trim($_POST['password'] ?? ''),
+                'confirm_password'      => trim($_POST['confirm_password'] ?? ''),
+                'password_err'          => '',
+                'confirm_password_err'  => ''
+            ];
+
+            if(empty($data['password'])){
+                $data['password_err'] = 'Please enter a new password.';
+            } elseif(strlen($data['password']) < 7){
+                $data['password_err'] = 'Password must be at least 7 characters.';
+            }
+
+            if(empty($data['confirm_password'])){
+                $data['confirm_password_err'] = 'Please confirm your new password.';
+            } elseif($data['password'] !== $data['confirm_password']){
+                $data['confirm_password_err'] = 'Passwords do not match.';
+            }
+
+            if(!empty($data['password_err']) || !empty($data['confirm_password_err'])){
+                $this->view('users/v_change_profile_password', $data);
+                return;
+            }
+
+            $hashed = password_hash($data['password'], PASSWORD_DEFAULT);
+            $email  = $_SESSION['profile_action_email'];
+
+            if($this->userModel->updatePassword($email, $hashed)){
+                unset($_SESSION['profile_action_email']);
+                unset($_SESSION['profile_action_type']);
+                unset($_SESSION['profile_otp_verified']);
+
+                // optionally redirect to profile
+                echo "<script>alert('Password updated successfully!'); window.location.href='".URLROOT."/Pages/".$_SESSION['user_role']."Profile';</script>";
+                return;
+            } else {
+                die('Something went wrong updating the password. Please try again.');
+            }
+
+        } else {
+            $data = [
+                'password'             => '',
+                'confirm_password'     => '',
+                'password_err'         => '',
+                'confirm_password_err' => ''
+            ];
+            $this->view('users/v_change_profile_password', $data);
+        }
+    }
+
+    public function deactivateAccount(){
+        if(!$this->isLoggedIn() || empty($_SESSION['profile_otp_verified']) || $_SESSION['profile_otp_verified'] !== true){
+            redirect('Users/login');
+            return;
+        }
+
+        if($_SESSION['profile_action_type'] !== 'deactivate') {
+            redirect('Pages/index');
+            return;
+        }
+
+        $email  = $_SESSION['profile_action_email'];
+
+        if($this->userModel->deactivateUser($email)){
+            unset($_SESSION['profile_action_email']);
+            unset($_SESSION['profile_action_type']);
+            unset($_SESSION['profile_otp_verified']);
+
+            // log the user out
+            $this->logout();
+        } else {
+            die('Something went wrong deactivating the account. Please try again.');
+        }
+    }
 
 }
 

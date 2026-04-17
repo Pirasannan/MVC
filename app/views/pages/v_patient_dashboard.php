@@ -1,6 +1,9 @@
 <?php 
 require APPROOT.'/views/inc/header.php'; 
 $current_page = 'patientDashboard';
+$dashboard = $data ?? [];
+$upcomingAppointments = $dashboard['upcomingAppointments'] ?? [];
+$recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
 ?>
 
 
@@ -22,25 +25,25 @@ $current_page = 'patientDashboard';
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Today's Appointments</h3>
-                            <div class="stat-number">1</div>
+                            <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['todayAppointmentsCount'] ?? 0)); ?></div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Active Medications</h3>
-                            <div class="stat-number">3</div>
+                            <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['activeMedicationsCount'] ?? 0)); ?></div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Unread Messages</h3>
-                            <div class="stat-number">2</div>
+                            <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['unreadMessagesCount'] ?? 0)); ?></div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
                             <h3 class="stat-title">Recent Prescriptions</h3>
-                            <div class="stat-number">5</div>
+                            <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['recentPrescriptionsCount'] ?? 0)); ?></div>
                         </div>
                     </div>
                 </div>
@@ -53,91 +56,85 @@ $current_page = 'patientDashboard';
                             <h2 class="section-title">Upcoming Appointments</h2>
                         </div>
                         <div class="section-content">
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. John Smith</div>
-                                    <div class="appointment-date">Today at 2:30 PM</div>
-                                    <div class="appointment-type">Follow-up Consultation</div>
+                            <?php if (!empty($upcomingAppointments)): ?>
+                                <?php foreach ($upcomingAppointments as $appointment): ?>
+                                    <?php
+                                        $appointmentStartsAt = !empty($appointment->starts_at) ? new DateTimeImmutable($appointment->starts_at) : null;
+                                        $appointmentDate = $appointmentStartsAt ? $appointmentStartsAt->format('M j, Y g:i A') : 'TBA';
+                                        $appointmentStatus = strtolower((string)($appointment->status ?? 'scheduled'));
+                                        $statusClasses = [
+                                            'approved' => 'confirmed',
+                                            'pending' => 'pending',
+                                            'completed' => 'scheduled',
+                                        ];
+                                        $statusLabels = [
+                                            'approved' => 'Confirmed',
+                                            'pending' => 'Scheduled',
+                                            'completed' => 'Completed',
+                                        ];
+                                        $statusClass = $statusClasses[$appointmentStatus] ?? 'scheduled';
+                                        $statusLabel = $statusLabels[$appointmentStatus] ?? ucfirst($appointmentStatus ?: 'scheduled');
+                                        $appointmentType = !empty($appointment->reason) ? $appointment->reason : 'Consultation';
+                                    ?>
+                                    <div class="appointment-item">
+                                        <div class="appointment-info">
+                                            <div class="doctor-name"><?php echo htmlspecialchars($appointment->doctor_name ?? 'Doctor'); ?></div>
+                                            <div class="appointment-date"><?php echo htmlspecialchars($appointmentDate); ?></div>
+                                            <div class="appointment-type"><?php echo htmlspecialchars($appointmentType); ?></div>
+                                        </div>
+                                        <div class="appointment-status">
+                                            <span class="status-badge <?php echo htmlspecialchars($statusClass); ?>"><?php echo htmlspecialchars($statusLabel); ?></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="empty-state">
+                                    <p>No upcoming appointments found.</p>
+                                    <p style="font-size: 14px; margin-top: 8px;">Your scheduled visits will appear here once they are approved.</p>
                                 </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge confirmed">Confirmed</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Sarah Johnson</div>
-                                    <div class="appointment-date">Tomorrow at 10:00 AM</div>
-                                    <div class="appointment-type">General Checkup</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge scheduled">Scheduled</span>
-                                </div>
-                            </div>
-                            <div class="appointment-item">
-                                <div class="appointment-info">
-                                    <div class="doctor-name">Dr. Michael Chen</div>
-                                    <div class="appointment-date">Jan 20 at 2:30 PM</div>
-                                    <div class="appointment-type">Specialist Consultation</div>
-                                </div>
-                                <div class="appointment-status">
-                                    <span class="status-badge pending">Pending</span>
-                                </div>
-                            </div>
+                            <?php endif; ?>
                         </div>
                         <div class="section-footer">
                             <a href="<?php echo URLROOT; ?>/Pages/patientBookAppointment"><button class="action-button primary">Book New Appointment</button></a>
                         </div>
                     </div>
 
-                    <!-- System Notifications Section -->
+                    <!-- Recent Prescriptions Section -->
                     <div class="content-section">
                         <div class="section-header">
-                            <h2 class="section-title">System Notifications</h2>
+                            <h2 class="section-title">Recent Prescriptions</h2>
                         </div>
                         <div class="section-content">
-                            <div class="notification-item">
-                                <div class="notification-info">
-                                    <div class="notification-title">New Prescription Available</div>
-                                    <div class="notification-message">Dr. John Smith has prescribed new medication for your condition</div>
-                                    <div class="notification-time">2 hours ago</div>
+                            <?php if (!empty($recentPrescriptions)): ?>
+                                <?php foreach ($recentPrescriptions as $prescription): ?>
+                                    <?php
+                                        $prescribedDate = !empty($prescription->created_at) ? date('M j, Y', strtotime($prescription->created_at)) : 'Today';
+                                        $doseText = trim((string)($prescription->dose_amount ?? '') . ' ' . (string)($prescription->dose_unit ?? ''));
+                                        $medicationDetails = trim(($doseText !== '' ? $doseText : 'No dose specified') . ', ' . ($prescription->frequency ?? 'As directed'));
+                                    ?>
+                                    <div class="medication-item">
+                                        <div class="medication-info">
+                                            <div class="medication-name"><?php echo htmlspecialchars($prescription->drug_name ?? 'Prescription'); ?></div>
+                                            <div class="medication-details"><?php echo htmlspecialchars($medicationDetails); ?></div>
+                                            <div class="prescribed-by">Prescribed by Dr. <?php echo htmlspecialchars($prescription->doctor_name ?? 'Unknown'); ?></div>
+                                        </div>
+                                        <div class="medication-date">
+                                            <div class="prescription-date"><?php echo htmlspecialchars($prescribedDate); ?></div>
+                                            <?php if (!empty($prescription->valid_until)): ?>
+                                                <div class="updated-date">Valid until: <?php echo htmlspecialchars(date('M j, Y', strtotime($prescription->valid_until))); ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="empty-state">
+                                    <p>No recent prescriptions found.</p>
+                                    <p style="font-size: 14px; margin-top: 8px;">New prescriptions from your doctor will appear here.</p>
                                 </div>
-                                <div class="notification-status">
-                                    <span class="status-badge new">New</span>
-                                </div>
-                            </div>
-                            <div class="notification-item">
-                                <div class="notification-info">
-                                    <div class="notification-title">Appointment Reminder</div>
-                                    <div class="notification-message">Your appointment with Dr. Sarah Johnson is tomorrow at 10:00 AM</div>
-                                    <div class="notification-time">1 day ago</div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-badge read">Read</span>
-                                </div>
-                            </div>
-                            <div class="notification-item">
-                                <div class="notification-info">
-                                    <div class="notification-title">Lab Results Ready</div>
-                                    <div class="notification-message">Your recent blood test results are now available for review</div>
-                                    <div class="notification-time">3 days ago</div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-badge read">Read</span>
-                                </div>
-                            </div>
-                            <div class="notification-item">
-                                <div class="notification-info">
-                                    <div class="notification-title">Prescription Refill Due</div>
-                                    <div class="notification-message">Your medication Lisinopril is due for refill in 3 days</div>
-                                    <div class="notification-time">1 week ago</div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-badge read">Read</span>
-                                </div>
-                            </div>
+                            <?php endif; ?>
                         </div>
                         <div class="section-footer">
-                            <button class="action-button primary">View All Notifications</button>
+                            <a href="<?php echo URLROOT; ?>/Pages/patientPrescriptions"><button class="action-button primary">View All Prescriptions</button></a>
                         </div>
                     </div>
                 </div>

@@ -3,6 +3,8 @@ require APPROOT.'/views/inc/header.php';
 $current_page = 'patientPrecall';
 $apt = $data['appointment'];
 $appointmentId = (int)$apt->id;
+$apt = $data['appointment'];
+$appointmentId = (int)$apt->id;
 ?>
 
 <div class="precall-container">
@@ -21,7 +23,11 @@ $appointmentId = (int)$apt->id;
         <!-- Patient Info -->
         <div class="patient-info-card">
             <div class="patient-avatar"></div>
+            <div class="patient-avatar"></div>
             <div class="patient-details">
+                <h3><?= htmlspecialchars($apt->doctor_name) ?></h3>
+                <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
+                <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>
                 <h3><?= htmlspecialchars($apt->doctor_name) ?></h3>
                 <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
                 <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>
@@ -42,30 +48,33 @@ $appointmentId = (int)$apt->id;
                 </div>
             </div>
 
-            <!-- Media Controls -->
-            <div class="media-controls">
-                <button class="media-btn camera-btn active" id="cameraBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M23 7l-7 5 7 5V7z"/>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                    </svg>
-                </button>
-                <button class="media-btn mic-btn active" id="micBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" y1="19" x2="12" y2="23"/>
-                        <line x1="8" y1="23" x2="16" y2="23"/>
-                    </svg>
-                </button>
-                <button class="media-btn speaker-btn active" id="speakerBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
+            <div class="media-right-panel">
+                <!-- Media Controls -->
+                <div class="media-controls">
+                    <button class="media-btn camera-btn active" id="cameraBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 7l-7 5 7 5V7z"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                        </svg>
+                        <span>Camera On</span>
+                    </button>
+                    <button class="media-btn mic-btn active" id="micBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                        <span>Microphone On</span>
+                    </button>
+                    <button class="media-btn speaker-btn active" id="speakerBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                        </svg>
+                        <span>Speaker On</span>
+                    </button>
+                </div>
 
         <!-- Consultation Details -->
         <div class="consultation-details">
@@ -80,15 +89,17 @@ $appointmentId = (int)$apt->id;
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="precall-actions">
-            <a href="<?= URLROOT ?>/VideoCall/room/<?= $appointmentId ?>" class="btn-primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M23 7l-7 5 7 5V7z"/>
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
-                Join Call
-            </a>
+                <!-- Action Buttons -->
+                <div class="precall-actions">
+                    <a href="<?= URLROOT ?>/VideoCall/room/<?= $appointmentId ?>" class="btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 7l-7 5 7 5V7z"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                        </svg>
+                        Join Call
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -143,6 +154,7 @@ document.getElementById('speakerBtn').addEventListener('click', function() {
     }
 });
 
+// (navigation handled by the <a> link)
 // (navigation handled by the <a> link)
 </script>
 

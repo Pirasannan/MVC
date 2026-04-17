@@ -1,7 +1,7 @@
 <?php require APPROOT . '/views/inc/header.php'; ?>
-<?php require APPROOT . '/views/inc/header.php'; ?>
 
 <!-- TOP NAVIGATION -->
+<!-- <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?> -->
 <!-- <?php require APPROOT . '/views/inc/components/topnavbar.php'; ?> -->
 
 <div class="form_container">
@@ -64,4 +64,5 @@
 
 </script>
 
+<?php require APPROOT . '/views/inc/footer.php'; ?>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

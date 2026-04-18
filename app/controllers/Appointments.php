@@ -166,6 +166,12 @@ class Appointments extends Controller
             return redirect('Appointments/my');
         }
 
+        $doctorStatus = strtolower((string)$this->userModel->getUserStatusById($doctor_id));
+        if ($doctorStatus !== 'active') {
+            $_SESSION['flash'] = 'Selected doctor is unavailable for appointments.';
+            return redirect('Appointments/my');
+        }
+
         // Fixed duration: 15 minutes
         $dtEndLocal = $dtStartLocal->modify('+15 minutes');
 
@@ -264,6 +270,16 @@ class Appointments extends Controller
     {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
             return redirect('Pages/index');
+        }
+
+        $doctorStatus = $this->getCurrentDoctorStatus();
+        if ($doctorStatus === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+            return redirect('Users/logout');
+        }
+        if ($doctorStatus === 'suspended') {
+            $_SESSION['flash'] = 'Your account is suspended. You cannot reschedule consultations.';
+            return redirect('Appointments/doctor');
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

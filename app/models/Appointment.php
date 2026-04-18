@@ -101,7 +101,7 @@ public function setStatus($id, $status){
 public function searchDoctorsByName($term){
     $this->db->query("SELECT id, name
                       FROM Users
-                      WHERE role = 'doctor' AND name LIKE :q
+                      WHERE role = 'doctor' AND status = 'active' AND name LIKE :q
                       ORDER BY name ASC
                       LIMIT 10");
     $like = '%'.$term.'%';

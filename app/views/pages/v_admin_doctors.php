@@ -84,10 +84,10 @@
 
             <!-- Additional Content Sections Row -->
             <div class="content-sections">
-                <!-- Rejected Applications Section -->
+                <!-- Inactive/Suspended Accounts Section -->
                 <div class="content-section full-width">
                     <div class="section-header">
-                        <h2 class="section-title">Rejected Applications</h2>
+                        <h2 class="section-title">Inactive/Suspended Accounts</h2>
                     </div>
                     <div class="section-content">
                         <?php
@@ -130,7 +130,7 @@
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <p class="empty-state">No rejected applications.</p>
+                            <p class="empty-state">No inactive or suspended accounts.</p>
                         <?php endif; ?>
                     </div>
                     <div class="section-footer">

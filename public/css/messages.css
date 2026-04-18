@@ -403,10 +403,14 @@
 }
 
 .message-actions {
-    display: flex;
+    display: none;
     justify-content: flex-end;
     gap: 8px;
     margin-bottom: 6px;
+}
+
+.message-bubble.show-actions .message-actions {
+    display: flex;
 }
 
 .message-action-btn {

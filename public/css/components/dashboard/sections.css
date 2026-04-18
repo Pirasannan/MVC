@@ -1,8 +1,9 @@
 /* Content Sections */
 .content-sections {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  align-items: start;
+  gap: 24px;
   }
   
   .content-section {
@@ -173,4 +174,19 @@
   background: #e5e7eb;
   color: #111827;
   text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .content-sections {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .section-header {
+    padding: 16px 18px;
+  }
+
+  .section-footer {
+    padding: 14px 18px;
+  }
 }

@@ -8,7 +8,25 @@ class Doctor extends Controller {
         $this->usersModel = $this->model('M_Users');
     }
 
+	private function getCurrentDoctorStatus() {
+		if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || strtolower((string)$_SESSION['user_role']) !== 'doctor') {
+			return null;
+		}
+
+		return strtolower((string)$this->usersModel->getUserStatusById((int)$_SESSION['user_id']));
+	}
+
     public function addPrescription() {
+		$doctorStatus = $this->getCurrentDoctorStatus();
+		if ($doctorStatus === 'inactive') {
+			$_SESSION['flash'] = 'Your account is deactivated. You cannot create prescriptions.';
+			return redirect('Users/logout');
+		}
+
+		if ($doctorStatus === 'suspended') {
+			$_SESSION['flash'] = 'Your account is suspended. You cannot create prescriptions.';
+			return redirect('Pages/doctorPrescriptions');
+		}
     
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $patients = $this->usersModel->getPatients();
@@ -130,6 +148,17 @@ class Doctor extends Controller {
 	}
 	
 	public function editPrescription($id) {
+		$doctorStatus = $this->getCurrentDoctorStatus();
+		if ($doctorStatus === 'inactive') {
+			$_SESSION['flash'] = 'Your account is deactivated. You cannot edit prescriptions.';
+			return redirect('Users/logout');
+		}
+
+		if ($doctorStatus === 'suspended') {
+			$_SESSION['flash'] = 'Your account is suspended. You cannot edit prescriptions.';
+			return redirect('Pages/doctorPrescriptions');
+		}
+
 		$prescription = $this->prescriptionModel->getPrescriptionById($id);
 	
 		// Restrict edit access

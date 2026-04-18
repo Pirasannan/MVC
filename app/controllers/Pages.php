@@ -614,6 +614,10 @@ class Pages extends Controller{
         $result = $this->adminModel->createNotification($data);
         
         if ($result) {
+            $emailReport = $this->sendNotificationEmails($data);
+            if (($emailReport['failed'] ?? 0) > 0) {
+                error_log('[System Notification] Email failures: ' . ($emailReport['failed'] ?? 0));
+            }
             if ($isJsonRequest) {
                 echo json_encode(['success' => true, 'message' => 'Notification sent successfully']);
             } else {
@@ -629,12 +633,128 @@ class Pages extends Controller{
         }
     }
 
+    public function getLatestNotification() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $userId = (int)$_SESSION['user_id'];
+        $role = strtolower($_SESSION['user_role'] ?? '');
+
+        if ($role === '') {
+            echo json_encode(['success' => true, 'hasNew' => false]);
+            return;
+        }
+
+        $notification = $this->adminModel->getLatestNotificationForUser($role, $userId);
+        if (!$notification) {
+            echo json_encode(['success' => true, 'hasNew' => false]);
+            return;
+        }
+
+        $lastSeenId = $this->userModel->getLastNotificationSeenId($userId);
+        $notificationId = (int)($notification->id ?? 0);
+
+        if ($notificationId === 0 || ($lastSeenId !== null && $notificationId <= (int)$lastSeenId)) {
+            echo json_encode(['success' => true, 'hasNew' => false]);
+            return;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'hasNew' => true,
+            'notification' => [
+                'id' => $notificationId,
+                'title' => $notification->title ?? '',
+                'message' => $notification->message ?? '',
+                'notification_type' => $notification->notification_type ?? 'info',
+                'created_at' => $notification->created_at ?? ''
+            ]
+        ]);
+    }
+
+    public function markNotificationSeen() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $isJsonRequest = $this->isJsonRequest();
+        $input = $isJsonRequest ? json_decode(file_get_contents('php://input'), true) : $_POST;
+        $notificationId = (int)($input['notification_id'] ?? 0);
+
+        if ($notificationId <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Notification ID required']);
+            return;
+        }
+
+        $userId = (int)$_SESSION['user_id'];
+        $currentSeenId = $this->userModel->getLastNotificationSeenId($userId);
+
+        if ($currentSeenId === null || $notificationId > (int)$currentSeenId) {
+            $this->userModel->updateLastNotificationSeenId($userId, $notificationId);
+        }
+
+        echo json_encode(['success' => true]);
+    }
+
     /**
      * Helper method to detect if request is JSON
      */
     private function isJsonRequest() {
         return !empty($_SERVER['CONTENT_TYPE']) && 
                strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+    }
+
+    private function sendNotificationEmails($data) {
+        $recipientType = strtolower($data['recipient_type'] ?? '');
+        $recipientId = !empty($data['recipient_id']) ? (int)$data['recipient_id'] : null;
+        $recipients = [];
+
+        if ($recipientId) {
+            $user = $this->userModel->getUserContactById($recipientId);
+            if ($user && strtolower($user->status ?? '') === 'active') {
+                $recipients = [$user];
+            }
+        } elseif ($recipientType === 'all') {
+            $recipients = $this->userModel->getAllActiveUsers();
+        } elseif (in_array($recipientType, ['admin', 'doctor', 'patient'], true)) {
+            $recipients = $this->userModel->getActiveUsersByRole($recipientType);
+        }
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($recipients as $recipient) {
+            $email = $recipient->email ?? '';
+            $name = $recipient->name ?? 'User';
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $failed++;
+                continue;
+            }
+
+            $ok = Mailer::sendNotification($email, $name, $data['title'], $data['message']);
+            if ($ok) {
+                $sent++;
+            } else {
+                $failed++;
+            }
+        }
+
+        return [
+            'attempted' => count($recipients),
+            'sent' => $sent,
+            'failed' => $failed
+        ];
     }
 
     public function adminAllDoctors() {

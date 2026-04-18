@@ -1,77 +1,84 @@
 <?php
-class M_Admin {
+class M_Admin
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = new Database;
     }
 
-	private function tableExists($tableName) {
-		$this->db->query('SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = :db AND table_name = :table LIMIT 1');
-		$this->db->bind(':db', DB_NAME);
-		$this->db->bind(':table', $tableName);
-		$result = $this->db->single();
-		return isset($result->total) && (int)$result->total > 0;
-	}
+    private function tableExists($tableName)
+    {
+        $this->db->query('SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = :db AND table_name = :table LIMIT 1');
+        $this->db->bind(':db', DB_NAME);
+        $this->db->bind(':table', $tableName);
+        $result = $this->db->single();
+        return isset($result->total) && (int)$result->total > 0;
+    }
 
     // ==================== DASHBOARD STATS ====================
-    
-    public function getDashboardStats() {
+
+    public function getDashboardStats()
+    {
         $stats = [];
-        
-		// Total Doctors (Users with role Doctor and active status)
-		$this->db->query('SELECT COUNT(*) as total FROM Users WHERE role = :role AND status = :status');
-		$this->db->bind(':role', 'Doctor');
-		$this->db->bind(':status', 'active');
-		$stats['total_doctors'] = $this->db->single()->total;
-        
-		// Total Patients (Users with role Patient and active status)
-		$this->db->query('SELECT COUNT(*) as total FROM Users WHERE role = :role AND status = :status');
-		$this->db->bind(':role', 'Patient');
-		$this->db->bind(':status', 'active');
-		$stats['total_patients'] = $this->db->single()->total;
-        
-		// Consultations Last Week (guard if table not present)
-		if ($this->tableExists('consultations')) {
-			$this->db->query('SELECT COUNT(*) as total FROM consultations 
+
+        // Total Doctors (Users with role Doctor and active status)
+        $this->db->query('SELECT COUNT(*) as total FROM Users WHERE role = :role AND status = :status');
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':status', 'active');
+        $stats['total_doctors'] = $this->db->single()->total;
+
+        // Total Patients (Users with role Patient and active status)
+        $this->db->query('SELECT COUNT(*) as total FROM Users WHERE role = :role AND status = :status');
+        $this->db->bind(':role', 'Patient');
+        $this->db->bind(':status', 'active');
+        $stats['total_patients'] = $this->db->single()->total;
+
+        // Consultations Last Week (guard if table not present)
+        if ($this->tableExists('consultations')) {
+            $this->db->query('SELECT COUNT(*) as total FROM consultations 
 							WHERE consultation_date >= DATE_SUB(NOW(), INTERVAL 7 DAY) 
 							AND status = :status');
-			$this->db->bind(':status', 'completed');
-			$stats['consultations_last_week'] = $this->db->single()->total;
-		} else {
-			$stats['consultations_last_week'] = 0;
-		}
-        
+            $this->db->bind(':status', 'completed');
+            $stats['consultations_last_week'] = $this->db->single()->total;
+        } else {
+            $stats['consultations_last_week'] = 0;
+        }
+
         return $stats;
     }
 
     // ==================== DASHBOARD - PENDING VERIFICATIONS ====================
-    
-	public function getPendingDoctorsForDashboard() {
-		$this->db->query('SELECT id, name, created_at as submitted_date
-						FROM Users 
-						WHERE role = :role AND status = :status 
-						ORDER BY created_at DESC 
-						LIMIT 3');
-		$this->db->bind(':role', 'Doctor');
-		$this->db->bind(':status', 'inactive');
-		return $this->db->resultSet();
-	}
 
-	public function getPendingPatientsForDashboard() {
-		$this->db->query('SELECT id, name, email, created_at as submitted_date
+    public function getPendingDoctorsForDashboard()
+    {
+        $this->db->query('SELECT id, name, created_at as submitted_date
 						FROM Users 
 						WHERE role = :role AND status = :status 
 						ORDER BY created_at DESC 
 						LIMIT 3');
-		$this->db->bind(':role', 'Patient');
-		$this->db->bind(':status', 'inactive');
-		return $this->db->resultSet();
-	}
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':status', 'inactive');
+        return $this->db->resultSet();
+    }
+
+    public function getPendingPatientsForDashboard()
+    {
+        $this->db->query('SELECT id, name, email, created_at as submitted_date
+						FROM Users 
+						WHERE role = :role AND status = :status 
+						ORDER BY created_at DESC 
+						LIMIT 3');
+        $this->db->bind(':role', 'Patient');
+        $this->db->bind(':status', 'inactive');
+        return $this->db->resultSet();
+    }
 
     // ==================== DASHBOARD - RECENT ACTIVITY ====================
-    
-    public function getRecentActivityForDashboard() {
+
+    public function getRecentActivityForDashboard()
+    {
         // $this->db->query('SELECT * FROM activity_logs 
         //                  ORDER BY created_at DESC 
         //                  LIMIT 3');
@@ -79,72 +86,82 @@ class M_Admin {
     }
 
     // ==================== DOCTOR MANAGEMENT ====================
-    
-	public function getPendingDoctors() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY created_at DESC');
-		$this->db->bind(':role', 'Doctor');
-		$this->db->bind(':status', 'inactive');
-		return $this->db->resultSet();
-	}
 
-    public function getUnverifiedDoctors() {
+    public function getPendingDoctors()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY created_at DESC');
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':status', 'inactive');
+        return $this->db->resultSet();
+    }
+
+    public function getUnverifiedDoctors()
+    {
         $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY created_at DESC');
         $this->db->bind(':role', 'Doctor');
         $this->db->bind(':status', 'unverified');
         return $this->db->resultSet();
     }
 
-	public function getVerifiedDoctors() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
-		$this->db->bind(':role', 'Doctor');
-		$this->db->bind(':status', 'active');
-		return $this->db->resultSet();
-	}
+    public function getVerifiedDoctors()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':status', 'active');
+        return $this->db->resultSet();
+    }
 
-	public function getRejectedDoctors() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
-		$this->db->bind(':role', 'Doctor');
-		$this->db->bind(':status', 'suspended');
-		return $this->db->resultSet();
-	}
+    public function getRejectedDoctors()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':status', 'suspended');
+        return $this->db->resultSet();
+    }
 
-	public function getInactiveDoctors() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status IN (:inactive, :suspended) ORDER BY updated_at DESC');
-		$this->db->bind(':role', 'Doctor');
-		$this->db->bind(':inactive', 'inactive');
-		$this->db->bind(':suspended', 'suspended');
-		return $this->db->resultSet();
-	}
+    public function getInactiveDoctors()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status IN (:inactive, :suspended) ORDER BY updated_at DESC');
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':inactive', 'inactive');
+        $this->db->bind(':suspended', 'suspended');
+        return $this->db->resultSet();
+    }
 
-	public function approveDoctor($doctor_id) {
-		$this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-		$this->db->bind(':status', 'active');
-		$this->db->bind(':id', $doctor_id);
-		return $this->db->execute();
-	}
+    public function approveDoctor($doctor_id)
+    {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'active');
+        $this->db->bind(':id', $doctor_id);
+        return $this->db->execute();
+    }
 
-	public function rejectDoctor($doctor_id, $reason) {
-		$this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-		$this->db->bind(':status', 'suspended');
-		$this->db->bind(':id', $doctor_id);
-		return $this->db->execute();
-	}
-
-    public function suspendDoctor($doctor_id) {
+    public function rejectDoctor($doctor_id, $reason)
+    {
         $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
         $this->db->bind(':status', 'suspended');
         $this->db->bind(':id', $doctor_id);
         return $this->db->execute();
     }
 
-    public function deactivateDoctor($doctor_id) {
+    public function suspendDoctor($doctor_id)
+    {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'suspended');
+        $this->db->bind(':id', $doctor_id);
+        return $this->db->execute();
+    }
+
+    public function deactivateDoctor($doctor_id)
+    {
         $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
         $this->db->bind(':status', 'inactive');
         $this->db->bind(':id', $doctor_id);
         return $this->db->execute();
     }
 
-    public function reactivateDoctor($doctor_id) {
+    public function reactivateDoctor($doctor_id)
+    {
         $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
         $this->db->bind(':status', 'active');
         $this->db->bind(':id', $doctor_id);
@@ -152,51 +169,58 @@ class M_Admin {
     }
 
     // ==================== PATIENT MANAGEMENT ====================
-    
-	public function getPendingPatients() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY created_at DESC');
-		$this->db->bind(':role', 'Patient');
-		$this->db->bind(':status', 'inactive');
-		return $this->db->resultSet();
-	}
 
-	public function getVerifiedPatients() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
-		$this->db->bind(':role', 'Patient');
-		$this->db->bind(':status', 'active');
-		return $this->db->resultSet();
-	}
+    public function getPendingPatients()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY created_at DESC');
+        $this->db->bind(':role', 'Patient');
+        $this->db->bind(':status', 'inactive');
+        return $this->db->resultSet();
+    }
 
-	public function getRejectedPatients() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
-		$this->db->bind(':role', 'Patient');
-		$this->db->bind(':status', 'suspended');
-		return $this->db->resultSet();
-	}
+    public function getVerifiedPatients()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
+        $this->db->bind(':role', 'Patient');
+        $this->db->bind(':status', 'active');
+        return $this->db->resultSet();
+    }
 
-	public function getInactivePatients() {
-		$this->db->query('SELECT * FROM Users WHERE role = :role AND status IN (:inactive, :suspended) ORDER BY updated_at DESC');
-		$this->db->bind(':role', 'Patient');
-		$this->db->bind(':inactive', 'inactive');
-		$this->db->bind(':suspended', 'suspended');
-		return $this->db->resultSet();
-	}
+    public function getRejectedPatients()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
+        $this->db->bind(':role', 'Patient');
+        $this->db->bind(':status', 'suspended');
+        return $this->db->resultSet();
+    }
 
-	public function approvePatient($patient_id) {
-		$this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-		$this->db->bind(':status', 'active');
-		$this->db->bind(':id', $patient_id);
-		return $this->db->execute();
-	}
+    public function getInactivePatients()
+    {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status IN (:inactive, :suspended) ORDER BY updated_at DESC');
+        $this->db->bind(':role', 'Patient');
+        $this->db->bind(':inactive', 'inactive');
+        $this->db->bind(':suspended', 'suspended');
+        return $this->db->resultSet();
+    }
 
-	public function rejectPatient($patient_id, $reason) {
-		$this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-		$this->db->bind(':status', 'suspended');
-		$this->db->bind(':id', $patient_id);
+    public function approvePatient($patient_id)
+    {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'active');
+        $this->db->bind(':id', $patient_id);
         return $this->db->execute();
     }
 
-    public function deactivatePatient($patient_id) {
+    public function rejectPatient($patient_id, $reason)
+    {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'suspended');
+        $this->db->bind(':id', $patient_id);
+        return $this->db->execute();
+    }
+
+    public function deactivatePatient($patient_id)
+    {
         $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
         $this->db->bind(':status', 'inactive');
         $this->db->bind(':id', $patient_id);
@@ -204,15 +228,17 @@ class M_Admin {
     }
 
     // ==================== PROFILE & SECURITY MANAGEMENT ====================
-    
-    public function getAdminProfile($admin_id) {
+
+    public function getAdminProfile($admin_id)
+    {
         $this->db->query('SELECT * FROM Users WHERE id = :admin_id AND LOWER(role) = :role LIMIT 1');
         $this->db->bind(':admin_id', $admin_id);
         $this->db->bind(':role', 'admin');
         return $this->db->single();
     }
 
-    public function getActiveSessions($admin_id) {
+    public function getActiveSessions($admin_id)
+    {
         // For now, return mock data since we don't have a sessions table
         return [
             (object)[
@@ -232,7 +258,8 @@ class M_Admin {
         ];
     }
 
-    public function getSecurityOverview($admin_id) {
+    public function getSecurityOverview($admin_id)
+    {
         // For now, return mock data
         return (object)[
             'last_password_change' => '2025-09-18',
@@ -243,7 +270,8 @@ class M_Admin {
         ];
     }
 
-    public function getAdminActivityLog($admin_id) {
+    public function getAdminActivityLog($admin_id)
+    {
         if (!$this->tableExists('activity_logs')) {
             return [];
         }
@@ -262,7 +290,8 @@ class M_Admin {
         return $this->db->resultSet();
     }
 
-    public function getSystemActivityLog() {
+    public function getSystemActivityLog()
+    {
         // For now, return mock data
         return [
             (object)[
@@ -289,7 +318,8 @@ class M_Admin {
         ];
     }
 
-    public function getLoginLogs($limit = 50) {
+    public function getLoginLogs($limit = 50)
+    {
         if (!$this->tableExists('activity_logs')) {
             return [];
         }
@@ -307,7 +337,8 @@ class M_Admin {
 
     // ==================== NOTIFICATIONS & REPORTS ====================
 
-    private function getReportsByTypeAndStatuses(array $types, array $statuses, $orderBy = 'r.created_at DESC') {
+    private function getReportsByTypeAndStatuses(array $types, array $statuses, $orderBy = 'r.created_at DESC')
+    {
         if (!$this->tableExists('reports')) {
             return [];
         }
@@ -349,8 +380,9 @@ class M_Admin {
 
         return $this->db->resultSet();
     }
-    
-    public function getReportedMessages() {
+
+    public function getReportedMessages()
+    {
         return $this->getReportsByTypeAndStatuses(
             ['Inappropriate Content', 'Spam Messages', 'Harassment', 'Fraudulent Activity', 'Technical Issue'],
             ['pending', 'under_review'],
@@ -358,15 +390,18 @@ class M_Admin {
         );
     }
 
-    public function getPendingCallReports() {
+    public function getPendingCallReports()
+    {
         return $this->getReportsByTypeAndStatuses(['Call Report'], ['pending', 'under_review'], 'r.created_at DESC');
     }
 
-    public function getPendingUserReports() {
+    public function getPendingUserReports()
+    {
         return $this->getReportsByTypeAndStatuses(['User Report'], ['pending', 'under_review'], 'r.created_at DESC');
     }
 
-    public function getResolvedReports() {
+    public function getResolvedReports()
+    {
         if (!$this->tableExists('reports')) {
             return [];
         }
@@ -385,7 +420,8 @@ class M_Admin {
         return $this->db->resultSet();
     }
 
-    public function resolveReport($reportId, $adminId, $resolution) {
+    public function resolveReport($reportId, $adminId, $resolution)
+    {
         if (!$this->tableExists('reports')) {
             return false;
         }
@@ -412,7 +448,8 @@ class M_Admin {
         return $this->db->rowCount() > 0;
     }
 
-    public function sendSystemNotification($data) {
+    public function sendSystemNotification($data)
+    {
         $this->db->query('INSERT INTO notifications (recipient_type, title, message, created_at) 
                          VALUES (:recipient_type, :title, :message, NOW())');
         $this->db->bind(':recipient_type', $data['recipient_type']);
@@ -422,39 +459,44 @@ class M_Admin {
     }
 
     // ==================== MEDICAL RECORDS ====================
-    
-	public function getRecentConsultations() {
-		if (!$this->tableExists('consultations')) {
-			return [];
-		}
-		// Under current schema, related tables may not exist; return empty for safety
-		return [];
-	}
 
-	public function getRecentPrescriptions() {
-		if (!$this->tableExists('prescriptions')) {
-			return [];
-		}
-		return [];
-	}
+    public function getRecentConsultations()
+    {
+        if (!$this->tableExists('consultations')) {
+            return [];
+        }
+        // Under current schema, related tables may not exist; return empty for safety
+        return [];
+    }
 
-	public function getTestReferrals() {
-		if (!$this->tableExists('test_referrals')) {
-			return [];
-		}
-		return [];
-	}
+    public function getRecentPrescriptions()
+    {
+        if (!$this->tableExists('prescriptions')) {
+            return [];
+        }
+        return [];
+    }
 
-	public function getPatientMedicalHistory($patient_id) {
-		if (!$this->tableExists('medical_history')) {
-			return [];
-		}
-		return [];
-	}
+    public function getTestReferrals()
+    {
+        if (!$this->tableExists('test_referrals')) {
+            return [];
+        }
+        return [];
+    }
+
+    public function getPatientMedicalHistory($patient_id)
+    {
+        if (!$this->tableExists('medical_history')) {
+            return [];
+        }
+        return [];
+    }
 
     // ==================== ACTIVITY LOGS ====================
-    
-    public function getRecentSystemActivity() {
+
+    public function getRecentSystemActivity()
+    {
         if (!$this->tableExists('activity_logs')) {
             return [];
         }
@@ -463,7 +505,8 @@ class M_Admin {
         return $this->db->resultSet();
     }
 
-    public function logAdminAction($admin_id, $action, $description) {
+    public function logAdminAction($admin_id, $action, $description)
+    {
         if (!$this->tableExists('activity_logs')) {
             return false;
         }
@@ -477,14 +520,16 @@ class M_Admin {
     }
 
     // ==================== ADMIN PROFILE ====================
-    
-    public function getAdminById($id) {
+
+    public function getAdminById($id)
+    {
         $this->db->query('SELECT * FROM admins WHERE id = :id');
         $this->db->bind(':id', $id);
         return $this->db->single();
     }
 
-    public function updateAdminProfile($data) {
+    public function updateAdminProfile($data)
+    {
         $this->db->query('UPDATE admins SET name = :name, email = :email, phone = :phone WHERE id = :id');
         $this->db->bind(':name', $data['name']);
         $this->db->bind(':email', $data['email']);
@@ -493,7 +538,8 @@ class M_Admin {
         return $this->db->execute();
     }
 
-    public function updateAdminPassword($admin_id, $hashed_password) {
+    public function updateAdminPassword($admin_id, $hashed_password)
+    {
         $this->db->query('UPDATE admins SET password = :password WHERE id = :id');
         $this->db->bind(':password', $hashed_password);
         $this->db->bind(':id', $admin_id);
@@ -501,8 +547,9 @@ class M_Admin {
     }
 
     // ==================== NOTIFICATIONS ====================
-    
-    public function createNotification($data) {
+
+    public function createNotification($data)
+    {
         $this->db->query('INSERT INTO notifications (recipient_type, recipient_id, title, message, notification_type, status, created_at) 
                          VALUES (:recipient_type, :recipient_id, :title, :message, :notification_type, :status, NOW())');
         $this->db->bind(':recipient_type', $data['recipient_type']);
@@ -514,7 +561,8 @@ class M_Admin {
         return $this->db->execute();
     }
 
-    public function getRecentNotifications($limit = 10) {
+    public function getRecentNotifications($limit = 10)
+    {
         $this->db->query('SELECT * FROM notifications 
                          ORDER BY created_at DESC 
                          LIMIT :limit');
@@ -522,13 +570,15 @@ class M_Admin {
         return $this->db->resultSet();
     }
 
-    public function getAllNotifications() {
+    public function getAllNotifications()
+    {
         $this->db->query('SELECT * FROM notifications 
                          ORDER BY created_at DESC');
         return $this->db->resultSet();
     }
 
-    public function getNotificationsByRecipient($recipient_type, $recipient_id = null) {
+    public function getNotificationsByRecipient($recipient_type, $recipient_id = null)
+    {
         if ($recipient_id) {
             $this->db->query('SELECT * FROM notifications 
                              WHERE recipient_type = :recipient_type AND recipient_id = :recipient_id
@@ -543,5 +593,21 @@ class M_Admin {
         }
         return $this->db->resultSet();
     }
+
+    public function getLatestNotificationForUser($recipientRole, $recipientId)
+    {
+        if (!$this->tableExists('notifications')) {
+            return null;
+        }
+
+        $this->db->query('SELECT * FROM notifications
+                         WHERE (recipient_type = :all_type AND recipient_id IS NULL)
+                            OR (recipient_type = :recipient_type AND (recipient_id IS NULL OR recipient_id = :recipient_id))
+                         ORDER BY created_at DESC, id DESC
+                         LIMIT 1');
+        $this->db->bind(':all_type', 'all');
+        $this->db->bind(':recipient_type', $recipientRole);
+        $this->db->bind(':recipient_id', (int)$recipientId);
+        return $this->db->single();
+    }
 }
-?>

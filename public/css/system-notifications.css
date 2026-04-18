@@ -1,0 +1,111 @@
+/* System notification modal */
+.system-notification-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 2000;
+}
+
+.system-notification-overlay.is-visible {
+  display: flex;
+}
+
+.system-notification-card {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 14px;
+  border-left: 6px solid #2563eb;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  animation: system-notification-pop 0.18s ease-out;
+}
+
+.system-notification-card--success {
+  border-left-color: #16a34a;
+}
+
+.system-notification-card--warning {
+  border-left-color: #f59e0b;
+}
+
+.system-notification-card--error {
+  border-left-color: #dc2626;
+}
+
+.system-notification-card--info {
+  border-left-color: #2563eb;
+}
+
+.system-notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 0;
+}
+
+.system-notification-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.system-notification-close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.system-notification-close:hover {
+  color: #374151;
+}
+
+.system-notification-body {
+  padding: 12px 18px 16px;
+  color: #374151;
+}
+
+.system-notification-message {
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.system-notification-meta {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.system-notification-actions {
+  padding: 0 18px 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.system-notification-button {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.system-notification-button:hover {
+  background: #1d4ed8;
+}
+
+@keyframes system-notification-pop {
+  from {
+    transform: translateY(8px);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

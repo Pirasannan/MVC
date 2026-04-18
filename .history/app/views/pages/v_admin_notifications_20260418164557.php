@@ -67,6 +67,10 @@ $current_page = 'adminNotifications';
                     </form>
                 </div>
 
+            </div>
+
+            <!-- Additional Content Sections Row -->
+            <div class="content-sections">
                 <!-- Recent System Notifications Section -->
                 <div class="content-section">
                     <div class="section-header">

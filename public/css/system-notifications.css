@@ -18,7 +18,7 @@
   width: min(520px, 100%);
   background: #ffffff;
   border-radius: 14px;
-  border-left: 6px solid #2563eb;
+  border-left: 6px solid var(--primary);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
   animation: system-notification-pop 0.18s ease-out;
 }
@@ -36,7 +36,7 @@
 }
 
 .system-notification-card--info {
-  border-left-color: #2563eb;
+  border-left-color: var(--primary);
 }
 
 .system-notification-header {
@@ -86,7 +86,7 @@
 }
 
 .system-notification-button {
-  background: #2563eb;
+  background: var(--primary);
   color: #ffffff;
   border: none;
   padding: 8px 14px;
@@ -96,7 +96,7 @@
 }
 
 .system-notification-button:hover {
-  background: #1d4ed8;
+  background: var(--primary);
 }
 
 @keyframes system-notification-pop {

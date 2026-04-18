@@ -1,8 +1,10 @@
-<?php require APPROOT.'/views/inc/header.php'; ?>
+<?php require APPROOT.'/views/inc/header.php'; 
+$current_page = 'adminMessages';
+?>
 <link rel='stylesheet' href='<?php echo URLROOT; ?>/css/messages.css?v=<?php echo time(); ?>'>
 
 <div class="dashboard-container admin" data-user-id="<?php echo $_SESSION['user_id']; ?>" data-user-type="<?php echo $_SESSION['user_role'] ?? 'admin'; ?>">
-    <?php require APPROOT.'/views/inc/components/adminSidebar.php'; ?>
+    <?php require APPROOT . '/views/inc/components/adminSidebar.php'; ?>
 
     <main class="main-content">
         <header class="top-header">

@@ -75,13 +75,17 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
     $rescheduleStatus = $a->reschedule_status ?? 'none';
   ?>
   <?php if ($rescheduleStatus !== 'pending_patient'): ?>
-    <button type="button"
-            class="btn btn-warning btn-reschedule"
-            data-id="<?= $a->id ?>"
-            data-current="<?= htmlspecialchars($currentDt) ?>"
-            onclick="openResModal(this)">
-      Reschedule
-    </button>
+    <?php if ($doctorStatus === 'suspended' || $doctorStatus === 'inactive'): ?>
+      <span class="btn btn-warning btn-reschedule" aria-disabled="true" style="pointer-events:none;opacity:.55;">Reschedule</span>
+    <?php else: ?>
+      <button type="button"
+              class="btn btn-warning btn-reschedule"
+              data-id="<?= $a->id ?>"
+              data-current="<?= htmlspecialchars($currentDt) ?>"
+              onclick="openResModal(this)">
+        Reschedule
+      </button>
+    <?php endif; ?>
   <?php else: ?>
     <span class="badge badge-warning">Waiting for patient confirmation</span>
   <?php endif; ?>
@@ -177,7 +181,7 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
       </div>
 
       <div class="res-modal__actions">
-        <button type="submit" class="btn btn-warning">Send Proposal</button>
+        <button type="submit" class="btn btn-warning" <?php echo ($doctorStatus === 'suspended' || $doctorStatus === 'inactive') ? 'disabled style="opacity:.55;cursor:not-allowed;"' : ''; ?>>Send Proposal</button>
         <button type="button" class="btn btn-light" onclick="closeResModal()">Close</button>
       </div>
     </form>

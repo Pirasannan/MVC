@@ -272,6 +272,16 @@ class Appointments extends Controller
             return redirect('Pages/index');
         }
 
+        $doctorStatus = $this->getCurrentDoctorStatus();
+        if ($doctorStatus === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+            return redirect('Users/logout');
+        }
+        if ($doctorStatus === 'suspended') {
+            $_SESSION['flash'] = 'Your account is suspended. You cannot reschedule consultations.';
+            return redirect('Appointments/doctor');
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return redirect('Appointments/doctor');
         }

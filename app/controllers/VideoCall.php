@@ -4,9 +4,11 @@ require_once APPROOT . '/libraries/StreamToken.php';
 class VideoCall extends Controller {
 
     private $apModel;
+    private $userModel;
 
     public function __construct() {
         $this->apModel = $this->model('Appointment');
+        $this->userModel = $this->model('M_Users');
     }
 
     // ── Pre-call screen ──────────────────────────────────────────────────────
@@ -15,6 +17,18 @@ class VideoCall extends Controller {
         $role = $_SESSION['user_role'] ?? null;
         if (!in_array($role, ['doctor', 'patient'], true)) {
             return redirect('Pages/index');
+        }
+
+        if ($role === 'patient') {
+            $status = strtolower((string)$this->userModel->getUserStatusById((int)($_SESSION['user_id'] ?? 0)));
+            if ($status === 'inactive') {
+                $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+                return redirect('Users/logout');
+            }
+            if ($status === 'suspended') {
+                $_SESSION['flash'] = 'Your account is suspended. You cannot join consultations.';
+                return redirect('Appointments/my');
+            }
         }
 
         $appointmentId = (int)$appointmentId;
@@ -43,6 +57,18 @@ class VideoCall extends Controller {
         $role = $_SESSION['user_role'] ?? null;
         if (!in_array($role, ['doctor', 'patient'], true)) {
             return redirect('Pages/index');
+        }
+
+        if ($role === 'patient') {
+            $status = strtolower((string)$this->userModel->getUserStatusById((int)($_SESSION['user_id'] ?? 0)));
+            if ($status === 'inactive') {
+                $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+                return redirect('Users/logout');
+            }
+            if ($status === 'suspended') {
+                $_SESSION['flash'] = 'Your account is suspended. You cannot join consultations.';
+                return redirect('Appointments/my');
+            }
         }
 
         $appointmentId = (int)$appointmentId;

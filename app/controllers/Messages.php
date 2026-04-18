@@ -13,12 +13,28 @@ class Messages extends Controller {
         $this->userModel = $this->model('M_Users');
     }
 
+    private function getCurrentPatientStatus() {
+        if (!isset($_SESSION['user_role']) || strtolower((string)$_SESSION['user_role']) !== 'patient') {
+            return null;
+        }
+
+        return strtolower((string)$this->userModel->getUserStatusById((int)$_SESSION['user_id']));
+    }
+
     // Get conversations list
     public function getConversations() {
         header('Content-Type: application/json');
         
         $userId = $_SESSION['user_id'];
         $userType = $_SESSION['user_role'] ?? '';
+
+        if ($this->getCurrentPatientStatus() === 'inactive') {
+            echo json_encode([
+                'success' => true,
+                'conversations' => []
+            ]);
+            return;
+        }
         
         try {
             $conversations = $this->messageModel->getConversations($userId, $userType);
@@ -114,6 +130,17 @@ class Messages extends Controller {
         $userId = $_SESSION['user_id'];
         $attachmentFile = $_FILES['attachment'] ?? null;
         $attachmentData = null;
+
+        $patientStatus = $this->getCurrentPatientStatus();
+        if ($patientStatus === 'inactive') {
+            echo json_encode(['success' => false, 'message' => 'Your account is deactivated. Please contact admin.']);
+            return;
+        }
+
+        if ($patientStatus === 'suspended') {
+            echo json_encode(['success' => false, 'message' => 'Your account is suspended. You cannot send messages.']);
+            return;
+        }
 
         $messageText = trim((string)$messageText);
         $hasAttachment = $attachmentFile && isset($attachmentFile['tmp_name']) && !empty($attachmentFile['tmp_name']) && ($attachmentFile['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
@@ -234,6 +261,17 @@ class Messages extends Controller {
         $messageId = $_POST['message_id'] ?? ($input['message_id'] ?? null);
         $messageText = $_POST['message'] ?? ($input['message'] ?? '');
         $userId = $_SESSION['user_id'];
+
+        $patientStatus = $this->getCurrentPatientStatus();
+        if ($patientStatus === 'inactive') {
+            echo json_encode(['success' => false, 'message' => 'Your account is deactivated. Please contact admin.']);
+            return;
+        }
+
+        if ($patientStatus === 'suspended') {
+            echo json_encode(['success' => false, 'message' => 'Your account is suspended. You cannot edit messages.']);
+            return;
+        }
 
         $messageText = trim((string)$messageText);
 
@@ -509,6 +547,17 @@ class Messages extends Controller {
         }
         $recipientId = $input['recipient_id'] ?? null;
         $userId = $_SESSION['user_id'];
+
+        $patientStatus = $this->getCurrentPatientStatus();
+        if ($patientStatus === 'inactive') {
+            echo json_encode(['success' => false, 'message' => 'Your account is deactivated. Please contact admin.']);
+            return;
+        }
+
+        if ($patientStatus === 'suspended') {
+            echo json_encode(['success' => false, 'message' => 'Your account is suspended. You cannot start new chats.']);
+            return;
+        }
         
         if (!$recipientId) {
             echo json_encode(['success' => false, 'message' => 'Missing recipient ID']);
@@ -592,6 +641,15 @@ class Messages extends Controller {
         $userRole = $_SESSION['user_role'] ?? '';
         $searchTerm = trim($_GET['search'] ?? '');
 
+        $patientStatus = $this->getCurrentPatientStatus();
+        if (in_array($patientStatus, ['inactive', 'suspended'], true)) {
+            echo json_encode([
+                'success' => true,
+                'contacts' => []
+            ]);
+            return;
+        }
+
         try {
             $contacts = $this->messageModel->getEligibleContacts($userId, $userRole, $searchTerm);
 
@@ -622,6 +680,17 @@ class Messages extends Controller {
         }
         $messageId = $input['message_id'] ?? null;
         $userId = $_SESSION['user_id'];
+
+        $patientStatus = $this->getCurrentPatientStatus();
+        if ($patientStatus === 'inactive') {
+            echo json_encode(['success' => false, 'message' => 'Your account is deactivated. Please contact admin.']);
+            return;
+        }
+
+        if ($patientStatus === 'suspended') {
+            echo json_encode(['success' => false, 'message' => 'Your account is suspended. You cannot delete messages.']);
+            return;
+        }
         
         if (!$messageId) {
             echo json_encode(['success' => false, 'message' => 'Missing message ID']);

@@ -1,0 +1,379 @@
+.dashboard-container.admin .profile-message {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dashboard-container.admin .profile-message.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.dashboard-container.admin .profile-message.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.dashboard-container.admin .admin-profile-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.dashboard-container.admin .admin-profile-card,
+.dashboard-container.admin .admin-details-card,
+.dashboard-container.admin .admin-activity-section {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.dashboard-container.admin .admin-profile-card {
+    padding: 26px 22px;
+    text-align: center;
+}
+
+.dashboard-container.admin .profile-avatar-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-container.admin .is-hidden {
+    display: none !important;
+}
+
+.dashboard-container.admin .profile-avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(74, 144, 226, 0.2);
+}
+
+.dashboard-container.admin .profile-avatar-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e2e8f0;
+    box-shadow: 0 10px 24px rgba(74, 144, 226, 0.2);
+}
+
+.dashboard-container.admin .admin-name {
+    margin: 14px 0 4px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.dashboard-container.admin .admin-role {
+    margin: 0 0 14px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dashboard-container.admin .profile-edit-btn {
+    width: 100%;
+}
+
+.dashboard-container.admin .admin-details-card {
+    padding: 18px;
+}
+
+.dashboard-container.admin .details-title {
+    margin: 0 0 12px;
+    color: #1f2937;
+    font-size: 28px;
+}
+
+.dashboard-container.admin .details-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.dashboard-container.admin .details-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-container.admin .details-row:last-child {
+    border-bottom: none;
+}
+
+.dashboard-container.admin .details-row > span {
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #1f2937;
+}
+
+.dashboard-container.admin .details-row > span:first-child {
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+    border-right: 1px solid #f3f4f6;
+}
+
+.dashboard-container.admin .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dashboard-container.admin .status-badge.admin {
+    background: rgba(74, 144, 226, 0.12);
+    color: #357abd;
+}
+
+.dashboard-container.admin .status-badge.active,
+.dashboard-container.admin .status-badge.completed {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.dashboard-container.admin .status-badge.pending,
+.dashboard-container.admin .status-badge.under_review {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+.dashboard-container.admin .admin-activity-section {
+    margin-top: 24px;
+}
+
+.dashboard-container.admin .admin-activity-section .section-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-container.admin .admin-activity-section .section-title {
+    margin: 0;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.dashboard-container.admin .activity-list {
+    padding: 10px 20px;
+}
+
+.dashboard-container.admin .activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-container.admin .activity-item:last-child {
+    border-bottom: none;
+}
+
+.dashboard-container.admin .activity-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.dashboard-container.admin .activity-details {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.dashboard-container.admin .activity-date {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.dashboard-container.admin .empty-activity {
+    color: #6b7280;
+    font-size: 14px;
+    padding: 16px 0;
+}
+
+.dashboard-container.admin .section-footer {
+    padding: 12px 20px 18px;
+}
+
+.dashboard-container.admin .action-button {
+    background: #4a90e2;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-container.admin .action-button.primary {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    box-shadow: 0 6px 18px rgba(74, 144, 226, 0.24);
+}
+
+.dashboard-container.admin .action-button.primary:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2563eb 100%);
+    transform: translateY(-1px);
+}
+
+.dashboard-container.admin .action-button.secondary {
+    background: #eef2f7;
+    color: #0f172a;
+}
+
+.dashboard-container.admin .action-button.secondary:hover {
+    background: #e2e8f0;
+}
+
+.dashboard-container.admin .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1200;
+}
+
+.dashboard-container.admin .modal-overlay.active {
+    display: flex;
+}
+
+.dashboard-container.admin .modal-card {
+    width: min(680px, 100%);
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 20px 50px rgba(17, 24, 39, 0.25);
+    padding: 18px;
+}
+
+.dashboard-container.admin .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.dashboard-container.admin .modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.dashboard-container.admin .modal-close {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.dashboard-container.admin .modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 12px;
+}
+
+.dashboard-container.admin .modal-form.upload-form {
+    border-top: none;
+    padding-top: 0;
+}
+
+.dashboard-container.admin .modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dashboard-container.admin .modal-field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dashboard-container.admin .profile-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #1f2937;
+    background: #ffffff;
+}
+
+.dashboard-container.admin .profile-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+
+.dashboard-container.admin .profile-input.is-invalid {
+    border-color: #ef4444;
+}
+
+.dashboard-container.admin .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+@media (max-width: 1024px) {
+    .dashboard-container.admin .admin-profile-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container.admin .details-row {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-container.admin .details-row > span:first-child {
+        border-right: none;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .dashboard-container.admin .modal-actions {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-container.admin .modal-actions .action-button {
+        width: 100%;
+    }
+}

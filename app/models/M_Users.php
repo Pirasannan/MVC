@@ -217,6 +217,13 @@
             return $this->db->single();
         }
 
+        public function getUserStatusById($userId) {
+            $this->db->query('SELECT LOWER(status) AS status FROM Users WHERE id = :user_id LIMIT 1');
+            $this->db->bind(':user_id', (int)$userId);
+            $row = $this->db->single();
+            return $row->status ?? null;
+        }
+
         // Check if user is online (based on last activity within 5 minutes)
         public function isUserOnline($userId) {
             // Uses updated_at as activity signal in current Users schema.

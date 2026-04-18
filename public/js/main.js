@@ -416,6 +416,7 @@ class PatientVerificationManager {
     this.rejectBtn = document.getElementById('rejectBtn')
     this.reactivateBtn = document.getElementById('reactivateBtn')
     this.suspendBtn = document.getElementById('suspendBtn')
+    this.deactivateBtn = document.getElementById('deactivateBtn')
     this.patientItems = document.querySelectorAll('.appointment-item')
     this.currentPatientId = null
     
@@ -492,6 +493,12 @@ class PatientVerificationManager {
     if (this.suspendBtn) {
       this.suspendBtn.addEventListener('click', () => {
         this.suspendPatient()
+      })
+    }
+
+    if (this.deactivateBtn) {
+      this.deactivateBtn.addEventListener('click', () => {
+        this.deactivatePatient()
       })
     }
   }
@@ -608,6 +615,35 @@ class PatientVerificationManager {
     .catch(error => {
       console.error('Error:', error)
       alert('Error suspending patient')
+    })
+  }
+
+  deactivatePatient() {
+    if (!this.currentPatientId) {
+      return
+    }
+
+    fetch(window.location.origin + '/MVC/Pages/deactivatePatient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patient_id: this.currentPatientId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Patient deactivated successfully!')
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to deactivate patient'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error deactivating patient')
     })
   }
 }

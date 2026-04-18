@@ -1,5 +1,10 @@
 <!-- Reusable WhatsApp-Style Message Component -->
-<div class="message-container">
+<?php
+    $currentUserStatus = strtolower((string)($data['user_status'] ?? $_SESSION['user_status'] ?? 'active'));
+    $isSuspendedPatient = ($currentUserStatus === 'suspended' && strtolower((string)($_SESSION['user_role'] ?? '')) === 'patient');
+    $isDeactivatedPatient = ($currentUserStatus === 'inactive' && strtolower((string)($_SESSION['user_role'] ?? '')) === 'patient');
+?>
+<div class="message-container" data-messaging-disabled="<?php echo ($isSuspendedPatient || $isDeactivatedPatient) ? '1' : '0'; ?>">
     <!-- Left Sidebar - Conversations List -->
     <div class="chat-conversations-sidebar">
         <!-- Search Bar -->
@@ -23,7 +28,7 @@
         <div class="chat-empty-state" id="chatEmptyState">
             <div class="empty-state-content">
                 <h3>MEDILINK Messages</h3>
-                <p>Send and receive messages securely</p>
+                <p><?php echo $isSuspendedPatient ? 'Your account is suspended. Messaging is disabled.' : ($isDeactivatedPatient ? 'Your account is deactivated. Messaging is disabled.' : 'Send and receive messages securely'); ?></p>
                 <small>Select a conversation to start messaging</small>
             </div>
         </div>
@@ -53,18 +58,24 @@
             <!-- Message Input Area -->
             <div class="message-input-area">
                 <input type="file" id="chatAttachmentInput" class="chat-attachment-input" accept="image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf" hidden>
-                <button class="attach-button" id="attachButton" type="button" title="Attach file">Attach</button>
+                <button class="attach-button" id="attachButton" type="button" title="Attach file" <?php echo ($isSuspendedPatient || $isDeactivatedPatient) ? 'disabled' : ''; ?>>Attach</button>
                 <div class="input-wrapper">
                     <textarea 
                         id="messageInput" 
                         class="message-input" 
-                        placeholder="Type a message"
-                        rows="1"></textarea>
+                        placeholder="<?php echo $isSuspendedPatient || $isDeactivatedPatient ? 'Messaging disabled for your account' : 'Type a message'; ?>"
+                        rows="1"
+                        <?php echo ($isSuspendedPatient || $isDeactivatedPatient) ? 'disabled' : ''; ?>></textarea>
                 </div>
-                <button class="send-button" id="sendButton" type="button">
+                <button class="send-button" id="sendButton" type="button" <?php echo ($isSuspendedPatient || $isDeactivatedPatient) ? 'disabled' : ''; ?>>
                     <span class="send-icon">Send</span>
                 </button>
             </div>
+            <?php if ($isSuspendedPatient || $isDeactivatedPatient): ?>
+                <div class="message-access-warning">
+                    <?php echo $isSuspendedPatient ? 'Your account is suspended. You cannot send messages.' : 'Your account is deactivated. Please contact admin.'; ?>
+                </div>
+            <?php endif; ?>
             <div class="attachment-preview" id="attachmentPreview" style="display:none;">
                 <div class="attachment-preview-info">
                     <span class="attachment-preview-icon">📎</span>

@@ -1,6 +1,12 @@
 <?php 
 require APPROOT.'/views/inc/header.php'; 
 $current_page = 'patientProfile';
+
+$profileImagePath = trim((string)($data['profile_image'] ?? ($_SESSION['user_profile_image'] ?? '')));
+$profileImagePath = str_replace('\\', '/', $profileImagePath);
+$profileImagePath = preg_replace('#/+#', '/', $profileImagePath);
+$profileImagePath = ltrim($profileImagePath, '/');
+$profileImageUrl = $profileImagePath !== '' ? URLROOT . '/' . $profileImagePath : '';
 ?>
 <link rel='stylesheet' href='<?php echo URLROOT; ?>/css/components/profile/patient_profile.css'>
 
@@ -38,11 +44,13 @@ $current_page = 'patientProfile';
             <div class="patient-profile-layout">
                 <div class="patient-profile-card">
                     <div class="profile-avatar-wrap">
-                        <?php if (!empty($data['profile_image'])): ?>
-                            <img src="<?php echo URLROOT . '/' . htmlspecialchars($data['profile_image']); ?>" alt="Profile picture" class="profile-avatar-image">
-                        <?php else: ?>
-                            <div class="profile-avatar-circle"><?php echo strtoupper(substr(trim($data['user_name']), 0, 1)); ?></div>
-                        <?php endif; ?>
+                        <img
+                            src="<?php echo htmlspecialchars($profileImageUrl); ?>"
+                            alt="Profile picture"
+                            class="profile-avatar-image <?php echo $profileImageUrl !== '' ? '' : 'is-hidden'; ?>"
+                            onerror="this.classList.add('is-hidden'); if(this.nextElementSibling){ this.nextElementSibling.classList.remove('is-hidden'); }"
+                        >
+                        <div class="profile-avatar-circle <?php echo $profileImageUrl !== '' ? 'is-hidden' : ''; ?>"><?php echo strtoupper(substr(trim($data['user_name']), 0, 1)); ?></div>
                     </div>
                     <h3 class="patient-name"><?php echo htmlspecialchars($data['user_name']); ?></h3>
                     <p class="patient-role">Patient</p>

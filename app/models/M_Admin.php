@@ -168,11 +168,19 @@ class M_Admin {
         return $this->db->execute();
     }
 
+    public function deactivatePatient($patient_id) {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'inactive');
+        $this->db->bind(':id', $patient_id);
+        return $this->db->execute();
+    }
+
     // ==================== PROFILE & SECURITY MANAGEMENT ====================
     
     public function getAdminProfile($admin_id) {
-        $this->db->query('SELECT * FROM Users WHERE id = :admin_id AND role = "Admin"');
+        $this->db->query('SELECT * FROM Users WHERE id = :admin_id AND LOWER(role) = :role LIMIT 1');
         $this->db->bind(':admin_id', $admin_id);
+        $this->db->bind(':role', 'admin');
         return $this->db->single();
     }
 
@@ -332,11 +340,19 @@ class M_Admin {
     // ==================== ACTIVITY LOGS ====================
     
     public function getRecentSystemActivity() {
+        if (!$this->tableExists('activity_logs')) {
+            return [];
+        }
+
         $this->db->query('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10');
         return $this->db->resultSet();
     }
 
     public function logAdminAction($admin_id, $action, $description) {
+        if (!$this->tableExists('activity_logs')) {
+            return false;
+        }
+
         $this->db->query('INSERT INTO activity_logs (admin_id, action, description, created_at) 
                          VALUES (:admin_id, :action, :description, NOW())');
         $this->db->bind(':admin_id', $admin_id);

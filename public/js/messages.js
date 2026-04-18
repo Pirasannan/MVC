@@ -11,6 +11,7 @@ let eligibleContacts = [];
 let conversationsCache = [];
 let sidebarSearchTerm = '';
 let selectedAttachmentFile = null;
+let messagingDisabled = false;
 
 // Initialize messaging when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -29,9 +30,11 @@ function initializeMessaging() {
     // Get user info from page data
     const userIdElement = document.querySelector('[data-user-id]');
     const userTypeElement = document.querySelector('[data-user-type]');
+    const messageContainer = document.querySelector('.message-container');
     
     if (userIdElement) currentUserId = userIdElement.dataset.userId;
     if (userTypeElement) currentUserType = userTypeElement.dataset.userType;
+    messagingDisabled = !!(messageContainer && messageContainer.dataset && messageContainer.dataset.messagingDisabled === '1');
 
     // Setup event listeners
     setupEventListeners();
@@ -237,10 +240,20 @@ function createEligibleContactItem(contact) {
     const button = div.querySelector('.start-chat-btn');
     button.addEventListener('click', (event) => {
         event.stopPropagation();
+        if (messagingDisabled) {
+            alert('Your account is suspended or deactivated. Messaging is disabled.');
+            return;
+        }
         startChatWithUser(contact.user_id);
     });
 
-    div.addEventListener('click', () => startChatWithUser(contact.user_id));
+    div.addEventListener('click', () => {
+        if (messagingDisabled) {
+            alert('Your account is suspended or deactivated. Messaging is disabled.');
+            return;
+        }
+        startChatWithUser(contact.user_id);
+    });
     return div;
 }
 
@@ -315,6 +328,11 @@ function showNoConversations() {
 
 // Select a conversation
 async function selectConversation(conversationId, userId, previewUser = null) {
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
+
     selectedConversationId = conversationId;
     lastMessageId = 0;
     
@@ -580,6 +598,11 @@ function renderAttachmentMarkup(attachment) {
 }
 
 function handleEditMessage(message) {
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
+
     const currentPayload = parseMessagePayload(message.message);
     const currentText = currentPayload.text || '';
     const newText = window.prompt('Edit message', currentText);
@@ -599,6 +622,11 @@ function handleEditMessage(message) {
 
 async function updateMessage(messageId, messageText) {
     if (!messageId || !selectedConversationId) {
+        return;
+    }
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
         return;
     }
 
@@ -626,6 +654,11 @@ async function updateMessage(messageId, messageText) {
 }
 
 function handleDeleteMessage(message) {
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
+
     const confirmed = window.confirm('Delete this message?');
     if (!confirmed) {
         return;
@@ -636,6 +669,11 @@ function handleDeleteMessage(message) {
 
 async function deleteMessage(messageId) {
     if (!messageId || !selectedConversationId) {
+        return;
+    }
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
         return;
     }
 
@@ -688,6 +726,11 @@ async function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const rawMessageText = messageInput.value;
     const messageText = rawMessageText.trim();
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
     
     // Validation: Check if conversation is selected
     if (!selectedConversationId) {
@@ -951,6 +994,11 @@ function searchConversations(event) {
 // Start chat with selected eligible user (creates conversation if needed)
 async function startChatWithUser(recipientId) {
     if (!recipientId) {
+        return;
+    }
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
         return;
     }
 

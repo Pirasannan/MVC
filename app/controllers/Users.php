@@ -160,7 +160,7 @@ class Users extends Controller {
                     $role = strtolower($loggeduser->role ?? '');
                     $status = strtolower($loggeduser->status ?? 'active');
 
-                    if($role === 'patient' && $status === 'inactive'){
+                    if(($role === 'patient' || $role === 'doctor') && $status === 'inactive'){
                         $data['password_err'] = 'Your account is deactivated. Please contact admin.';
                         $this->view('users/v_login', $data);
                         return;

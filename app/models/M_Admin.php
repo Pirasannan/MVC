@@ -123,6 +123,27 @@ class M_Admin {
 		return $this->db->execute();
 	}
 
+    public function suspendDoctor($doctor_id) {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'suspended');
+        $this->db->bind(':id', $doctor_id);
+        return $this->db->execute();
+    }
+
+    public function deactivateDoctor($doctor_id) {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'inactive');
+        $this->db->bind(':id', $doctor_id);
+        return $this->db->execute();
+    }
+
+    public function reactivateDoctor($doctor_id) {
+        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
+        $this->db->bind(':status', 'active');
+        $this->db->bind(':id', $doctor_id);
+        return $this->db->execute();
+    }
+
     // ==================== PATIENT MANAGEMENT ====================
     
 	public function getPendingPatients() {

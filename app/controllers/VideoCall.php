@@ -19,6 +19,18 @@ class VideoCall extends Controller {
             return redirect('Pages/index');
         }
 
+        if ($role === 'doctor') {
+            $status = strtolower((string)$this->userModel->getUserStatusById((int)($_SESSION['user_id'] ?? 0)));
+            if ($status === 'inactive') {
+                $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+                return redirect('Users/logout');
+            }
+            if ($status === 'suspended') {
+                $_SESSION['flash'] = 'Your account is suspended. You cannot start consultations.';
+                return redirect('Appointments/doctor');
+            }
+        }
+
         if ($role === 'patient') {
             $status = strtolower((string)$this->userModel->getUserStatusById((int)($_SESSION['user_id'] ?? 0)));
             if ($status === 'inactive') {
@@ -57,6 +69,18 @@ class VideoCall extends Controller {
         $role = $_SESSION['user_role'] ?? null;
         if (!in_array($role, ['doctor', 'patient'], true)) {
             return redirect('Pages/index');
+        }
+
+        if ($role === 'doctor') {
+            $status = strtolower((string)$this->userModel->getUserStatusById((int)($_SESSION['user_id'] ?? 0)));
+            if ($status === 'inactive') {
+                $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+                return redirect('Users/logout');
+            }
+            if ($status === 'suspended') {
+                $_SESSION['flash'] = 'Your account is suspended. You cannot start consultations.';
+                return redirect('Appointments/doctor');
+            }
         }
 
         if ($role === 'patient') {

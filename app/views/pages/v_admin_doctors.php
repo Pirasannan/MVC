@@ -90,17 +90,42 @@
                         <h2 class="section-title">Rejected Applications</h2>
                     </div>
                     <div class="section-content">
-                        <?php $rejectedDoctors = $data['rejectedDoctors'] ?? []; ?>
-                        <?php if (!empty($rejectedDoctors)): ?>
-                            <?php foreach ($rejectedDoctors as $doctor): ?>
-                                <div class="appointment-item">
+                        <?php
+                            $rejectedDoctors = $data['rejectedDoctors'] ?? [];
+                            $inactiveDoctors = $data['inactiveDoctors'] ?? [];
+                            $doctorApplications = array_merge(
+                                array_map(function ($doctor) {
+                                    $doctor->__application_status = 'suspended';
+                                    return $doctor;
+                                }, $rejectedDoctors),
+                                array_map(function ($doctor) {
+                                    $doctor->__application_status = 'inactive';
+                                    return $doctor;
+                                }, $inactiveDoctors)
+                            );
+                        ?>
+                        <?php if (!empty($doctorApplications)): ?>
+                            <?php foreach ($doctorApplications as $doctor): ?>
+                                <?php
+                                    $applicationStatus = $doctor->__application_status ?? 'suspended';
+                                    $statusLabel = $applicationStatus === 'inactive' ? 'Deactivated' : 'Rejected';
+                                    $statusText = $applicationStatus === 'inactive' ? 'Inactive' : 'Suspended';
+                                ?>
+                                <div
+                                    class="appointment-item"
+                                    data-doctor-id="<?php echo htmlspecialchars($doctor->id ?? ''); ?>"
+                                    data-doctor-name="<?php echo htmlspecialchars($doctor->name ?? ''); ?>"
+                                    data-doctor-email="<?php echo htmlspecialchars($doctor->email ?? ''); ?>"
+                                    data-doctor-created="<?php echo htmlspecialchars($doctor->updated_at ?? ''); ?>"
+                                    data-doctor-status="<?php echo htmlspecialchars($applicationStatus); ?>"
+                                >
                                     <div class="appointment-info">
                                         <div class="doctor-name"><?php echo htmlspecialchars($doctor->name ?? ''); ?></div>
                                         <div class="appointment-date">Updated: <?php echo htmlspecialchars($doctor->updated_at ?? ''); ?></div>
-                                        <div class="prescribed-by">Status: Suspended</div>
+                                        <div class="prescribed-by">Status: <?php echo htmlspecialchars($statusText); ?></div>
                                     </div>
                                     <div class="appointment-status">
-                                        <span class="status-badge rejected">Rejected</span>
+                                        <span class="status-badge rejected"><?php echo htmlspecialchars($statusLabel); ?></span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -115,6 +140,39 @@
             </div>
         </div>
     </main>
+</div>
+
+<!-- Doctor Details Modal -->
+<div id="doctorModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Doctor Details</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="doctor-details">
+                <div class="detail-row">
+                    <label>Name:</label>
+                    <span id="modal-doctor-name"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Email:</label>
+                    <span id="modal-doctor-email"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Updated:</label>
+                    <span id="modal-doctor-created"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Status:</label>
+                    <span id="modal-doctor-status" class="status-badge rejected">Rejected</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="reactivateBtn" class="action-button secondary">Reactivate</button>
+        </div>
+    </div>
 </div>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

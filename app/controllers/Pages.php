@@ -345,6 +345,78 @@ class Pages extends Controller{
         }
     }
 
+    public function suspendDoctor() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $doctor_id = $input['doctor_id'] ?? null;
+
+        if (!$doctor_id) {
+            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
+            return;
+        }
+
+        $result = $this->adminModel->suspendDoctor($doctor_id);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Doctor suspended successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to suspend doctor']);
+        }
+    }
+
+    public function deactivateDoctor() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $doctor_id = $input['doctor_id'] ?? null;
+
+        if (!$doctor_id) {
+            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
+            return;
+        }
+
+        $result = $this->adminModel->deactivateDoctor($doctor_id);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Doctor deactivated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to deactivate doctor']);
+        }
+    }
+
+    public function reactivateDoctor() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $doctor_id = $input['doctor_id'] ?? null;
+
+        if (!$doctor_id) {
+            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
+            return;
+        }
+
+        $result = $this->adminModel->reactivateDoctor($doctor_id);
+
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Doctor reactivated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to reactivate doctor']);
+        }
+    }
+
     public function approvePatient() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             http_response_code(403);
@@ -499,7 +571,8 @@ class Pages extends Controller{
         }
 
         $data = [
-            'rejectedDoctors' => $this->adminModel->getRejectedDoctors()
+            'rejectedDoctors' => $this->adminModel->getRejectedDoctors(),
+            'inactiveDoctors' => $this->adminModel->getInactiveDoctors()
         ];
 
         $this->view('pages/v_admin_rejected_doctors', $data);

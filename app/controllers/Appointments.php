@@ -18,6 +18,15 @@ class Appointments extends Controller
         return strtolower((string)$this->userModel->getUserStatusById((int)$_SESSION['user_id']));
     }
 
+    private function getCurrentDoctorStatus()
+    {
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return null;
+        }
+
+        return strtolower((string)$this->userModel->getUserStatusById((int)$_SESSION['user_id']));
+    }
+
     // PATIENT
     public function my()
     {
@@ -52,6 +61,8 @@ class Appointments extends Controller
     {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor')
             return redirect('Pages/index');
+
+        $doctorStatus = $this->getCurrentDoctorStatus();
 
         $pending  = $this->apModel->getByDoctor($_SESSION['user_id'], 'pending');
         $approved = $this->apModel->getByDoctor($_SESSION['user_id'], 'approved');
@@ -112,6 +123,7 @@ class Appointments extends Controller
             'approved' => $approved,
             'flash'    => $_SESSION['flash'] ?? null,
             'cal'      => $cal, // pass to view
+            'doctor_status' => $doctorStatus ?: 'active',
         ];
         unset($_SESSION['flash']);
 
@@ -189,6 +201,16 @@ class Appointments extends Controller
     public function setStatus($id, $new)
     {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') return redirect('Pages/index');
+
+        $doctorStatus = $this->getCurrentDoctorStatus();
+        if ($doctorStatus === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+            return redirect('Users/logout');
+        }
+        if ($doctorStatus === 'suspended') {
+            $_SESSION['flash'] = 'Your account is suspended. You cannot manage appointments.';
+            return redirect('Appointments/doctor');
+        }
 
         $id = (int)$id;
         $new = strtolower($new);

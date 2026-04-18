@@ -208,8 +208,12 @@ class DoctorVerificationManager {
     this.closeBtn = document.querySelector('.close')
     this.approveBtn = document.getElementById('approveBtn')
     this.rejectBtn = document.getElementById('rejectBtn')
+    this.suspendBtn = document.getElementById('suspendBtn')
+    this.deactivateBtn = document.getElementById('deactivateBtn')
+    this.reactivateBtn = document.getElementById('reactivateBtn')
     this.doctorItems = document.querySelectorAll('.appointment-item')
     this.currentDoctorId = null
+    this.currentDoctorStatus = 'active'
     
     console.log('DoctorVerificationManager initialized')
     console.log('Modal found:', !!this.modal)
@@ -229,13 +233,40 @@ class DoctorVerificationManager {
     
     // Open modal when doctor item is clicked
     this.doctorItems.forEach((item, index) => {
+      if (!item.dataset.doctorId) {
+        return
+      }
+
       console.log('Adding click listener to item', index)
       item.addEventListener('click', (e) => {
         console.log('Doctor item clicked:', item.dataset.doctorName)
         this.currentDoctorId = item.dataset.doctorId
+        this.currentDoctorStatus = item.dataset.doctorStatus || 'active'
         document.getElementById('modal-doctor-name').textContent = item.dataset.doctorName
         document.getElementById('modal-doctor-email').textContent = item.dataset.doctorEmail
         document.getElementById('modal-doctor-created').textContent = item.dataset.doctorCreated
+
+        const statusElement = document.getElementById('modal-doctor-status')
+        if (statusElement) {
+          statusElement.textContent = this.currentDoctorStatus === 'inactive' ? 'Inactive' : 'Suspended'
+          statusElement.className = 'status-badge ' + (this.currentDoctorStatus === 'inactive' ? 'confirmed' : 'rejected')
+        }
+
+        if (this.approveBtn) {
+          this.approveBtn.style.display = this.currentDoctorStatus === 'suspended' ? 'inline-flex' : 'none'
+        }
+
+        if (this.reactivateBtn) {
+          this.reactivateBtn.style.display = this.currentDoctorStatus === 'inactive' ? 'inline-flex' : 'none'
+        }
+
+        if (this.suspendBtn) {
+          this.suspendBtn.style.display = this.currentDoctorStatus === 'inactive' ? 'none' : 'inline-flex'
+        }
+
+        if (this.deactivateBtn) {
+          this.deactivateBtn.style.display = this.currentDoctorStatus === 'inactive' ? 'none' : 'inline-flex'
+        }
 
         const documentLink = document.getElementById('modal-doctor-document-link')
         if (documentLink) {
@@ -281,6 +312,24 @@ class DoctorVerificationManager {
     if (this.rejectBtn) {
       this.rejectBtn.addEventListener('click', () => {
         this.rejectDoctor()
+      })
+    }
+
+    if (this.suspendBtn) {
+      this.suspendBtn.addEventListener('click', () => {
+        this.suspendDoctor()
+      })
+    }
+
+    if (this.deactivateBtn) {
+      this.deactivateBtn.addEventListener('click', () => {
+        this.deactivateDoctor()
+      })
+    }
+
+    if (this.reactivateBtn) {
+      this.reactivateBtn.addEventListener('click', () => {
+        this.reactivateDoctor()
       })
     }
   }
@@ -339,6 +388,93 @@ class DoctorVerificationManager {
         alert('Error rejecting doctor')
       })
     }
+  }
+
+  suspendDoctor() {
+    if (!this.currentDoctorId) {
+      return
+    }
+
+    fetch(window.location.origin + '/MVC/Pages/suspendDoctor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        doctor_id: this.currentDoctorId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Doctor suspended successfully!')
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to suspend doctor'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error suspending doctor')
+    })
+  }
+
+  deactivateDoctor() {
+    if (!this.currentDoctorId) {
+      return
+    }
+
+    fetch(window.location.origin + '/MVC/Pages/deactivateDoctor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        doctor_id: this.currentDoctorId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Doctor deactivated successfully!')
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to deactivate doctor'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error deactivating doctor')
+    })
+  }
+
+  reactivateDoctor() {
+    if (!this.currentDoctorId) {
+      return
+    }
+
+    fetch(window.location.origin + '/MVC/Pages/reactivateDoctor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        doctor_id: this.currentDoctorId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Doctor reactivated successfully!')
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to reactivate doctor'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error reactivating doctor')
+    })
   }
 }
 

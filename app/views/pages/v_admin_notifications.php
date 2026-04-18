@@ -1,16 +1,16 @@
-<?php 
-    require APPROOT.'/views/inc/header.php'; 
-    $current_page = 'adminNotifications';
+<?php
+require APPROOT . '/views/inc/header.php';
+$current_page = 'adminNotifications';
 ?>
 
 <div class="dashboard-container">
     <!-- Sidebar Navigation -->
-    <?php require APPROOT.'/views/inc/components/adminSidebar.php'; ?>
+    <?php require APPROOT . '/views/inc/components/adminSidebar.php'; ?>
 
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Top Header -->
-        <?php require APPROOT.'/views/inc/components/adminHeader.php'; ?>
+        <?php require APPROOT . '/views/inc/components/adminHeader.php'; ?>
 
 
         <!-- Dashboard Content -->
@@ -22,40 +22,49 @@
                     <div class="section-header">
                         <h2 class="section-title">Send System-Wide Notification</h2>
                     </div>
-                    <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Notification Type</div>
-                                <div class="appointment-date">
-                                    <select id="recipientType" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
+                    
+                    <?php if (isset($_GET['sent']) && $_GET['sent'] == '1'): ?>
+                        <div style="padding: 12px; margin-bottom: 16px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+                            ✓ Notification sent successfully!
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (isset($_GET['error'])): ?>
+                        <div style="padding: 12px; margin-bottom: 16px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">
+                            ✗ Error: <?php echo htmlspecialchars($_GET['error']); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form id="sysNotification" method="post" action="<?= URLROOT ?>/Pages/sendNotification">
+                        <div class="p-form" style="border-top: none;">
+                            <div class="form-grid" style="grid-template-columns: 1fr;">
+                                <div class="field">
+                                    <label for="userType" class="label">Notification Type</label>
+                                    <select id="userType" name="recipient_type" class="input" required>
+                                        <option value="">-- Select Type --</option>
                                         <option value="all">All Users</option>
-                                        <option value="doctor">All Doctors</option>
-                                        <option value="patient">All Patients</option>
-                                        <option value="admin">All Admins</option>
+                                        <option value="doctor">Doctors</option>
+                                        <option value="patient">Patients</option>
+                                        <option value="admin">Admins</option>
                                     </select>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Notification Title</div>
-                                <div class="appointment-date">
-                                    <input type="text" id="notificationTitle" placeholder="Enter notification title" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
+
+                                <div class="field">
+                                    <label for="title" class="label">Notification Title</label>
+                                    <input type="text" class="input" id="title" name="title" placeholder="Enter notification title" required>
+                                </div>
+
+                                <div class="field">
+                                    <label for="message" class="label">Message Content</label>
+                                    <textarea class="input" id="message" name="message" placeholder="Enter notification message" required></textarea>
                                 </div>
                             </div>
                         </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Message Content</div>
-                                <div class="appointment-date">
-                                    <textarea id="notificationMessage" placeholder="Enter notification message" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px; min-height: 100px;"></textarea>
-                                </div>
-                            </div>
+
+                        <div class="section-footer">
+                            <button type="submit" class="action-button">Send Notification</button>
                         </div>
-                    </div>
-                    <div class="section-footer">
-                        <button id="sendNotificationBtn" class="action-button">Send Notification</button>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Reported Messages/Complaints Section -->
@@ -122,7 +131,7 @@
                     </div>
                     <div class="section-content">
                         <?php $recentNotifications = $data['recentNotifications'] ?? []; ?>
-                        
+
                         <?php if (!empty($recentNotifications)): ?>
                             <?php foreach ($recentNotifications as $notification): ?>
                                 <div class="appointment-item">
@@ -189,4 +198,4 @@
     </main>
 </div>
 
-<?php require APPROOT.'/views/inc/footer.php'; ?>
+<?php require APPROOT . '/views/inc/footer.php'; ?>

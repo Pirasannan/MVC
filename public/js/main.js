@@ -327,70 +327,6 @@ class DoctorVerificationManager {
 }
 
 // Notification Manager
-class NotificationManager {
-  constructor() {
-    this.sendBtn = document.getElementById('sendNotificationBtn')
-    this.recipientType = document.getElementById('recipientType')
-    this.title = document.getElementById('notificationTitle')
-    this.message = document.getElementById('notificationMessage')
-    
-    if (this.sendBtn) {
-      this.init()
-    }
-  }
-
-  init() {
-    this.bindEvents()
-  }
-
-  bindEvents() {
-    this.sendBtn.addEventListener('click', () => {
-      this.sendNotification()
-    })
-  }
-
-  sendNotification() {
-    const data = {
-      recipient_type: this.recipientType.value,
-      title: this.title.value,
-      message: this.message.value,
-      notification_type: 'info'
-    }
-
-    // Validate
-    if (!data.title.trim() || !data.message.trim()) {
-      alert('Please fill in both title and message')
-      return
-    }
-
-    // Send request
-    fetch(window.location.origin + '/MVC/Pages/sendNotification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Notification sent successfully!')
-        // Clear form
-        this.title.value = ''
-        this.message.value = ''
-        // Reload page to show new notification
-        location.reload()
-      } else {
-        alert('Error: ' + (data.message || 'Failed to send notification'))
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error)
-      alert('Error sending notification')
-    })
-  }
-}
-
 // Patient Verification Modal Manager
 class PatientVerificationManager {
   constructor() {
@@ -524,6 +460,4 @@ document.addEventListener("DOMContentLoaded", () => {
   window.pageManager = new PageManager()
   window.doctorVerificationManager = new DoctorVerificationManager()
   window.patientVerificationManager = new PatientVerificationManager()
-  window.notificationManager = new NotificationManager()
-  // Prescription manager is now handled by modal-manager.js
 })

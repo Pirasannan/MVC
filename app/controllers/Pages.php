@@ -293,29 +293,73 @@ class Pages extends Controller{
             return;
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
+        // Detect request type: JSON or form POST
+        $isJsonRequest = $this->isJsonRequest();
         
+        // Parse input based on request type
+        if ($isJsonRequest) {
+            $input = json_decode(file_get_contents('php://input'), true);
+        } else {
+            $input = $_POST;
+        }
+        
+        // Build data array
         $data = [
-            'recipient_type' => $input['recipient_type'] ?? 'all',
+            'recipient_type' => $input['recipient_type'] ?? '',
             'recipient_id' => $input['recipient_id'] ?? null,
             'title' => $input['title'] ?? '',
             'message' => $input['message'] ?? '',
             'notification_type' => $input['notification_type'] ?? 'info'
         ];
 
-        // Validate required fields
-        if (empty($data['title']) || empty($data['message'])) {
-            echo json_encode(['success' => false, 'message' => 'Title and message are required']);
+        // Validate recipient_type
+        $validRecipients = ['all', 'admin', 'doctor', 'patient'];
+        if (empty($data['recipient_type']) || !in_array($data['recipient_type'], $validRecipients)) {
+            $errorMsg = 'Invalid recipient type';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
             return;
         }
 
+        // Validate title and message
+        if (empty(trim($data['title'])) || empty(trim($data['message']))) {
+            $errorMsg = 'Title and message are required';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
+            return;
+        }
+
+        // Insert notification via model
         $result = $this->adminModel->createNotification($data);
         
         if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Notification sent successfully']);
+            if ($isJsonRequest) {
+                echo json_encode(['success' => true, 'message' => 'Notification sent successfully']);
+            } else {
+                redirect('Pages/adminNotifications?sent=1');
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to send notification']);
+            $errorMsg = 'Failed to send notification';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
         }
+    }
+
+    /**
+     * Helper method to detect if request is JSON
+     */
+    private function isJsonRequest() {
+        return !empty($_SERVER['CONTENT_TYPE']) && 
+               strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
     }
 
     public function adminAllDoctors() {

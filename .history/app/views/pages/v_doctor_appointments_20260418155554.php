@@ -180,8 +180,12 @@ $current_page = 'doctorAppointments';
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
                 <td class="cell-reason\"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
+                <?php
+                  $rescheduleStatus = $a->reschedule_status ?? 'none';
+                  $statusLabel = ($rescheduleStatus === 'accepted') ? 'Reschedule accepted' : ($a->status ?? '');
+                ?>
                 <td>
-                  <span class="status completed"><span class="dot"></span>Completed</span>
+                  <span class="status completed"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
                 </td>
                 <td>
                   <span class="no-action">-</span>

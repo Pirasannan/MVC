@@ -59,10 +59,12 @@ $current_page = 'doctorAppointments';
                 <?php
                   $currentDt = $a->starts_at ?? '';
                   $rescheduleStatus = $a->reschedule_status ?? 'none';
-                  $statusLabel = ($rescheduleStatus === 'accepted') ? 'Reschedule accepted' : ($a->status ?? '');
                 ?>
                 <td>
-                  <span class="status pending"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
+                  <span class="status pending"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <?php if ($rescheduleStatus === 'accepted'): ?>
+                    <div class="status-substate">Reschedule accepted</div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <div class="actions">
@@ -124,12 +126,12 @@ $current_page = 'doctorAppointments';
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
                 <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
-                <?php
-                  $rescheduleStatus = $a->reschedule_status ?? 'none';
-                  $statusLabel = ($rescheduleStatus === 'accepted') ? 'Reschedule accepted' : ($a->status ?? '');
-                ?>
+                <?php $rescheduleStatus = $a->reschedule_status ?? 'none'; ?>
                 <td>
-                  <span class="status approved"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
+                  <span class="status approved"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <?php if ($rescheduleStatus === 'accepted'): ?>
+                    <div class="status-substate">Reschedule accepted</div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <div class="actions">
@@ -180,8 +182,12 @@ $current_page = 'doctorAppointments';
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
                 <td class="cell-reason\"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
+                <?php $rescheduleStatus = $a->reschedule_status ?? 'none'; ?>
                 <td>
-                  <span class="status completed"><span class="dot"></span>Completed</span>
+                  <span class="status completed"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <?php if ($rescheduleStatus === 'accepted'): ?>
+                    <div class="status-substate">Reschedule accepted</div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <span class="no-action">-</span>

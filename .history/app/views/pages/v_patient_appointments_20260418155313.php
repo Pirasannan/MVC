@@ -74,15 +74,11 @@ $current_page = 'patientAppointments';
                   <?php
                     $st = $status;
                     $cls = in_array($st, ['approved','pending','rejected','cancelled','completed']) ? $st : 'pending';
-                    if ($st === 'completed') {
-                      $statusLabel = 'Completed';
-                    } elseif ($rescheduleStatus === 'accepted') {
-                      $statusLabel = 'Reschedule accepted';
-                    } else {
-                      $statusLabel = $a->status ?? '';
-                    }
                   ?>
-                  <span class="status <?= $cls ?>"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
+                  <span class="status <?= $cls ?>"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <?php if ($rescheduleStatus === 'accepted'): ?>
+                    <div class="status-substate">Reschedule accepted</div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <?php if ($rescheduleStatus === 'pending_patient' && $proposedTime): ?>

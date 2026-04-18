@@ -216,30 +216,22 @@ class M_Admin {
     }
 
     public function getAdminActivityLog($admin_id) {
-        // For now, return mock data
-        return [
-            (object)[
-                'id' => 1,
-                'action' => 'Doctor Verification Approved',
-                'details' => 'Approved: Dr. Sunil Jayawardena',
-                'timestamp' => '2025-10-18 10:15:00',
-                'status' => 'completed'
-            ],
-            (object)[
-                'id' => 2,
-                'action' => 'System Notification Sent',
-                'details' => 'Recipients: All Users',
-                'timestamp' => '2025-10-18 09:45:00',
-                'status' => 'completed'
-            ],
-            (object)[
-                'id' => 3,
-                'action' => 'Patient Account Suspended',
-                'details' => 'Suspended: Yasmin Fonseka',
-                'timestamp' => '2025-10-17 16:30:00',
-                'status' => 'completed'
-            ]
-        ];
+        if (!$this->tableExists('activity_logs')) {
+            return [];
+        }
+
+        $this->db->query('SELECT id,
+                                 action,
+                                 COALESCE(description, "") AS details,
+                                 created_at AS timestamp,
+                                 "completed" AS status
+                          FROM activity_logs
+                          WHERE admin_id = :admin_id OR user_id = :admin_id
+                          ORDER BY created_at DESC
+                          LIMIT 10');
+        $this->db->bind(':admin_id', $admin_id);
+
+        return $this->db->resultSet();
     }
 
     public function getSystemActivityLog() {

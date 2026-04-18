@@ -1,7 +1,6 @@
 <?php 
 require APPROOT.'/views/inc/header.php'; 
 $current_page = 'doctorAppointments';
-$doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
 ?>
 
 
@@ -67,13 +66,8 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                 </td>
                 <td>
                   <div class="actions">
-                    <?php if ($doctorStatus === 'suspended'): ?>
-                      <span class="btn btn-approve" aria-disabled="true" style="pointer-events:none;opacity:.55;">Approve</span>
-                      <span class="btn btn-reject" aria-disabled="true" style="pointer-events:none;opacity:.55;">Reject</span>
-                    <?php else: ?>
-                      <a class="btn btn-approve" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/approved">Approve</a>
-                      <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
-                    <?php endif; ?>
+                    <a class="btn btn-approve" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/approved">Approve</a>
+                    <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
                     <!-- Reschedule button / info -->
                     <?php if ($rescheduleStatus !== 'pending_patient'): ?>
                       <button type="button"
@@ -139,15 +133,9 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                 </td>
                 <td>
                   <div class="actions">
-                    <?php if ($doctorStatus === 'suspended'): ?>
-                      <span class="btn btn-start" aria-disabled="true" style="pointer-events:none;opacity:.55;">Start</span>
-                      <span class="btn btn-cancel" aria-disabled="true" style="pointer-events:none;opacity:.55;">Cancel</span>
-                      <span class="btn btn-complete" aria-disabled="true" style="pointer-events:none;opacity:.55;">Complete</span>
-                    <?php else: ?>
-                      <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="btn btn-start">Start</a>
-                      <a class="btn btn-cancel"   href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/cancelled">Cancel</a>
-                      <a class="btn btn-complete" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/completed">Complete</a>
-                    <?php endif; ?>
+                    <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="btn btn-start">Start</a>
+                    <a class="btn btn-cancel"   href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/cancelled">Cancel</a>
+                    <a class="btn btn-complete" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/completed">Complete</a>
                   </div>
                 </td>
               </tr>
@@ -201,10 +189,7 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                           title="Report call"
                           data-appointment-id="<?= (int)$a->id ?>"
                           onclick="openCallReportModal(this)">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M4 4v16"></path>
-                      <path d="M4 4h11l-1 3 1 3H4"></path>
-                    </svg>
+                    <i class="fas fa-flag"></i>
                   </button>
                 </td>
               </tr>
@@ -259,12 +244,12 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
         <label>Reason</label>
         <select name="reason" required>
           <option value="">Select a reason</option>
-          <option value="Abusive or offensive communication">Abusive or offensive communication</option>
-          <option value="Spam or unwanted call">Spam or unwanted call</option>
-          <option value="Technical issues (poor audio/video)">Technical issues (poor audio/video)</option>
-          <option value="Disruptive behavior during call">Disruptive behavior during call</option>
-          <option value="Call didn't follow agreed purpose">Call didn't follow agreed purpose</option>
-          <option value="Other">Other</option>
+          <option value="abuse">Abuse</option>
+          <option value="harassment">Harassment</option>
+          <option value="no-show">No-show</option>
+          <option value="fraud">Fraud</option>
+          <option value="technical issue">Technical issue</option>
+          <option value="something else">Something else</option>
         </select>
       </div>
 
@@ -283,18 +268,13 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
 
 <style>
 .btn-report-call {
-  width: 30px;
-  height: 30px;
-  padding: 0;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #b45309;
-}
-
-.btn-report-call svg {
-  display: block;
 }
 
 #callReportModal select,

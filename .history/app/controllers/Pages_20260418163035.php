@@ -1,24 +1,18 @@
 <?php 
 
-require_once '../app/libraries/FileValidator.php';
-
 class Pages extends Controller{
     private $pagesModel;
     private $adminModel;
-    private $verificationModel;
     private $appointmentModel;
     private $prescriptionModel;
     private $messageModel;
-    private $userModel;
     public function __construct() {
         
         $this->pagesModel = $this->model('M_Pages');
         $this->adminModel = $this->model('M_Admin');
-        $this->verificationModel = $this->model('M_Verification');
         $this->appointmentModel = $this->model('Appointment');
         $this->prescriptionModel = $this->model('Prescription');
         $this->messageModel = $this->model('Message');
-        $this->userModel = $this->model('M_Users');
     
     }
     
@@ -38,126 +32,7 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-
-        $adminId = $_SESSION['user_id'];
-        $adminProfile = $this->adminModel->getAdminProfile($adminId);
-
-        $adminName = $adminProfile->name ?? ($_SESSION['user_name'] ?? 'Admin');
-        $adminEmail = $adminProfile->email ?? ($_SESSION['user_email'] ?? '');
-        $nameErr = '';
-        $emailErr = '';
-        $profileImageErr = '';
-        $profileImageSuccess = '';
-        $profileSuccess = '';
-        $currentProfileImage = $this->userModel->getUserProfileImage($adminId);
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $formType = trim($_POST['form_type'] ?? '');
-
-            if ($formType === 'update_profile_image') {
-                if (!isset($_FILES['profile_image']) || empty($_FILES['profile_image']['tmp_name'])) {
-                    $profileImageErr = 'Please choose an image first.';
-                } else {
-                    $file = $_FILES['profile_image'];
-                    $validation = FileValidator::validateFile($file);
-
-                    if (!$validation['valid']) {
-                        $profileImageErr = implode(', ', $validation['errors']);
-                    } else {
-                        $uploadDir = $this->ensurePatientProfileImageDirectory($adminId);
-
-                        if ($uploadDir === false) {
-                            $profileImageErr = 'Failed to prepare upload directory.';
-                        } else {
-                            try {
-                                $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                                $fileName = 'profile_' . $adminId . '_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $extension;
-                                $targetAbsolutePath = $uploadDir['absolute'] . $fileName;
-
-                                if (move_uploaded_file($file['tmp_name'], $targetAbsolutePath)) {
-                                    chmod($targetAbsolutePath, 0644);
-                                    $newRelativePath = $uploadDir['relative'] . $fileName;
-
-                                    if ($this->userModel->updateUserProfileImage($adminId, $newRelativePath)) {
-                                        if (!empty($currentProfileImage) && $currentProfileImage !== $newRelativePath) {
-                                            $oldAbsolutePath = dirname(APPROOT) . '/public/' . $currentProfileImage;
-                                            if (file_exists($oldAbsolutePath)) {
-                                                @unlink($oldAbsolutePath);
-                                            }
-                                        }
-
-                                        $currentProfileImage = $newRelativePath;
-                                        $_SESSION['user_profile_image'] = $newRelativePath;
-                                        $profileImageSuccess = 'Profile picture updated successfully.';
-                                        $this->adminModel->logAdminAction($adminId, 'Profile Picture Updated', 'Updated profile picture');
-                                    } else {
-                                        @unlink($targetAbsolutePath);
-                                        $profileImageErr = 'Failed to save profile picture path.';
-                                    }
-                                } else {
-                                    $profileImageErr = 'Failed to upload selected image.';
-                                }
-                            } catch (Throwable $exception) {
-                                $profileImageErr = 'Image upload failed. Please try again.';
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($formType === 'update_profile_details' || $formType === 'update_name') {
-                $submittedName = trim($_POST['user_name'] ?? '');
-                $submittedEmail = trim($_POST['user_email'] ?? '');
-
-                if ($submittedName === '') {
-                    $nameErr = 'Please enter your name.';
-                } elseif (strlen($submittedName) < 3) {
-                    $nameErr = 'Name must be at least 3 characters.';
-                }
-
-                if ($submittedEmail === '') {
-                    $emailErr = 'Please enter your email.';
-                } elseif (!filter_var($submittedEmail, FILTER_VALIDATE_EMAIL)) {
-                    $emailErr = 'Please enter a valid email address.';
-                } elseif ($this->userModel->findUserByEmailExcludingUser($submittedEmail, $adminId)) {
-                    $emailErr = 'This email is already in use.';
-                }
-
-                if ($nameErr === '' && $emailErr === '') {
-                    if ($this->userModel->updateUserProfile($adminId, $submittedName, $submittedEmail)) {
-                        $_SESSION['user_name'] = $submittedName;
-                        $_SESSION['user_email'] = $submittedEmail;
-                        $adminName = $submittedName;
-                        $adminEmail = $submittedEmail;
-                        $profileSuccess = 'Profile updated successfully.';
-                        $this->adminModel->logAdminAction($adminId, 'Profile Updated', 'Updated personal information');
-                    }
-                } else {
-                    $adminName = $submittedName;
-                    $adminEmail = $submittedEmail;
-                }
-            }
-        }
-
-        $recentActivity = $this->adminModel->getAdminActivityLog($adminId);
-
-        $data = [
-            'admin_id' => $adminId,
-            'admin_name' => $adminName,
-            'admin_email' => $adminEmail,
-            'role' => 'Admin',
-            'status' => $adminProfile->status ?? 'active',
-            'profile_success' => $profileSuccess,
-            'profile_image' => $currentProfileImage,
-            'profile_image_success' => $profileImageSuccess,
-            'profile_image_err' => $profileImageErr,
-            'name_err' => $nameErr,
-            'email_err' => $emailErr,
-            'recent_activity' => $recentActivity
-        ];
-
-        $this->view('pages/v_admin_profile', $data);
+        $this->view('pages/v_admin_profile', []);
     }
 
     public function doctorVideoConsultation() {
@@ -261,7 +136,7 @@ class Pages extends Controller{
             return;
         }
         $data = [
-            'pendingDoctors' => $this->verificationModel->getPendingDoctorVerificationsForAdmin(),
+            'pendingDoctors' => $this->adminModel->getPendingDoctors(),
             'verifiedDoctors' => $this->adminModel->getVerifiedDoctors(),
             'rejectedDoctors' => $this->adminModel->getRejectedDoctors(),
             'inactiveDoctors' => $this->adminModel->getInactiveDoctors()
@@ -276,7 +151,7 @@ class Pages extends Controller{
         }
 
         $data = [
-            'pendingVerifications' => $this->verificationModel->getPendingDoctorVerificationsForAdmin()
+            'pendingDoctors' => $this->adminModel->getPendingDoctors()
         ];
 
         $this->view('pages/v_admin_doctor_verification', $data);
@@ -297,16 +172,9 @@ class Pages extends Controller{
             return;
         }
 
-        $verification = $this->verificationModel->getVerificationByUserId($doctor_id);
-        if (!$verification) {
-            echo json_encode(['success' => false, 'message' => 'No verification document found for this doctor']);
-            return;
-        }
-
-        $accountUpdated = $this->adminModel->approveDoctor($doctor_id);
-        $verificationUpdated = $this->verificationModel->updateStatus((int)$verification->id, 'verified');
+        $result = $this->adminModel->approveDoctor($doctor_id);
         
-        if ($accountUpdated && $verificationUpdated) {
+        if ($result) {
             echo json_encode(['success' => true, 'message' => 'Doctor approved successfully']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to approve doctor']);
@@ -329,91 +197,12 @@ class Pages extends Controller{
             return;
         }
 
-        $verification = $this->verificationModel->getVerificationByUserId($doctor_id);
-        if (!$verification) {
-            echo json_encode(['success' => false, 'message' => 'No verification document found for this doctor']);
-            return;
-        }
-
-        $accountUpdated = $this->adminModel->rejectDoctor($doctor_id, $reason);
-        $verificationUpdated = $this->verificationModel->updateStatus((int)$verification->id, 'rejected', $reason);
+        $result = $this->adminModel->rejectDoctor($doctor_id, $reason);
         
-        if ($accountUpdated && $verificationUpdated) {
+        if ($result) {
             echo json_encode(['success' => true, 'message' => 'Doctor rejected successfully']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to reject doctor']);
-        }
-    }
-
-    public function suspendDoctor() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            return;
-        }
-
-        $input = json_decode(file_get_contents('php://input'), true);
-        $doctor_id = $input['doctor_id'] ?? null;
-
-        if (!$doctor_id) {
-            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
-            return;
-        }
-
-        $result = $this->adminModel->suspendDoctor($doctor_id);
-
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Doctor suspended successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to suspend doctor']);
-        }
-    }
-
-    public function deactivateDoctor() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            return;
-        }
-
-        $input = json_decode(file_get_contents('php://input'), true);
-        $doctor_id = $input['doctor_id'] ?? null;
-
-        if (!$doctor_id) {
-            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
-            return;
-        }
-
-        $result = $this->adminModel->deactivateDoctor($doctor_id);
-
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Doctor deactivated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to deactivate doctor']);
-        }
-    }
-
-    public function reactivateDoctor() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            return;
-        }
-
-        $input = json_decode(file_get_contents('php://input'), true);
-        $doctor_id = $input['doctor_id'] ?? null;
-
-        if (!$doctor_id) {
-            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
-            return;
-        }
-
-        $result = $this->adminModel->reactivateDoctor($doctor_id);
-
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Doctor reactivated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to reactivate doctor']);
         }
     }
 
@@ -466,30 +255,6 @@ class Pages extends Controller{
         }
     }
 
-    public function deactivatePatient() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-            return;
-        }
-
-        $input = json_decode(file_get_contents('php://input'), true);
-        $patient_id = $input['patient_id'] ?? null;
-
-        if (!$patient_id) {
-            echo json_encode(['success' => false, 'message' => 'Patient ID required']);
-            return;
-        }
-
-        $result = $this->adminModel->deactivatePatient($patient_id);
-
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Patient deactivated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to deactivate patient']);
-        }
-    }
-
     public function adminPatients() {
         
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
@@ -515,8 +280,7 @@ class Pages extends Controller{
         }
 
         $data = [
-            'recentNotifications' => $this->adminModel->getRecentNotifications(5),
-            'resolvedReports' => $this->adminModel->getResolvedReports()
+            'recentNotifications' => $this->adminModel->getRecentNotifications(5)
         ];
 
         $this->view('pages/v_admin_notifications', $data);
@@ -616,8 +380,7 @@ class Pages extends Controller{
         }
 
         $data = [
-            'rejectedDoctors' => $this->adminModel->getRejectedDoctors(),
-            'inactiveDoctors' => $this->adminModel->getInactiveDoctors()
+            'rejectedDoctors' => $this->adminModel->getRejectedDoctors()
         ];
 
         $this->view('pages/v_admin_rejected_doctors', $data);
@@ -1012,99 +775,6 @@ class Pages extends Controller{
         $userId = $_SESSION['user_id'];
         $userEmail = $_SESSION['user_email'];
         $userName = $_SESSION['user_name'];
-        $userNameErr = '';
-        $userEmailErr = '';
-        $profileImageErr = '';
-        $profileImageSuccess = '';
-        $profileSuccess = '';
-        $currentProfileImage = $this->userModel->getUserProfileImage($userId);
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $formType = trim($_POST['form_type'] ?? '');
-
-            if ($formType === 'update_profile_image') {
-                if (!isset($_FILES['profile_image']) || empty($_FILES['profile_image']['tmp_name'])) {
-                    $profileImageErr = 'Please choose an image first.';
-                } else {
-                    $file = $_FILES['profile_image'];
-                    $validation = FileValidator::validateFile($file);
-
-                    if (!$validation['valid']) {
-                        $profileImageErr = implode(', ', $validation['errors']);
-                    } else {
-                        $uploadDir = $this->ensurePatientProfileImageDirectory($userId);
-
-                        if ($uploadDir === false) {
-                            $profileImageErr = 'Failed to prepare upload directory.';
-                        } else {
-                            try {
-                                $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                                $fileName = 'profile_' . $userId . '_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $extension;
-                                $targetAbsolutePath = $uploadDir['absolute'] . $fileName;
-
-                                if (move_uploaded_file($file['tmp_name'], $targetAbsolutePath)) {
-                                    chmod($targetAbsolutePath, 0644);
-                                    $newRelativePath = $uploadDir['relative'] . $fileName;
-
-                                    if ($this->userModel->updateUserProfileImage($userId, $newRelativePath)) {
-                                        if (!empty($currentProfileImage) && $currentProfileImage !== $newRelativePath) {
-                                            $oldAbsolutePath = dirname(APPROOT) . '/public/' . $currentProfileImage;
-                                            if (file_exists($oldAbsolutePath)) {
-                                                @unlink($oldAbsolutePath);
-                                            }
-                                        }
-
-                                        $currentProfileImage = $newRelativePath;
-                                        $_SESSION['user_profile_image'] = $newRelativePath;
-                                        $profileImageSuccess = 'Profile picture updated successfully.';
-                                    } else {
-                                        @unlink($targetAbsolutePath);
-                                        $profileImageErr = 'Failed to save profile picture path.';
-                                    }
-                                } else {
-                                    $profileImageErr = 'Failed to upload selected image.';
-                                }
-                            } catch (Throwable $exception) {
-                                $profileImageErr = 'Image upload failed. Please try again.';
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($formType === 'update_profile_details' || $formType === 'update_name') {
-                $submittedName = trim($_POST['user_name'] ?? '');
-                $submittedEmail = trim($_POST['user_email'] ?? '');
-
-                if ($submittedName === '') {
-                    $userNameErr = 'Please enter your name.';
-                } elseif (strlen($submittedName) < 3) {
-                    $userNameErr = 'Name must be at least 3 characters.';
-                }
-
-                if ($submittedEmail === '') {
-                    $userEmailErr = 'Please enter your email.';
-                } elseif (!filter_var($submittedEmail, FILTER_VALIDATE_EMAIL)) {
-                    $userEmailErr = 'Please enter a valid email address.';
-                } elseif ($this->userModel->findUserByEmailExcludingUser($submittedEmail, $userId)) {
-                    $userEmailErr = 'This email is already in use.';
-                }
-
-                if ($userNameErr === '' && $userEmailErr === '') {
-                    if ($this->userModel->updateUserProfile($userId, $submittedName, $submittedEmail)) {
-                        $_SESSION['user_name'] = $submittedName;
-                        $_SESSION['user_email'] = $submittedEmail;
-                        $userName = $submittedName;
-                        $userEmail = $submittedEmail;
-                        $profileSuccess = 'Profile updated successfully.';
-                    }
-                } else {
-                    $userName = $submittedName;
-                    $userEmail = $submittedEmail;
-                }
-            }
-        }
         
         // Get verification data
         $verification = $verificationModel->getVerificationByUserId($userId);
@@ -1113,13 +783,7 @@ class Pages extends Controller{
             'user_id' => $userId,
             'user_email' => $userEmail,
             'user_name' => $userName,
-            'verification' => $verification,
-            'user_name_err' => $userNameErr,
-            'user_email_err' => $userEmailErr,
-            'profile_image' => $currentProfileImage,
-            'profile_image_success' => $profileImageSuccess,
-            'profile_image_err' => $profileImageErr,
-            'profile_success' => $profileSuccess
+            'verification' => $verification
         ];
         
         $this->view('pages/v_doctor_profile', $data);
@@ -1251,163 +915,18 @@ class Pages extends Controller{
             return redirect('Pages/index');
         }
         
+        // Get patient data from session
         $userId = $_SESSION['user_id'];
         $userEmail = $_SESSION['user_email'];
         $userName = $_SESSION['user_name'];
-        $nameErr = '';
-        $nameSuccess = '';
-        $medicalSuccess = '';
-        $profileImageSuccess = '';
-        $profileImageErr = '';
-        $currentProfileImage = $this->userModel->getUserProfileImage($userId);
-
-        $medicalInfo = $this->userModel->getPatientMedicalInfo($userId);
-
-        $medicalForm = [
-            'blood_type' => $medicalInfo->blood_type ?? '',
-            'date_of_birth' => $medicalInfo->date_of_birth ?? '',
-            'emergency_contact' => $medicalInfo->emergency_contact ?? '',
-            'insurance_provider' => $medicalInfo->insurance_provider ?? '',
-            'allergies' => $medicalInfo->allergies ?? ''
-        ];
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $formType = trim($_POST['form_type'] ?? '');
-
-            if ($formType === 'update_name') {
-                $submittedName = trim($_POST['user_name'] ?? '');
-
-                if ($submittedName === '') {
-                    $nameErr = 'Please enter your name.';
-                } elseif (strlen($submittedName) < 3) {
-                    $nameErr = 'Name must be at least 3 characters.';
-                } else {
-                    if ($this->userModel->updateUserName($userId, $submittedName)) {
-                        $_SESSION['user_name'] = $submittedName;
-                        $userName = $submittedName;
-                        $nameSuccess = 'Name updated successfully.';
-                    }
-                }
-
-                if ($nameErr !== '') {
-                    $userName = $submittedName;
-                }
-            }
-
-            if ($formType === 'update_profile_image') {
-                if (!isset($_FILES['profile_image']) || empty($_FILES['profile_image']['tmp_name'])) {
-                    $profileImageErr = 'Please choose an image first.';
-                } else {
-                    $file = $_FILES['profile_image'];
-                    $validation = FileValidator::validateFile($file);
-
-                    if (!$validation['valid']) {
-                        $profileImageErr = implode(', ', $validation['errors']);
-                    } else {
-                        $uploadDir = $this->ensurePatientProfileImageDirectory($userId);
-
-                        if ($uploadDir === false) {
-                            $profileImageErr = 'Failed to prepare upload directory.';
-                        } else {
-                            try {
-                                $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                                $fileName = 'profile_' . $userId . '_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $extension;
-                                $targetAbsolutePath = $uploadDir['absolute'] . $fileName;
-
-                                if (move_uploaded_file($file['tmp_name'], $targetAbsolutePath)) {
-                                    chmod($targetAbsolutePath, 0644);
-                                    $newRelativePath = $uploadDir['relative'] . $fileName;
-
-                                    if ($this->userModel->updateUserProfileImage($userId, $newRelativePath)) {
-                                        if (!empty($currentProfileImage) && $currentProfileImage !== $newRelativePath) {
-                                            $oldAbsolutePath = dirname(APPROOT) . '/public/' . $currentProfileImage;
-                                            if (file_exists($oldAbsolutePath)) {
-                                                @unlink($oldAbsolutePath);
-                                            }
-                                        }
-
-                                        $currentProfileImage = $newRelativePath;
-                                        $profileImageSuccess = 'Profile picture updated successfully.';
-                                    } else {
-                                        @unlink($targetAbsolutePath);
-                                        $profileImageErr = 'Failed to save profile picture path.';
-                                    }
-                                } else {
-                                    $profileImageErr = 'Failed to upload selected image.';
-                                }
-                            } catch (Throwable $exception) {
-                                $profileImageErr = 'Image upload failed. Please try again.';
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($formType === 'update_medical') {
-                $medicalForm = [
-                    'blood_type' => trim($_POST['blood_type'] ?? ''),
-                    'date_of_birth' => trim($_POST['date_of_birth'] ?? ''),
-                    'emergency_contact' => trim($_POST['emergency_contact'] ?? ''),
-                    'insurance_provider' => trim($_POST['insurance_provider'] ?? ''),
-                    'allergies' => trim($_POST['allergies'] ?? '')
-                ];
-
-                $medicalPayload = $medicalForm;
-                $medicalPayload['patient_id'] = $userId;
-
-                if ($this->userModel->savePatientMedicalInfo($medicalPayload)) {
-                    $medicalSuccess = 'Medical information saved successfully.';
-                    $medicalInfo = $this->userModel->getPatientMedicalInfo($userId);
-                    $medicalForm = [
-                        'blood_type' => $medicalInfo->blood_type ?? '',
-                        'date_of_birth' => $medicalInfo->date_of_birth ?? '',
-                        'emergency_contact' => $medicalInfo->emergency_contact ?? '',
-                        'insurance_provider' => $medicalInfo->insurance_provider ?? '',
-                        'allergies' => $medicalInfo->allergies ?? ''
-                    ];
-                }
-            }
-        }
         
         $data = [
             'user_id' => $userId,
             'user_email' => $userEmail,
-            'user_name' => $userName,
-            'name_err' => $nameErr,
-            'name_success' => $nameSuccess,
-            'medical_success' => $medicalSuccess,
-            'profile_image' => $currentProfileImage,
-            'profile_image_success' => $profileImageSuccess,
-            'profile_image_err' => $profileImageErr,
-            'medical_info' => $medicalInfo,
-            'medical_form' => $medicalForm
+            'user_name' => $userName
         ];
         
         $this->view('pages/v_patient_profile', $data);
-    }
-
-    private function ensurePatientProfileImageDirectory($userId) {
-        $relativeDir = 'uploads/profile_images/' . (int)$userId . '/';
-        $absoluteDir = dirname(APPROOT) . '/public/' . $relativeDir;
-
-        if (!is_dir($absoluteDir) && !mkdir($absoluteDir, 0755, true)) {
-            return false;
-        }
-
-        $htaccessPath = $absoluteDir . '.htaccess';
-        if (!file_exists($htaccessPath)) {
-            $htaccessContent = "Options -Indexes\n";
-            $htaccessContent .= "<FilesMatch \"\\.(php|phtml|php3|php4|php5|phar)$\">\n";
-            $htaccessContent .= "    Deny from all\n";
-            $htaccessContent .= "</FilesMatch>\n";
-            @file_put_contents($htaccessPath, $htaccessContent);
-        }
-
-        return [
-            'relative' => $relativeDir,
-            'absolute' => $absoluteDir
-        ];
     }
     
     public function patientMedicalrecords() {
@@ -1454,8 +973,7 @@ class Pages extends Controller{
         
         $data = [
             'user_id' => $_SESSION['user_id'],
-            'user_name' => $_SESSION['user_name'],
-            'user_status' => $this->userModel->getUserStatusById($_SESSION['user_id'])
+            'user_name' => $_SESSION['user_name']
         ];
         
         $this->view('pages/messages/v_admin_messages', $data);
@@ -1469,8 +987,7 @@ class Pages extends Controller{
         
         $data = [
             'user_id' => $_SESSION['user_id'],
-            'user_name' => $_SESSION['user_name'],
-            'user_status' => $this->userModel->getUserStatusById($_SESSION['user_id'])
+            'user_name' => $_SESSION['user_name']
         ];
         
         $this->view('pages/messages/v_patient_messages', $data);

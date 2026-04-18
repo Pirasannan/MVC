@@ -123,27 +123,6 @@ class M_Admin {
 		return $this->db->execute();
 	}
 
-    public function suspendDoctor($doctor_id) {
-        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-        $this->db->bind(':status', 'suspended');
-        $this->db->bind(':id', $doctor_id);
-        return $this->db->execute();
-    }
-
-    public function deactivateDoctor($doctor_id) {
-        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-        $this->db->bind(':status', 'inactive');
-        $this->db->bind(':id', $doctor_id);
-        return $this->db->execute();
-    }
-
-    public function reactivateDoctor($doctor_id) {
-        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-        $this->db->bind(':status', 'active');
-        $this->db->bind(':id', $doctor_id);
-        return $this->db->execute();
-    }
-
     // ==================== PATIENT MANAGEMENT ====================
     
 	public function getPendingPatients() {
@@ -189,19 +168,11 @@ class M_Admin {
         return $this->db->execute();
     }
 
-    public function deactivatePatient($patient_id) {
-        $this->db->query('UPDATE Users SET status = :status, updated_at = NOW() WHERE id = :id');
-        $this->db->bind(':status', 'inactive');
-        $this->db->bind(':id', $patient_id);
-        return $this->db->execute();
-    }
-
     // ==================== PROFILE & SECURITY MANAGEMENT ====================
     
     public function getAdminProfile($admin_id) {
-        $this->db->query('SELECT * FROM Users WHERE id = :admin_id AND LOWER(role) = :role LIMIT 1');
+        $this->db->query('SELECT * FROM Users WHERE id = :admin_id AND role = "Admin"');
         $this->db->bind(':admin_id', $admin_id);
-        $this->db->bind(':role', 'admin');
         return $this->db->single();
     }
 
@@ -237,22 +208,30 @@ class M_Admin {
     }
 
     public function getAdminActivityLog($admin_id) {
-        if (!$this->tableExists('activity_logs')) {
-            return [];
-        }
-
-        $this->db->query('SELECT id,
-                                 action,
-                                 COALESCE(description, "") AS details,
-                                 created_at AS timestamp,
-                                 "completed" AS status
-                          FROM activity_logs
-                          WHERE admin_id = :admin_id OR user_id = :admin_id
-                          ORDER BY created_at DESC
-                          LIMIT 10');
-        $this->db->bind(':admin_id', $admin_id);
-
-        return $this->db->resultSet();
+        // For now, return mock data
+        return [
+            (object)[
+                'id' => 1,
+                'action' => 'Doctor Verification Approved',
+                'details' => 'Approved: Dr. Sunil Jayawardena',
+                'timestamp' => '2025-10-18 10:15:00',
+                'status' => 'completed'
+            ],
+            (object)[
+                'id' => 2,
+                'action' => 'System Notification Sent',
+                'details' => 'Recipients: All Users',
+                'timestamp' => '2025-10-18 09:45:00',
+                'status' => 'completed'
+            ],
+            (object)[
+                'id' => 3,
+                'action' => 'Patient Account Suspended',
+                'details' => 'Suspended: Yasmin Fonseka',
+                'timestamp' => '2025-10-17 16:30:00',
+                'status' => 'completed'
+            ]
+        ];
     }
 
     public function getSystemActivityLog() {
@@ -448,19 +427,11 @@ class M_Admin {
     // ==================== ACTIVITY LOGS ====================
     
     public function getRecentSystemActivity() {
-        if (!$this->tableExists('activity_logs')) {
-            return [];
-        }
-
         $this->db->query('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10');
         return $this->db->resultSet();
     }
 
     public function logAdminAction($admin_id, $action, $description) {
-        if (!$this->tableExists('activity_logs')) {
-            return false;
-        }
-
         $this->db->query('INSERT INTO activity_logs (admin_id, action, description, created_at) 
                          VALUES (:admin_id, :action, :description, NOW())');
         $this->db->bind(':admin_id', $admin_id);

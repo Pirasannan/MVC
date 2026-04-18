@@ -1,0 +1,904 @@
+/* Button Component */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    /* explicit border for outline variants */
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    line-height: 1.25;
+}
+
+/* Primary Variant */
+.btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Secondary Variant */
+.btn-secondary {
+    background-color: var(--muted);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+    /* darker muted */
+    color: var(--foreground);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Success Variant */
+.btn-success {
+    background-color: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.btn-success:hover {
+    filter: brightness(0.95);
+    box-shadow: var(--shadow-md);
+}
+
+/* Warning Variant */
+.btn-warning {
+    background-color: var(--warning);
+    color: white;
+    border-color: var(--warning);
+}
+
+.btn-warning:hover {
+    filter: brightness(0.95);
+    box-shadow: var(--shadow-md);
+}
+
+/* Danger Variant */
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+.btn-danger:hover {
+    background-color: #ef4444;
+    /* slightly darker/hardcoded fallbacks if var missing */
+    filter: brightness(0.9);
+    box-shadow: var(--shadow-md);
+}
+
+/* Secondary / Ghost Variant */
+.btn-ghost {
+    background-color: transparent;
+    color: var(--foreground);
+}
+
+.btn-ghost:hover {
+    background-color: var(--muted);
+}
+
+/* Outline Variant */
+.btn-outline {
+    background-color: transparent;
+    color: var(--foreground);
+    border-color: var(--border);
+}
+
+.btn-outline:hover {
+    background-color: var(--muted);
+    border-color: var(--muted-foreground);
+}
+
+/* Sizes */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    /* 13px */
+}
+
+.btn-large {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Special Hero/CTA Variants */
+.btn-hero-primary {
+    background-color: var(--primary-foreground);
+    color: var(--primary);
+    border-color: var(--primary-foreground);
+}
+
+.btn-hero-primary:hover {
+    background-color: hsla(0, 0%, 100%, 0.9);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.btn-hero-secondary {
+    background-color: transparent;
+    color: var(--primary-foreground);
+    border: 2px solid var(--primary-foreground);
+}
+
+.btn-hero-secondary:hover {
+    background-color: hsla(0, 0%, 100%, 0.1);
+}
+
+.btn-cta {
+    background-color: var(--primary-foreground);
+    color: var(--primary);
+}
+
+.btn-cta:hover {
+    background-color: hsla(0, 0%, 100%, 0.9);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* Dashboard Buttons (Moved from layout.css) */
+/* Action Buttons - Matches global .btn-primary but specific to dashboard layout */
+.action-button {
+    background: var(--primary);
+    text-decoration: none;
+    color: var(--primary-foreground);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+}
+
+.action-button:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.action-button.secondary {
+    background: var(--muted);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+}
+
+.action-button.secondary:hover {
+    background: #e2e8f0;
+    color: var(--foreground);
+}
+
+/* Medical Records Buttons (Moved from medical_records.css) */
+.btn-upload {
+    background: #4a90e2;
+    /* TODO: Use var(--secondary) */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-upload:hover {
+    background: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: #f9fafb;
+    border-color: #4a90e2;
+    color: #4a90e2;
+}
+
+.action-btn.primary {
+    background: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+
+.action-btn.primary:hover {
+    background: #357abd;
+}
+
+/* Modal Buttons for Medical Upload */
+.medical-upload-cancel-btn,
+.medical-upload-submit-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.medical-upload-cancel-btn {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.medical-upload-cancel-btn:hover {
+    background: #e5e7eb;
+}
+
+.medical-upload-submit-btn {
+    background: #4a90e2;
+    color: white;
+}
+
+.medical-upload-submit-btn:hover {
+    background: #357abd;
+}
+
+.medical-upload-submit-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Appointments Buttons (Moved from appointments.css) */
+/* Scoped to avoid conflict with global .btn */
+.dashboard-container.doctor .btn,
+.appt-table .btn {
+    appearance: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--soft);
+    color: var(--text);
+    /* from appt variables */
+    transition: 0.15s;
+    /* Ensuring flex/inline-flex if needed, originally default */
+}
+
+.dashboard-container.doctor .btn:hover {
+    filter: brightness(0.95);
+}
+
+/* Variants */
+.btn-approve {
+    background: rgba(22, 163, 74, 0.1) !important;
+    border-color: rgba(22, 163, 74, 0.2) !important;
+    color: #16a34a !important;
+    /* var(--ok) */
+}
+
+.btn-approve:hover {
+    background: rgba(22, 163, 74, 0.2) !important;
+}
+
+.btn-reject {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border-color: rgba(220, 38, 38, 0.2) !important;
+    color: #dc2626 !important;
+    /* var(--danger) */
+}
+
+.btn-reject:hover {
+    background: rgba(220, 38, 38, 0.2) !important;
+}
+
+.btn-cancel {
+    background: rgba(156, 163, 175, 0.1) !important;
+    border-color: rgba(156, 163, 175, 0.2) !important;
+    color: #9ca3af !important;
+    /* var(--neutral) */
+}
+
+.btn-cancel:hover {
+    background: rgba(156, 163, 175, 0.2) !important;
+}
+
+.btn-start {
+    background: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    color: #f59e0b !important;
+    /* var(--warn) */
+}
+
+.btn-start:hover {
+    background: rgba(245, 158, 11, 0.2) !important;
+}
+
+.btn-complete {
+    background: rgba(37, 99, 235, 0.1) !important;
+    border-color: rgba(37, 99, 235, 0.2) !important;
+    color: #2563eb !important;
+    /* var(--brand) */
+}
+
+.btn-complete:hover {
+    background: rgba(37, 99, 235, 0.2) !important;
+}
+
+.btn-warning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    color: #f59e0b !important;
+}
+
+.btn-warning:hover {
+    background: rgba(245, 158, 11, 0.2) !important;
+}
+
+.btn[disabled],
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Patient Appointment Primary Button */
+/* Also scoped if necessary, or renamed */
+.p-form .btn-primary {
+    background: #2563eb;
+    /* var(--brand) */
+    color: #fff;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: filter .15s;
+    width: max-content;
+}
+
+.p-form .btn-primary:hover {
+    filter: brightness(.95);
+}
+
+/* Verification Buttons (Moved from verification_style.css) */
+/* Scoped to .verification-actions or .verification-section */
+
+.verification-actions .action-button,
+.verification-status .action-button,
+.verification-section .action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.verification-actions .action-button.primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.verification-actions .action-button.primary:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+}
+
+.verification-actions .action-button.secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.verification-actions .action-button.secondary:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+.verification-actions .action-button.danger {
+    background: #ef4444;
+    color: white;
+}
+
+.verification-actions .action-button.danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Loading State */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Zoom Controls */
+.zoom-controls .btn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+}
+
+/* Profile Buttons (Moved from profile_style.css) */
+/* Scoped */
+.profile-container .action-button,
+.account-settings .action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.profile-container .action-button::before,
+.account-settings .action-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.profile-container .action-button:hover::before,
+.account-settings .action-button:hover::before {
+    left: 100%;
+}
+
+.profile-container .action-button.primary,
+.account-settings .action-button.primary {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
+}
+
+.profile-container .action-button.primary:hover,
+.account-settings .action-button.primary:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2563eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
+}
+
+.profile-container .action-button.secondary,
+.account-settings .action-button.secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(107, 114, 128, 0.2);
+}
+
+.profile-container .action-button.secondary:hover,
+.account-settings .action-button.secondary:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(107, 114, 128, 0.3);
+}
+
+/* Form/Auth Text Buttons (Moved from components/form/button_style.css) */
+.create_acc,
+.forgot_pass,
+.alreadyhaveaccount {
+    font-size: 13px;
+    color: #109CF1;
+    /* TODO: Use var(--primary) */
+    text-decoration: none;
+    padding: 8px 40px;
+    line-height: 20px;
+    border-radius: 6px;
+    background: transparent;
+    transition: color .12s ease, background .12s ease, transform .08s ease;
+}
+
+.create_acc:hover,
+.create_acc:focus,
+.forgot_pass:hover,
+.forgot_pass:focus,
+.alreadyhaveaccount:hover,
+.alreadyhaveaccount:focus {
+    color: #047ecacc;
+    text-decoration: none;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+/*  VIDEO CONSULTATION BUTTONS  (Moved from videocall.css & precall.css) */
+
+/* --- Precall Screen Buttons --- */
+/* Scoped to .precall-container or .precall-actions */
+.precall-actions .btn-primary,
+.precall-actions .btn-secondary {
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* E-PRESCRIPTION BUTTONS (Moved from components/form/e_pres.css) */
+/* Scoped to .e_prescription_container to avoid conflicts */
+
+.e_prescription_container .submit-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    max-width: 200px;
+}
+
+.e_prescription_container .submit-btn:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.e_prescription_container .cancel-btn {
+    background: #95a5a6;
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s ease;
+    flex: 1;
+    max-width: 200px;
+    display: inline-block;
+}
+
+.e_prescription_container .cancel-btn:hover {
+    background: #7f8c8d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(149, 165, 166, 0.3);
+}
+
+.e_prescription_container .btn {
+    background: #109CF1;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.e_prescription_container .btn:hover {
+    background: #0e8bd4;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 156, 241, 0.3);
+}
+
+.e_prescription_container .btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.e_prescription_container .btn-primary:hover {
+    background: #2980b9;
+}
+
+.e_prescription_container .btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.e_prescription_container .btn-secondary:hover {
+    background: #7f8c8d;
+}
+
+.e_prescription_container .goback {
+    align-self: center;
+    text-decoration: none;
+    font-size: 13px;
+    color: #109CF1;
+    line-height: 20px;
+    border-radius: 6px;
+    background: transparent;
+    transition: color .12s ease, background .12s ease, transform .08s ease;
+}
+
+
+
+.precall-actions .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.precall-actions .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.precall-actions .btn-secondary {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.precall-actions .btn-secondary:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+.back-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-btn:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+.media-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.media-btn.active {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.media-btn svg {
+    width: 24px;
+    height: 24px;
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+.media-btn.active svg {
+    color: #3b82f6;
+}
+
+.media-btn span {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.media-btn.active span {
+    color: #3b82f6;
+}
+
+.media-btn:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+/* --- Videocall Screen Buttons --- */
+/* Scoped to .videocall-container */
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.control-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.mic-btn.active,
+.camera-btn.active {
+    background: #10b981;
+    border-color: #10b981;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+.mic-btn:not(.active),
+.camera-btn:not(.active) {
+    background: #ef4444;
+    border-color: #ef4444;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+.screen-btn,
+.chat-btn,
+.participants-btn,
+.notes-btn,
+.help-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.endcall-btn {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* Sidebar buttons in videocall (Notes panel) */
+.notes-actions .btn-secondary {
+    background: #f8fafc;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+}
+
+.notes-actions .btn-secondary:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+.notes-actions .btn-primary {
+    text-decoration: none;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    justify-content: center;
+}
+
+.notes-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}

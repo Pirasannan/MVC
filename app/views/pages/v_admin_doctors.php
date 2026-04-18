@@ -26,14 +26,20 @@
                         <?php $pendingDoctors = $data['pendingDoctors'] ?? []; ?>
                         <?php if (!empty($pendingDoctors)): ?>
                             <?php foreach ($pendingDoctors as $doctor): ?>
+                                <?php
+                                    $doctorName = $doctor->user_name ?? $doctor->name ?? '';
+                                    $doctorEmail = $doctor->user_email ?? $doctor->email ?? '';
+                                    $submittedAt = $doctor->uploaded_at ?? $doctor->created_at ?? '';
+                                    $hasDocument = !empty($doctor->photo_path);
+                                ?>
                                 <div class="appointment-item">
                                     <div class="appointment-info">
-                                        <div class="doctor-name"><?php echo htmlspecialchars($doctor->name ?? ''); ?></div>
-                                        <div class="appointment-date">Status: <?php echo htmlspecialchars($doctor->status ?? 'inactive'); ?></div>
-                                        <div class="prescribed-by">Joined: <?php echo htmlspecialchars($doctor->created_at ?? ''); ?></div>
+                                        <div class="doctor-name"><?php echo htmlspecialchars($doctorName); ?></div>
+                                        <div class="appointment-date">Email: <?php echo htmlspecialchars($doctorEmail); ?></div>
+                                        <div class="prescribed-by">Submitted: <?php echo htmlspecialchars($submittedAt); ?></div>
                                     </div>
                                     <div class="appointment-status">
-                                        <span class="status-badge pending">Pending Review</span>
+                                        <span class="status-badge pending"><?php echo $hasDocument ? 'Document Uploaded' : 'Pending Review'; ?></span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

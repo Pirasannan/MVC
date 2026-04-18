@@ -101,6 +101,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 }
 
 .dashboard-container.doctor .profile-field label {
@@ -144,6 +145,64 @@
     background: linear-gradient(135deg, #357abd 0%, #2563eb 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+}
+
+.dashboard-container.doctor .doctor-profile-edit {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.dashboard-container.doctor .doctor-profile-edit.hidden {
+    display: none;
+}
+
+.dashboard-container.doctor .profile-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #1f2937;
+    background: #ffffff;
+}
+
+.dashboard-container.doctor .profile-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+
+.dashboard-container.doctor .profile-input.is-invalid {
+    border-color: #ef4444;
+}
+
+.dashboard-container.doctor .field-error {
+    color: #b91c1c;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.dashboard-container.doctor .doctor-profile-edit-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.dashboard-container.doctor .profile-message {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dashboard-container.doctor .profile-message.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
 }
 
 /* Role Badge - Matches existing button styling */
@@ -452,6 +511,15 @@
     .dashboard-container.doctor .profile-row {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+
+    .dashboard-container.doctor .doctor-profile-edit-actions {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-container.doctor .doctor-profile-edit-actions .action-button {
+        width: 100%;
     }
     
     .dashboard-container.doctor .profile-stats {

@@ -15,185 +15,183 @@ $current_page = 'patientProfile';
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-            <!-- Stats Cards Row -->
-            <div class="stats-row">
-                <div class="stat-card primary">
-                    <div class="stat-content">
-                        <h3 class="stat-title">Total Appointments</h3>
-                        <div class="stat-number">24</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 class="stat-title">Active Prescriptions</h3>
-                        <div class="stat-number">3</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 class="stat-title">Medical Reports</h3>
-                        <div class="stat-number">8</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 class="stat-title">Doctors Consulted</h3>
-                        <div class="stat-number">5</div>
-                    </div>
-                </div>
-            </div>
+            <?php if (!empty($data['name_success'])): ?>
+                <div class="profile-message success"><?php echo htmlspecialchars($data['name_success']); ?></div>
+            <?php endif; ?>
 
-            <!-- Content Sections Row -->
-            <div class="content-sections">
-                <!-- Profile Information Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Profile Information</h2>
+            <?php if (!empty($data['profile_image_success'])): ?>
+                <div class="profile-message success"><?php echo htmlspecialchars($data['profile_image_success']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['medical_success'])): ?>
+                <div class="profile-message success"><?php echo htmlspecialchars($data['medical_success']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['profile_image_err'])): ?>
+                <div class="profile-message error"><?php echo htmlspecialchars($data['profile_image_err']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['name_err'])): ?>
+                <div class="profile-message error"><?php echo htmlspecialchars($data['name_err']); ?></div>
+            <?php endif; ?>
+
+            <div class="patient-profile-layout">
+                <div class="patient-profile-card">
+                    <div class="profile-avatar-wrap">
+                        <?php if (!empty($data['profile_image'])): ?>
+                            <img src="<?php echo URLROOT . '/' . htmlspecialchars($data['profile_image']); ?>" alt="Profile picture" class="profile-avatar-image">
+                        <?php else: ?>
+                            <div class="profile-avatar-circle"><?php echo strtoupper(substr(trim($data['user_name']), 0, 1)); ?></div>
+                        <?php endif; ?>
                     </div>
-                    <div class="section-content">
-                        <div class="profile-info-item">
-                            <div class="info-label">Full Name:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($data['user_name']); ?></div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Email:</div>
-                            <div class="info-value"><?php echo htmlspecialchars($data['user_email']); ?></div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Patient ID:</div>
-                            <div class="info-value"><?php echo $data['user_id']; ?></div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Account Status:</div>
-                            <div class="info-value">
-                                <span class="status-badge active">Active</span>
-                            </div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Member Since:</div>
-                            <div class="info-value"><?php echo date('M Y'); ?></div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button">Edit Profile</button>
-                    </div>
+                    <h3 class="patient-name"><?php echo htmlspecialchars($data['user_name']); ?></h3>
+                    <p class="patient-role">Patient</p>
+                    <button type="button" class="action-button primary profile-edit-btn" id="open-profile-edit-modal-btn">Edit Profile</button>
                 </div>
 
-                <!-- Medical Information Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Medical Information</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="profile-info-item">
-                            <div class="info-label">Blood Type:</div>
-                            <div class="info-value">
-                                <span class="blood-type-badge">O+</span>
-                            </div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Date of Birth:</div>
-                            <div class="info-value">January 15, 1990</div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Emergency Contact:</div>
-                            <div class="info-value">+1 (555) 123-4567</div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Insurance Provider:</div>
-                            <div class="info-value">HealthCare Plus</div>
-                        </div>
-                        <div class="profile-info-item">
-                            <div class="info-label">Allergies:</div>
-                            <div class="info-value">
-                                <span class="allergy-badge">Penicillin</span>
-                                <span class="allergy-badge">Shellfish</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button primary">Update Medical Info</button>
+                <div class="patient-details-card">
+                    <h3 class="details-title">Patient Information</h3>
+                    <div class="details-table">
+                        <div class="details-row"><span>Email</span><span><?php echo htmlspecialchars($data['user_email']); ?></span></div>
+                        <div class="details-row"><span>Patient ID</span><span>#<?php echo htmlspecialchars($data['user_id']); ?></span></div>
+                        <div class="details-row"><span>Account Status</span><span><span class="status-badge active">Active</span></span></div>
+                        <div class="details-row"><span>Member Since</span><span><?php echo date('M Y'); ?></span></div>
+                        <div class="details-row"><span>Blood Type</span><span><?php echo !empty($data['medical_info']->blood_type) ? htmlspecialchars($data['medical_info']->blood_type) : '-'; ?></span></div>
+                        <div class="details-row"><span>Date of Birth</span><span><?php echo !empty($data['medical_info']->date_of_birth) ? htmlspecialchars($data['medical_info']->date_of_birth) : '-'; ?></span></div>
+                        <div class="details-row"><span>Emergency Contact</span><span><?php echo !empty($data['medical_info']->emergency_contact) ? htmlspecialchars($data['medical_info']->emergency_contact) : '-'; ?></span></div>
+                        <div class="details-row"><span>Insurance Provider</span><span><?php echo !empty($data['medical_info']->insurance_provider) ? htmlspecialchars($data['medical_info']->insurance_provider) : '-'; ?></span></div>
+                        <div class="details-row"><span>Allergies</span><span><?php echo !empty($data['medical_info']->allergies) ? nl2br(htmlspecialchars($data['medical_info']->allergies)) : '-'; ?></span></div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Recent Activity Section -->
-            <div class="content-sections">
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Recent Activity</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="activity-item">
-                            <div class="activity-info">
-                                <div class="activity-title">Appointment Completed</div>
-                                <div class="activity-details">Consultation with Dr. Sarah Johnson</div>
-                                <div class="activity-date">2 days ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-info">
-                                <div class="activity-title">New Prescription</div>
-                                <div class="activity-details">Lisinopril 10mg prescribed by Dr. Johnson</div>
-                                <div class="activity-date">3 days ago</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-info">
-                                <div class="activity-title">Lab Results Available</div>
-                                <div class="activity-details">Blood work results from General Hospital</div>
-                                <div class="activity-date">1 week ago</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <button class="action-button primary">View All Records</button>
-                    </div>
-                </div>
-
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Add Payment Method</h2>
-                    </div>
-
-                    <div class="section-content payment-section-content">
-                        <div class="payment-card-icons">
-                            <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/visa.png" alt="Visa"></div>
-                            <div class="payment-icon"><img src="<?php echo URLROOT; ?>/img/mastercard.png" alt="MasterCard"></div>
-                        </div>
-
-                        <div class="payment-field">
-                            <label class="payment-label">Cardholder Name</label>
-                            <input type="text" class="payment-input" placeholder="John Doe">
-                        </div>
-
-                        <div class="payment-field">
-                            <label class="payment-label">Card Number</label>
-                            <input type="text" class="payment-input" placeholder="1234 5678 9012 3456">
-                        </div>
-
-                        <div class="payment-row">
-                            <div class="payment-field">
-                                <label class="payment-label">Expiry Date</label>
-                                <input type="text" class="payment-input" placeholder="MM/YY">
-                            </div>
-                            <div class="payment-field">
-                                <label class="payment-label">CVV</label>
-                                <input type="text" class="payment-input" placeholder="123">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-footer">
-                        <button class="action-button">Add Card</button>
-                    </div>
-                </div>
-
-
             </div>
         </div>
     </main>
 </div>
+
+
+<div class="modal-overlay" id="profile-edit-modal-overlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="profile-edit-modal-title">
+        <div class="modal-header">
+            <h3 id="profile-edit-modal-title">Edit Profile</h3>
+            <button type="button" class="modal-close" id="close-profile-edit-modal-btn" aria-label="Close">&times;</button>
+        </div>
+
+        <form action="<?php echo URLROOT; ?>/Pages/patientProfile" method="POST" enctype="multipart/form-data" class="modal-form upload-form">
+            <input type="hidden" name="form_type" value="update_profile_image">
+
+            <div class="modal-field">
+                <label for="profile_image">Profile Image (JPG/PNG)</label>
+                <input type="file" id="profile_image" name="profile_image" class="profile-input" accept="image/jpeg,image/jpg,image/png" required>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="action-button secondary">Upload Picture</button>
+            </div>
+        </form>
+
+        <form action="<?php echo URLROOT; ?>/Pages/patientProfile" method="POST" class="modal-form">
+            <input type="hidden" name="form_type" value="update_name">
+
+            <div class="modal-field">
+                <label for="patient_user_name">Change Name</label>
+                <input
+                    type="text"
+                    id="patient_user_name"
+                    name="user_name"
+                    value="<?php echo htmlspecialchars($data['user_name']); ?>"
+                    class="profile-input <?php echo !empty($data['name_err']) ? 'is-invalid' : ''; ?>"
+                    required
+                >
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="action-button primary">Save Name</button>
+            </div>
+        </form>
+
+        <form action="<?php echo URLROOT; ?>/Pages/patientProfile" method="POST" class="modal-form" id="medical-info-form">
+            <input type="hidden" name="form_type" value="update_medical">
+
+            <div class="modal-field-row">
+                <div class="modal-field">
+                    <label for="blood_type">Blood Type</label>
+                    <select id="blood_type" name="blood_type" class="profile-input">
+                        <?php $bloodType = $data['medical_form']['blood_type'] ?? ''; ?>
+                        <option value="">Select blood type</option>
+                        <?php foreach (['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $type): ?>
+                            <option value="<?php echo $type; ?>" <?php echo $bloodType === $type ? 'selected' : ''; ?>><?php echo $type; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="modal-field">
+                    <label for="date_of_birth">Date of Birth</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth" class="profile-input" value="<?php echo htmlspecialchars($data['medical_form']['date_of_birth'] ?? ''); ?>">
+                </div>
+            </div>
+
+            <div class="modal-field-row">
+                <div class="modal-field">
+                    <label for="emergency_contact">Emergency Contact</label>
+                    <input type="text" id="emergency_contact" name="emergency_contact" class="profile-input" value="<?php echo htmlspecialchars($data['medical_form']['emergency_contact'] ?? ''); ?>" placeholder="0771234567">
+                </div>
+
+                <div class="modal-field">
+                    <label for="insurance_provider">Insurance Provider</label>
+                    <input type="text" id="insurance_provider" name="insurance_provider" class="profile-input" value="<?php echo htmlspecialchars($data['medical_form']['insurance_provider'] ?? ''); ?>" placeholder="Company name">
+                </div>
+            </div>
+
+            <div class="modal-field">
+                <label for="allergies">Allergies</label>
+                <textarea id="allergies" name="allergies" class="profile-input textarea-input" rows="3" placeholder="Enter allergies if any"><?php echo htmlspecialchars($data['medical_form']['allergies'] ?? ''); ?></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="action-button primary">Save Medical Info</button>
+                <button type="button" class="action-button" id="cancel-profile-edit-modal-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const openButton = document.getElementById('open-profile-edit-modal-btn');
+    const closeButton = document.getElementById('close-profile-edit-modal-btn');
+    const cancelButton = document.getElementById('cancel-profile-edit-modal-btn');
+    const modal = document.getElementById('profile-edit-modal-overlay');
+
+    if (!modal || !openButton) {
+        return;
+    }
+
+    const openModal = function () {
+        modal.classList.add('active');
+    };
+
+    const closeModal = function () {
+        modal.classList.remove('active');
+    };
+
+    openButton.addEventListener('click', openModal);
+
+    if (closeButton) {
+        closeButton.addEventListener('click', closeModal);
+    }
+
+    if (cancelButton) {
+        cancelButton.addEventListener('click', closeModal);
+    }
+
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+});
+</script>
 
 
 

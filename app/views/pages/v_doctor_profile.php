@@ -23,6 +23,10 @@
                         <h2 class="section-title">Profile Information</h2>
                     </div>
                     <div class="section-content">
+                        <?php if (!empty($data['profile_success'])): ?>
+                            <div class="profile-message success"><?php echo htmlspecialchars($data['profile_success']); ?></div>
+                        <?php endif; ?>
+
                         <div class="profile-details">
                             <div class="profile-row">
                                 <div class="profile-field">
@@ -48,9 +52,52 @@
                         
                         <!-- Edit Profile Button Row -->
                         <div class="profile-edit-row">
-                            <button class="action-button primary edit-profile-btn">
+                            <button type="button" class="action-button primary edit-profile-btn" id="doctor-profile-toggle-btn">
                                 <i class="fas fa-edit"></i> Edit Profile
                             </button>
+                        </div>
+
+                        <div class="doctor-profile-edit <?php echo (!empty($data['user_name_err']) || !empty($data['user_email_err'])) ? '' : 'hidden'; ?>" id="doctor-profile-edit-form">
+                            <form action="<?php echo URLROOT; ?>/Pages/doctorprofile" method="POST" novalidate>
+                                <div class="profile-row form-row">
+                                    <div class="profile-field">
+                                        <label for="doctor_user_name">Full Name:</label>
+                                        <input
+                                            type="text"
+                                            id="doctor_user_name"
+                                            name="user_name"
+                                            value="<?php echo htmlspecialchars($data['user_name']); ?>"
+                                            class="profile-input <?php echo !empty($data['user_name_err']) ? 'is-invalid' : ''; ?>"
+                                        >
+                                        <?php if (!empty($data['user_name_err'])): ?>
+                                            <small class="field-error"><?php echo htmlspecialchars($data['user_name_err']); ?></small>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div class="profile-field">
+                                        <label for="doctor_user_email">Email:</label>
+                                        <input
+                                            type="email"
+                                            id="doctor_user_email"
+                                            name="user_email"
+                                            value="<?php echo htmlspecialchars($data['user_email']); ?>"
+                                            class="profile-input <?php echo !empty($data['user_email_err']) ? 'is-invalid' : ''; ?>"
+                                        >
+                                        <?php if (!empty($data['user_email_err'])): ?>
+                                            <small class="field-error"><?php echo htmlspecialchars($data['user_email_err']); ?></small>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <div class="doctor-profile-edit-actions">
+                                    <button type="submit" class="action-button primary">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                    <button type="button" class="action-button secondary" id="doctor-profile-cancel-btn">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -156,6 +203,29 @@
         </div>
     </main>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleButton = document.getElementById('doctor-profile-toggle-btn');
+    const cancelButton = document.getElementById('doctor-profile-cancel-btn');
+    const editForm = document.getElementById('doctor-profile-edit-form');
+
+    if (!toggleButton || !editForm) {
+        return;
+    }
+
+    toggleButton.addEventListener('click', function () {
+        editForm.classList.toggle('hidden');
+    });
+
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function () {
+            editForm.classList.add('hidden');
+        });
+    }
+});
+</script>
 
 
 

@@ -11,7 +11,6 @@ let eligibleContacts = [];
 let conversationsCache = [];
 let sidebarSearchTerm = '';
 let selectedAttachmentFile = null;
-let activeMessageActionsId = null;
 
 // Initialize messaging when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -400,7 +399,6 @@ function displayMessages(messages) {
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.innerHTML = '';
     lastMessageId = 0;
-    hideMessageActions();
     
     if (!messages || messages.length === 0) {
         showEmptyMessages();
@@ -497,39 +495,9 @@ function createMessageBubble(message) {
                 handleDeleteMessage(message);
             });
         }
-
-        if (canManageMessage) {
-            div.addEventListener('contextmenu', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                showMessageActions(div, messageId);
-            });
-        }
     }
     
     return div;
-}
-
-function showMessageActions(messageBubble, messageId) {
-    if (!messageBubble || !messageId) {
-        return;
-    }
-
-    const openedBubble = document.querySelector('.message-bubble.message-actions-open');
-    if (openedBubble && openedBubble !== messageBubble) {
-        openedBubble.classList.remove('message-actions-open');
-    }
-
-    messageBubble.classList.add('message-actions-open');
-    activeMessageActionsId = String(messageId);
-}
-
-function hideMessageActions() {
-    const openedBubble = document.querySelector('.message-bubble.message-actions-open');
-    if (openedBubble) {
-        openedBubble.classList.remove('message-actions-open');
-    }
-    activeMessageActionsId = null;
 }
 
 function parseMessagePayload(rawMessage) {
@@ -702,31 +670,8 @@ function setMessageActionsDisabled(messageBubble, disabled) {
     });
 }
 
-document.addEventListener('click', (event) => {
-    const openedBubble = document.querySelector('.message-bubble.message-actions-open');
-    if (!openedBubble) return;
-
-    if (!openedBubble.contains(event.target)) {
-        hideMessageActions();
-    }
-});
-
-document.addEventListener('contextmenu', (event) => {
-    const bubble = event.target.closest('.message-bubble');
-    if (!bubble) {
-        hideMessageActions();
-    }
-});
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        hideMessageActions();
-    }
-});
-
 // Show empty messages state
 function showEmptyMessages() {
-    hideMessageActions();
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #8696a0; text-align: center;">

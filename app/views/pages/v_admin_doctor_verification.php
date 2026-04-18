@@ -24,17 +24,31 @@
                     </div>
 
                     <div class="section-content">
-                        <?php $pendingDoctors = $data['pendingDoctors'] ?? []; ?>
+                        <?php $pendingVerifications = $data['pendingVerifications'] ?? []; ?>
 
-                        <?php if (!empty($pendingDoctors)): ?>
-                            <?php foreach ($pendingDoctors as $doctor): ?>
-                                <div class="appointment-item" data-doctor-id="<?php echo $doctor->id; ?>" data-doctor-name="<?php echo htmlspecialchars($doctor->name ?? ''); ?>" data-doctor-email="<?php echo htmlspecialchars($doctor->email ?? ''); ?>" data-doctor-created="<?php echo htmlspecialchars($doctor->created_at ?? ''); ?>">
+                        <?php if (!empty($pendingVerifications)): ?>
+                            <?php foreach ($pendingVerifications as $verification): ?>
+                                <?php
+                                    $doctorId = (int)($verification->user_id ?? 0);
+                                    $doctorName = $verification->user_name ?? '';
+                                    $doctorEmail = $verification->user_email ?? $verification->email ?? '';
+                                    $uploadedAt = $verification->uploaded_at ?? '';
+                                    $documentPath = $verification->photo_path ?? '';
+                                ?>
+                                <div
+                                    class="appointment-item"
+                                    data-doctor-id="<?php echo $doctorId; ?>"
+                                    data-doctor-name="<?php echo htmlspecialchars($doctorName); ?>"
+                                    data-doctor-email="<?php echo htmlspecialchars($doctorEmail); ?>"
+                                    data-doctor-created="<?php echo htmlspecialchars($uploadedAt); ?>"
+                                    data-doctor-document="<?php echo htmlspecialchars($documentPath); ?>"
+                                >
                                     <div class="appointment-info">
-                                        <div class="doctor-name"><?php echo htmlspecialchars($doctor->name ?? ''); ?></div>
+                                        <div class="doctor-name"><?php echo htmlspecialchars($doctorName); ?></div>
                                         <div class="appointment-date">
-                                            Submitted: <?php echo htmlspecialchars($doctor->created_at ?? ''); ?>
+                                            Submitted: <?php echo htmlspecialchars($uploadedAt); ?>
                                         </div>
-                                        <div class="prescribed-by">Email: <?php echo htmlspecialchars($doctor->email ?? ''); ?></div>
+                                        <div class="prescribed-by">Email: <?php echo htmlspecialchars($doctorEmail); ?></div>
                                     </div>
                                     <div class="appointment-status">
                                         <span class="status-badge pending">Pending</span>
@@ -42,7 +56,7 @@
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <p class="empty-state">No pending doctor verifications found.</p>
+                            <p class="empty-state">No pending doctor verification documents found.</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -75,6 +89,12 @@
                 <div class="detail-row">
                     <label>Status:</label>
                     <span class="status-badge pending">Pending Review</span>
+                </div>
+                <div class="detail-row">
+                    <label>Document:</label>
+                    <span>
+                        <a href="#" id="modal-doctor-document-link" target="_blank" rel="noopener noreferrer">View Uploaded Document</a>
+                    </span>
                 </div>
             </div>
         </div>

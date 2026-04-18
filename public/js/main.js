@@ -236,6 +236,22 @@ class DoctorVerificationManager {
         document.getElementById('modal-doctor-name').textContent = item.dataset.doctorName
         document.getElementById('modal-doctor-email').textContent = item.dataset.doctorEmail
         document.getElementById('modal-doctor-created').textContent = item.dataset.doctorCreated
+
+        const documentLink = document.getElementById('modal-doctor-document-link')
+        if (documentLink) {
+          if (item.dataset.doctorDocument) {
+            documentLink.href = window.location.origin + '/MVC/' + item.dataset.doctorDocument
+            documentLink.style.pointerEvents = 'auto'
+            documentLink.style.opacity = '1'
+            documentLink.textContent = 'View Uploaded Document'
+          } else {
+            documentLink.href = '#'
+            documentLink.style.pointerEvents = 'none'
+            documentLink.style.opacity = '0.6'
+            documentLink.textContent = 'Document not available'
+          }
+        }
+
         this.modal.style.display = 'block'
       })
     })
@@ -398,6 +414,8 @@ class PatientVerificationManager {
     this.closeBtn = document.querySelector('.close')
     this.approveBtn = document.getElementById('approveBtn')
     this.rejectBtn = document.getElementById('rejectBtn')
+    this.reactivateBtn = document.getElementById('reactivateBtn')
+    this.suspendBtn = document.getElementById('suspendBtn')
     this.patientItems = document.querySelectorAll('.appointment-item')
     this.currentPatientId = null
     
@@ -426,6 +444,11 @@ class PatientVerificationManager {
         document.getElementById('modal-patient-name').textContent = item.dataset.patientName
         document.getElementById('modal-patient-email').textContent = item.dataset.patientEmail
         document.getElementById('modal-patient-created').textContent = item.dataset.patientCreated
+        const statusElement = document.getElementById('modal-patient-status')
+        if (statusElement) {
+          statusElement.textContent = item.dataset.patientStatus || 'inactive'
+        }
+
         this.modal.style.display = 'block'
       })
     })
@@ -455,6 +478,20 @@ class PatientVerificationManager {
     if (this.rejectBtn) {
       this.rejectBtn.addEventListener('click', () => {
         this.rejectPatient()
+      })
+    }
+
+    // Reactivate patient from inactive/suspended account view.
+    if (this.reactivateBtn) {
+      this.reactivateBtn.addEventListener('click', () => {
+        this.reactivatePatient()
+      })
+    }
+
+    // Suspend patient from inactive/suspended account view.
+    if (this.suspendBtn) {
+      this.suspendBtn.addEventListener('click', () => {
+        this.suspendPatient()
       })
     }
   }
@@ -513,6 +550,65 @@ class PatientVerificationManager {
         alert('Error rejecting patient')
       })
     }
+  }
+
+  reactivatePatient() {
+    if (!this.currentPatientId) {
+      return
+    }
+
+    fetch(window.location.origin + '/MVC/Pages/approvePatient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patient_id: this.currentPatientId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Patient reactivated successfully!')
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to reactivate patient'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error reactivating patient')
+    })
+  }
+
+  suspendPatient() {
+    if (!this.currentPatientId) {
+      return
+    }
+
+    fetch(window.location.origin + '/MVC/Pages/rejectPatient', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patient_id: this.currentPatientId,
+        reason: 'Suspended by admin from inactive/suspended accounts'
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Patient suspended successfully!')
+        location.reload()
+      } else {
+        alert('Error: ' + (data.message || 'Failed to suspend patient'))
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error)
+      alert('Error suspending patient')
+    })
   }
 }
 

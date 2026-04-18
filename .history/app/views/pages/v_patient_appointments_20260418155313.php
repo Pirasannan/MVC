@@ -1,8 +1,6 @@
 <?php 
 require APPROOT.'/views/inc/header.php'; 
 $current_page = 'patientAppointments';
-$patientStatus = strtolower((string)($data['patient_status'] ?? 'active'));
-$isSuspendedPatient = ($patientStatus === 'suspended');
 ?>
 
 
@@ -76,15 +74,11 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
                   <?php
                     $st = $status;
                     $cls = in_array($st, ['approved','pending','rejected','cancelled','completed']) ? $st : 'pending';
-                    if ($st === 'completed') {
-                      $statusLabel = 'Completed';
-                    } elseif ($rescheduleStatus === 'accepted') {
-                      $statusLabel = 'Reschedule accepted';
-                    } else {
-                      $statusLabel = $a->status ?? '';
-                    }
                   ?>
-                  <span class="status <?= $cls ?>"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
+                  <span class="status <?= $cls ?>"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <?php if ($rescheduleStatus === 'accepted'): ?>
+                    <div class="status-substate">Reschedule accepted</div>
+                  <?php endif; ?>
                 </td>
                 <td>
                   <?php if ($rescheduleStatus === 'pending_patient' && $proposedTime): ?>
@@ -111,21 +105,6 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
                     </a>
                   <?php elseif ($rescheduleStatus === 'declined'): ?>
                     <span class="badge badge-info">Reschedule declined</span>
-                  <?php elseif (strtolower($a->status) === 'approved'): ?>
-                    <?php if ($isSuspendedPatient): ?>
-                      <a
-                        href="#"
-                        class="join-consultation-btn suspended-join-btn"
-                        title="Double-click to see why joining is blocked"
-                        style="display: inline-block; padding: 8px 16px; background: #9ca3af; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: not-allowed;"
-                      >
-                        <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
-                      </a>
-                    <?php else: ?>
-                      <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="join-consultation-btn" style="display: inline-block; padding: 8px 16px; background: #4a90e2; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500;">
-                        <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
-                      </a>
-                    <?php endif; ?>
                   <?php else: ?>
                     <span class="no-action">-</span>
                   <?php endif; ?>
@@ -147,7 +126,7 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
         <span class="hint">Pick a doctor, date and time</span>
       </div>
 
-      <form id="apptForm" class="p-form" method="post" action="<?= URLROOT ?>/Appointments/book" data-patient-status="<?= htmlspecialchars($patientStatus) ?>">
+      <form id="apptForm" class="p-form" method="post" action="<?= URLROOT ?>/Appointments/book">
         <div class="form-grid">
           <div class="field">
             <label class="label" for="doctor_name">Doctor</label>
@@ -175,14 +154,7 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="btn-primary"
-          id="request-appointment-btn"
-          <?php echo $isSuspendedPatient ? 'disabled title="Suspended accounts cannot request appointments"' : ''; ?>
-        >
-          <?php echo $isSuspendedPatient ? 'Request Disabled (Suspended)' : 'Request'; ?>
-        </button>
+        <button type="submit" class="btn-primary">Request</button>
       </form>
       <script>
 (function(){
@@ -190,7 +162,6 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
   const idInput   = document.getElementById('doctor_id');
   const box       = document.getElementById('doctor_suggestions');
   const form      = document.getElementById('apptForm');
-  const patientStatus = (form?.dataset?.patientStatus || '').toLowerCase();
   let timer;
 
   function clearSuggestions(){
@@ -257,31 +228,12 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
 
   // Guard: require a selected doctor
   form.addEventListener('submit', function(e){
-    if(patientStatus === 'suspended'){
-      e.preventDefault();
-      alert('Your account is suspended. You cannot request appointments.');
-      return;
-    }
-
     if(!idInput.value){
       e.preventDefault();
       alert('Please select a doctor from the list.');
       nameInput.focus();
     }
   });
-
-  if (patientStatus === 'suspended') {
-    document.querySelectorAll('.suspended-join-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-      });
-
-      btn.addEventListener('dblclick', (e) => {
-        e.preventDefault();
-        alert('Your account is suspended. You cannot join consultations.');
-      });
-    });
-  }
 })();
 </script>
 

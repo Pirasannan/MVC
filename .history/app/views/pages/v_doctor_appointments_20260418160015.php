@@ -1,7 +1,6 @@
 <?php 
 require APPROOT.'/views/inc/header.php'; 
 $current_page = 'doctorAppointments';
-$doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
 ?>
 
 
@@ -67,13 +66,8 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                 </td>
                 <td>
                   <div class="actions">
-                    <?php if ($doctorStatus === 'suspended'): ?>
-                      <span class="btn btn-approve" aria-disabled="true" style="pointer-events:none;opacity:.55;">Approve</span>
-                      <span class="btn btn-reject" aria-disabled="true" style="pointer-events:none;opacity:.55;">Reject</span>
-                    <?php else: ?>
-                      <a class="btn btn-approve" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/approved">Approve</a>
-                      <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
-                    <?php endif; ?>
+                    <a class="btn btn-approve" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/approved">Approve</a>
+                    <a class="btn btn-reject"  href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/rejected">Reject</a>
                     <!-- Reschedule button / info -->
                     <?php if ($rescheduleStatus !== 'pending_patient'): ?>
                       <button type="button"
@@ -139,15 +133,9 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                 </td>
                 <td>
                   <div class="actions">
-                    <?php if ($doctorStatus === 'suspended'): ?>
-                      <span class="btn btn-start" aria-disabled="true" style="pointer-events:none;opacity:.55;">Start</span>
-                      <span class="btn btn-cancel" aria-disabled="true" style="pointer-events:none;opacity:.55;">Cancel</span>
-                      <span class="btn btn-complete" aria-disabled="true" style="pointer-events:none;opacity:.55;">Complete</span>
-                    <?php else: ?>
-                      <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="btn btn-start">Start</a>
-                      <a class="btn btn-cancel"   href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/cancelled">Cancel</a>
-                      <a class="btn btn-complete" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/completed">Complete</a>
-                    <?php endif; ?>
+                    <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="btn btn-start">Start</a>
+                    <a class="btn btn-cancel"   href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/cancelled">Cancel</a>
+                    <a class="btn btn-complete" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/completed">Complete</a>
                   </div>
                 </td>
               </tr>

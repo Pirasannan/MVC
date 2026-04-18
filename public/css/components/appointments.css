@@ -137,6 +137,9 @@
 .status.pending .dot {
   background: var(--warn);
 }
+.status.completed .dot {
+  background: var(--brand);
+}
 .status.rejected .dot,
 .status.cancelled .dot {
   background: var(--danger);
@@ -381,7 +384,14 @@
 .status .dot{ width:8px; height:8px; border-radius:50%; }
 .status.approved .dot{ background:var(--ok); }
 .status.pending .dot{ background:var(--warn); }
+.status.completed .dot{ background:var(--brand); }
 .status.rejected .dot, .status.cancelled .dot{ background:var(--danger); }
+.p-appt-table .status.completed{
+  color: var(--brand);
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+.p-appt-table .status.completed .dot{ background: var(--brand); }
 
 /* Booking form */
 .p-form{

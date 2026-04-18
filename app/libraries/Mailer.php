@@ -67,18 +67,18 @@ class Mailer
     }
 
     /**
-     * Send OTP email for Forgot Password.
+     * Send OTP email for Forgot Password or Registration.
      *
-     * @param string $toEmail  The user's registered email
-     * @param string $toName   The user's name (or email if name unknown)
-     * @param string $otp      The 6-digit OTP code
+     * @param string $toEmail  Recipient email
+     * @param string $toName   Recipient name
+     * @param string $otp      6-digit code
+     * @param string $type     'reset' or 'register'
      * @return bool
      */
-    public static function sendOtp(string $toEmail, string $toName, string $otp): bool
+    public static function sendOtp(string $toEmail, string $toName, string $otp, string $type = 'reset'): bool
     {
-        $subject = 'Your MediLink Password Reset Code';
-
-        $htmlBody = self::otpEmailTemplate($toName, $otp);
+        $subject = ($type === 'register') ? 'Verify Your MediLink Account' : 'Your MediLink Password Reset Code';
+        $htmlBody = self::otpEmailTemplate($toName, $otp, $type);
 
         return self::send($toEmail, $toName, $subject, $htmlBody);
     }
@@ -106,16 +106,21 @@ class Mailer
     /**
      * OTP Email Template — styled, professional HTML email.
      */
-    private static function otpEmailTemplate(string $name, string $otp): string
+    private static function otpEmailTemplate(string $name, string $otp, string $type = 'reset'): string
     {
         $year = date('Y');
+        $title = ($type === 'register') ? 'Account Verification' : 'Password Reset Request';
+        $mainText = ($type === 'register') 
+            ? 'Thank you for choosing MediLink. Use the verification code below to complete your registration and activate your account.'
+            : 'We received a request to reset your MediLink password. Use the verification code below to proceed with the reset.';
+
         return <<<HTML
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Password Reset OTP</title>
+            <title>{$title}</title>
         </head>
         <body style="margin:0;padding:0;background-color:#f5f7fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f7fa;padding:40px 20px;">
@@ -127,7 +132,7 @@ class Mailer
                             <tr>
                                 <td style="background:linear-gradient(135deg,#109CF1,#0b64f3);padding:32px 40px;text-align:center;">
                                     <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:-0.5px;">MediLink</h1>
-                                    <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">Password Reset Request</p>
+                                    <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">{$title}</p>
                                 </td>
                             </tr>
 
@@ -136,7 +141,7 @@ class Mailer
                                 <td style="padding:40px;">
                                     <p style="margin:0 0 16px;font-size:16px;color:#1a1a2e;">Hi <strong>{$name}</strong>,</p>
                                     <p style="margin:0 0 28px;font-size:15px;color:#555;line-height:1.6;">
-                                        We received a request to reset your MediLink password. Use the verification code below to proceed. This code is valid for <strong>15 minutes</strong>.
+                                        {$mainText} This code is valid for <strong>15 minutes</strong>.
                                     </p>
 
                                     <!-- OTP Box -->
@@ -152,7 +157,7 @@ class Mailer
                                     </table>
 
                                     <p style="margin:0 0 16px;font-size:14px;color:#777;line-height:1.6;">
-                                        If you didn't request this, you can safely ignore this email. Your password will not be changed.
+                                        If you didn't request this, you can safely ignore this email.
                                     </p>
                                     <p style="margin:0;font-size:14px;color:#777;">
                                         — The MediLink Team

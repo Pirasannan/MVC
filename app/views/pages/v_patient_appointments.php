@@ -124,14 +124,15 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
                     <span class="badge badge-info">Reschedule declined</span>
                   <?php elseif (strtolower($a->status) === 'approved'): ?>
                     <?php if ($isSuspendedPatient): ?>
-                      <a
-                        href="#"
-                        class="join-consultation-btn suspended-join-btn"
-                        title="Double-click to see why joining is blocked"
-                        style="display: inline-block; padding: 8px 16px; background: #9ca3af; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: not-allowed;"
+                      <button
+                        type="button"
+                        class="join-consultation-btn"
+                        title="Your account is suspended. You cannot join consultations."
+                        disabled
+                        style="display: inline-block; padding: 8px 16px; background: #9ca3af; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: not-allowed; border: none; opacity: 1;"
                       >
                         <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
-                      </a>
+                      </button>
                     <?php else: ?>
                       <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="join-consultation-btn" style="display: inline-block; padding: 8px 16px; background: #4a90e2; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500;">
                         <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
@@ -367,18 +368,6 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
     }
   });
 
-  if (patientStatus === 'suspended') {
-    document.querySelectorAll('.suspended-join-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-      });
-
-      btn.addEventListener('dblclick', (e) => {
-        e.preventDefault();
-        alert('Your account is suspended. You cannot join consultations.');
-      });
-    });
-  }
 })();
 
 function openCallReportModal(triggerBtn) {

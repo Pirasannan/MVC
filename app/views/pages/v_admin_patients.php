@@ -17,35 +17,6 @@
         <div class="dashboard-content">
             <!-- Content Sections Row -->
             <div class="content-sections">
-                <!-- Pending Verifications Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Pending Verifications</h2>
-                    </div>
-                    <div class="section-content">
-                        <?php $pendingPatients = $data['pendingPatients'] ?? []; ?>
-                        <?php if (!empty($pendingPatients)): ?>
-                            <?php foreach ($pendingPatients as $patient): ?>
-                                <div class="appointment-item">
-                                    <div class="appointment-info">
-                                        <div class="doctor-name"><?php echo htmlspecialchars($patient->name ?? ''); ?></div>
-                                        <div class="appointment-date">Email: <?php echo htmlspecialchars($patient->email ?? ''); ?></div>
-                                        <div class="prescribed-by">Joined: <?php echo htmlspecialchars($patient->created_at ?? ''); ?></div>
-                                    </div>
-                                    <div class="appointment-status">
-                                        <span class="status-badge pending">Pending Review</span>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="empty-state">No pending patient verifications.</p>
-                        <?php endif; ?>
-                    </div>
-                    <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminPatientVerification"><button class="action-button">Review Documents</button></a>
-                    </div>
-                </div>
-
                 <!-- Verified Patients Section -->
                 <div class="content-section">
                     <div class="section-header">
@@ -78,35 +49,6 @@
 
             <!-- Additional Content Sections Row -->
             <div class="content-sections">
-                <!-- Rejected Applications Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Rejected Applications</h2>
-                    </div>
-                    <div class="section-content">
-                        <?php $rejectedPatients = $data['rejectedPatients'] ?? []; ?>
-                        <?php if (!empty($rejectedPatients)): ?>
-                            <?php foreach ($rejectedPatients as $patient): ?>
-                                <div class="appointment-item">
-                                    <div class="appointment-info">
-                                        <div class="doctor-name"><?php echo htmlspecialchars($patient->name ?? ''); ?></div>
-                                        <div class="appointment-date">Email: <?php echo htmlspecialchars($patient->email ?? ''); ?></div>
-                                        <div class="prescribed-by">Updated: <?php echo htmlspecialchars($patient->updated_at ?? ''); ?></div>
-                                    </div>
-                                    <div class="appointment-status">
-                                        <span class="status-badge rejected">Rejected</span>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="empty-state">No rejected patient applications.</p>
-                        <?php endif; ?>
-                    </div>
-                    <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminRejectedPatients"><button class="action-button">View Rejection Details</button></a>
-                    </div>
-                </div>
-
                 <!-- Inactive/Suspended Patients Section -->
                 <div class="content-section">
                     <div class="section-header">

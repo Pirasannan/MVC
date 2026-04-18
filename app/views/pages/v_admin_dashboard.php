@@ -79,45 +79,6 @@
                         <a href="<?php echo URLROOT; ?>/Pages/adminDoctorVerification"><button class="action-button">View All Verifications</button></a>
                     </div>
                 </div>
-
-
-                <!-- Patient Verifications & Support Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Pending Patient Verifications</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Kamal Wickramasinghe</div>
-                                <div class="medication-details">Phone: +94 77 123 4567 | OTP Verified</div>
-                                <div class="prescribed-by">NIC document uploaded for review</div>
-                            </div>
-                            <div class="medication-date">2025-10-18</div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Priya Mendis</div>
-                                <div class="medication-details">Email: priya.m@email.com | OTP Verified</div>
-                                <div class="prescribed-by">NIC document uploaded for review</div>
-                            </div>
-                            <div class="medication-date">2025-10-17</div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Saman De Silva</div>
-                                <div class="medication-details">Phone: +94 71 987 6543 | OTP Verified</div>
-                                <div class="prescribed-by">NIC document uploaded for review</div>
-                            </div>
-                            <div class="medication-date">2025-10-17</div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminPatientVerification">
-                            <button class="action-button secondary">Review All Patients</button>
-                        </a>
-                    </div>
-                </div>
             </div>
             
             <!-- Additional Content Sections Row -->

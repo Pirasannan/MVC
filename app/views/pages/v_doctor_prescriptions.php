@@ -1,6 +1,8 @@
 <?php 
 require APPROOT.'/views/inc/header.php';
 $current_page = 'doctorPrescriptions';
+$doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
+$canCreatePrescription = ($doctorStatus === 'active');
 ?>
 
 
@@ -39,6 +41,13 @@ $current_page = 'doctorPrescriptions';
                 </div>
             <?php endif; ?>
 
+            <?php if (isset($_SESSION['flash'])): ?>
+                <div class="error-message" style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #ffeeba;">
+                    <?php echo htmlspecialchars($_SESSION['flash']); ?>
+                </div>
+                <?php unset($_SESSION['flash']); ?>
+            <?php endif; ?>
+
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <!-- Content Sections Row -->
@@ -49,9 +58,15 @@ $current_page = 'doctorPrescriptions';
                             <div class="section-header-content">
                                 <h2 class="section-title">Issued Prescriptions</h2>
                                 <div class="header-actions">
-                                    <a class="create-prescription-btn" href="<?php echo URLROOT; ?>/Pages/createprescription" >
-                                        <i class="fas fa-plus"></i> Create ePrescription
-                                    </a>
+                                    <?php if ($canCreatePrescription): ?>
+                                        <a class="create-prescription-btn" href="<?php echo URLROOT; ?>/Pages/createprescription" >
+                                            <i class="fas fa-plus"></i> Create ePrescription
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="create-prescription-btn" type="button" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                            <i class="fas fa-plus"></i> Create ePrescription (Disabled)
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

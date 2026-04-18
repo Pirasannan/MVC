@@ -81,6 +81,7 @@
         <div class="modal-footer">
             <button id="reactivateBtn" class="action-button">Reactivate</button>
             <button id="suspendBtn" class="action-button secondary">Suspend</button>
+            <button id="deactivateBtn" class="action-button secondary">Deactivate</button>
         </div>
     </div>
 </div>

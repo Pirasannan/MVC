@@ -113,10 +113,7 @@ $current_page = 'patientAppointments';
                             title="Report call"
                             data-appointment-id="<?= (int)$a->id ?>"
                             onclick="openCallReportModal(this)">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M4 4v16"></path>
-                        <path d="M4 4h11l-1 3 1 3H4"></path>
-                      </svg>
+                      <i class="fas fa-flag"></i>
                     </button>
                   <?php elseif ($rescheduleStatus === 'declined'): ?>
                     <span class="badge badge-info">Reschedule declined</span>
@@ -145,12 +142,12 @@ $current_page = 'patientAppointments';
           <label>Reason</label>
           <select name="reason" required>
             <option value="">Select a reason</option>
-            <option value="Abusive or offensive communication">Abusive or offensive communication</option>
-            <option value="Spam or unwanted call">Spam or unwanted call</option>
-            <option value="Technical issues (poor audio/video)">Technical issues (poor audio/video)</option>
-            <option value="Disruptive behavior during call">Disruptive behavior during call</option>
-            <option value="Call didn't follow agreed purpose">Call didn't follow agreed purpose</option>
-            <option value="Other">Other</option>
+            <option value="abuse">Abuse</option>
+            <option value="harassment">Harassment</option>
+            <option value="no-show">No-show</option>
+            <option value="fraud">Fraud</option>
+            <option value="technical issue">Technical issue</option>
+            <option value="something else">Something else</option>
           </select>
         </div>
 
@@ -168,45 +165,14 @@ $current_page = 'patientAppointments';
   </div>
 
   <style>
-  #callReportModal {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.45);
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-
-  #callReportModal .res-modal__content {
-    width: min(560px, calc(100% - 24px));
-    background: #fff;
-    border-radius: 12px;
-    padding: 18px;
-  }
-
-  #callReportModal .res-modal__row {
-    margin-top: 12px;
-  }
-
-  #callReportModal .res-modal__actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-  }
-
   .btn-report-call {
-    width: 30px;
-    height: 30px;
-    padding: 0;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: #b45309;
-  }
-
-  .btn-report-call svg {
-    display: block;
   }
 
   #callReportModal select,

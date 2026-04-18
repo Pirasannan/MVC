@@ -200,6 +200,12 @@ $apt = $data['appointment'];
             <label for="reportReason">Reason</label>
             <select id="reportReason" name="reason" required>
                 <option value="">Select a reason</option>
+                <option value="abuse">Abuse</option>
+                <option value="harassment">Harassment</option>
+                <option value="no-show">No-show</option>
+                <option value="fraud">Fraud</option>
+                <option value="technical issue">Technical issue</option>
+                <option value="something else">Something else</option>
             </select>
 
             <label for="reportDescription">Description (optional)</label>
@@ -365,23 +371,6 @@ function renderParticipantsSidebar(participants) {
                 </div>
                 <div class="ptcpt-debug">tracks:[${trackList}] | bound-video:${videoBindings.has(p.sessionId) ? 'YES' : 'NO'} | bound-audio:${audioBindings.has(p.sessionId) ? 'YES' : 'NO'}</div>
             </div>`;
-
-        const parsedParticipant = parseStreamUserId(p.userId || '');
-        if (!isLocal && parsedParticipant && parsedParticipant.id > 0) {
-            const body = card.querySelector('.ptcpt-body');
-            const actions = document.createElement('div');
-            actions.className = 'ptcpt-actions';
-
-            const reportBtn = document.createElement('button');
-            reportBtn.type = 'button';
-            reportBtn.className = 'ptcpt-report-btn';
-            reportBtn.textContent = 'Report user';
-            reportBtn.addEventListener('click', () => openUserReportModal(parsedParticipant.id));
-
-            actions.appendChild(reportBtn);
-            body.appendChild(actions);
-        }
-
         list.appendChild(card);
     });
 }
@@ -541,100 +530,6 @@ window.toggleChat         = () => document.getElementById('chatPanel').classList
 window.toggleNotes        = () => document.getElementById('notesPanel').classList.toggle('active');
 window.toggleParticipants = () => document.getElementById('participantsPanel').classList.toggle('active');
 window.saveNotes          = () => alert('Notes saved!');
-
-const reportModal = document.getElementById('reportModal');
-const reportForm = document.getElementById('reportForm');
-const reportScopeInput = document.getElementById('reportScope');
-const reportedUserInput = document.getElementById('reportedUserId');
-const reportModalTitle = document.getElementById('reportModalTitle');
-const reportReasonSelect = document.getElementById('reportReason');
-
-const USER_REPORT_REASONS = [
-    'Abuse or harassment',
-    'Fraud or scam',
-    'No-show / missed appointment',
-    'Inappropriate behavior',
-    'Fake profile',
-];
-
-const CALL_REPORT_REASONS = [
-    'Abusive or offensive communication',
-    'Spam or unwanted call',
-    'Technical issues (poor audio/video)',
-    'Disruptive behavior during call',
-    "Call didn't follow agreed purpose",
-    'Other',
-];
-
-function setReportReasonOptions(reportScope) {
-    const options = reportScope === 'user' ? USER_REPORT_REASONS : CALL_REPORT_REASONS;
-    reportReasonSelect.innerHTML = '<option value="">Select a reason</option>';
-    options.forEach((label) => {
-        const option = document.createElement('option');
-        option.value = label;
-        option.textContent = label;
-        reportReasonSelect.appendChild(option);
-    });
-}
-
-function openCallReportModal() {
-    reportScopeInput.value = 'call';
-    reportedUserInput.value = '';
-    reportModalTitle.textContent = 'Report Call';
-    setReportReasonOptions('call');
-    reportModal.style.display = 'flex';
-}
-
-function openUserReportModal(reportedUserId) {
-    reportScopeInput.value = 'user';
-    reportedUserInput.value = String(reportedUserId || '');
-    reportModalTitle.textContent = 'Report User';
-    setReportReasonOptions('user');
-    reportModal.style.display = 'flex';
-}
-
-function closeReportModal() {
-    reportForm.reset();
-    reportScopeInput.value = 'call';
-    reportedUserInput.value = '';
-    reportModal.style.display = 'none';
-}
-
-window.openCallReportModal = openCallReportModal;
-window.openUserReportModal = openUserReportModal;
-window.closeReportModal = closeReportModal;
-
-setReportReasonOptions('call');
-
-reportForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const payload = new URLSearchParams(new FormData(reportForm));
-
-    try {
-        const response = await fetch(REPORT_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: payload.toString(),
-        });
-
-        const result = await response.json();
-        if (!response.ok || !result.success) {
-            alert(result.message || 'Could not submit report.');
-            return;
-        }
-
-        alert(result.message || 'Report submitted.');
-        closeReportModal();
-    } catch (error) {
-        console.error('Report submission failed', error);
-        alert('Could not submit report. Please try again.');
-    }
-});
 
 init();
 </script>

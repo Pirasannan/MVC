@@ -280,8 +280,7 @@ class Pages extends Controller{
         }
 
         $data = [
-            'recentNotifications' => $this->adminModel->getRecentNotifications(5),
-            'resolvedReports' => $this->adminModel->getResolvedReports()
+            'recentNotifications' => $this->adminModel->getRecentNotifications(5)
         ];
 
         $this->view('pages/v_admin_notifications', $data);

@@ -200,6 +200,12 @@ $apt = $data['appointment'];
             <label for="reportReason">Reason</label>
             <select id="reportReason" name="reason" required>
                 <option value="">Select a reason</option>
+                <option value="abuse">Abuse</option>
+                <option value="harassment">Harassment</option>
+                <option value="no-show">No-show</option>
+                <option value="fraud">Fraud</option>
+                <option value="technical issue">Technical issue</option>
+                <option value="something else">Something else</option>
             </select>
 
             <label for="reportDescription">Description (optional)</label>
@@ -547,41 +553,11 @@ const reportForm = document.getElementById('reportForm');
 const reportScopeInput = document.getElementById('reportScope');
 const reportedUserInput = document.getElementById('reportedUserId');
 const reportModalTitle = document.getElementById('reportModalTitle');
-const reportReasonSelect = document.getElementById('reportReason');
-
-const USER_REPORT_REASONS = [
-    'Abuse or harassment',
-    'Fraud or scam',
-    'No-show / missed appointment',
-    'Inappropriate behavior',
-    'Fake profile',
-];
-
-const CALL_REPORT_REASONS = [
-    'Abusive or offensive communication',
-    'Spam or unwanted call',
-    'Technical issues (poor audio/video)',
-    'Disruptive behavior during call',
-    "Call didn't follow agreed purpose",
-    'Other',
-];
-
-function setReportReasonOptions(reportScope) {
-    const options = reportScope === 'user' ? USER_REPORT_REASONS : CALL_REPORT_REASONS;
-    reportReasonSelect.innerHTML = '<option value="">Select a reason</option>';
-    options.forEach((label) => {
-        const option = document.createElement('option');
-        option.value = label;
-        option.textContent = label;
-        reportReasonSelect.appendChild(option);
-    });
-}
 
 function openCallReportModal() {
     reportScopeInput.value = 'call';
     reportedUserInput.value = '';
     reportModalTitle.textContent = 'Report Call';
-    setReportReasonOptions('call');
     reportModal.style.display = 'flex';
 }
 
@@ -589,7 +565,6 @@ function openUserReportModal(reportedUserId) {
     reportScopeInput.value = 'user';
     reportedUserInput.value = String(reportedUserId || '');
     reportModalTitle.textContent = 'Report User';
-    setReportReasonOptions('user');
     reportModal.style.display = 'flex';
 }
 
@@ -603,8 +578,6 @@ function closeReportModal() {
 window.openCallReportModal = openCallReportModal;
 window.openUserReportModal = openUserReportModal;
 window.closeReportModal = closeReportModal;
-
-setReportReasonOptions('call');
 
 reportForm.addEventListener('submit', async (event) => {
     event.preventDefault();

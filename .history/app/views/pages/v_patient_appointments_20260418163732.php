@@ -113,10 +113,7 @@ $current_page = 'patientAppointments';
                             title="Report call"
                             data-appointment-id="<?= (int)$a->id ?>"
                             onclick="openCallReportModal(this)">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M4 4v16"></path>
-                        <path d="M4 4h11l-1 3 1 3H4"></path>
-                      </svg>
+                      <i class="fas fa-flag"></i>
                     </button>
                   <?php elseif ($rescheduleStatus === 'declined'): ?>
                     <span class="badge badge-info">Reschedule declined</span>
@@ -195,18 +192,13 @@ $current_page = 'patientAppointments';
   }
 
   .btn-report-call {
-    width: 30px;
-    height: 30px;
-    padding: 0;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: #b45309;
-  }
-
-  .btn-report-call svg {
-    display: block;
   }
 
   #callReportModal select,

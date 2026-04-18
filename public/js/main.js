@@ -581,9 +581,18 @@ class PatientVerificationManager {
         document.getElementById('modal-patient-name').textContent = item.dataset.patientName
         document.getElementById('modal-patient-email').textContent = item.dataset.patientEmail
         document.getElementById('modal-patient-created').textContent = item.dataset.patientCreated
+        const currentStatus = item.dataset.patientStatus || 'inactive'
         const statusElement = document.getElementById('modal-patient-status')
         if (statusElement) {
-          statusElement.textContent = item.dataset.patientStatus || 'inactive'
+          statusElement.textContent = currentStatus
+        }
+
+        if (this.suspendBtn) {
+          this.suspendBtn.style.display = currentStatus === 'suspended' ? 'none' : 'inline-block'
+        }
+
+        if (this.deactivateBtn) {
+          this.deactivateBtn.style.display = currentStatus === 'suspended' ? 'inline-block' : 'none'
         }
 
         this.modal.style.display = 'block'

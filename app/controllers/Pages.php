@@ -583,11 +583,7 @@ class Pages extends Controller{
             return redirect('Pages/index');
         }
 
-        $data = [
-            'pendingPatients' => $this->adminModel->getPendingPatients()
-        ];
-
-        $this->view('pages/v_admin_patient_verification', $data);
+        return redirect('Pages/adminPatients');
     }
 
     public function adminAllPatients() {

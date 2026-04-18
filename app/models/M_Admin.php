@@ -87,6 +87,13 @@ class M_Admin {
 		return $this->db->resultSet();
 	}
 
+    public function getUnverifiedDoctors() {
+        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY created_at DESC');
+        $this->db->bind(':role', 'Doctor');
+        $this->db->bind(':status', 'unverified');
+        return $this->db->resultSet();
+    }
+
 	public function getVerifiedDoctors() {
 		$this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
 		$this->db->bind(':role', 'Doctor');

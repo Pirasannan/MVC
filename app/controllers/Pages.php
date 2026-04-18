@@ -260,8 +260,28 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
+        $pendingVerifications = $this->verificationModel->getPendingDoctorVerificationsForAdmin();
+        $unverifiedDoctors = $this->adminModel->getUnverifiedDoctors();
+        $pendingDoctorsMap = [];
+
+        foreach ($pendingVerifications as $doctor) {
+            $doctorKey = $doctor->user_id ?? $doctor->email ?? null;
+            if ($doctorKey === null) {
+                continue;
+            }
+            $pendingDoctorsMap[$doctorKey] = $doctor;
+        }
+
+        foreach ($unverifiedDoctors as $doctor) {
+            $doctorKey = $doctor->id ?? $doctor->email ?? null;
+            if ($doctorKey === null || isset($pendingDoctorsMap[$doctorKey])) {
+                continue;
+            }
+            $pendingDoctorsMap[$doctorKey] = $doctor;
+        }
+
         $data = [
-            'pendingDoctors' => $this->verificationModel->getPendingDoctorVerificationsForAdmin(),
+            'pendingDoctors' => array_values($pendingDoctorsMap),
             'verifiedDoctors' => $this->adminModel->getVerifiedDoctors(),
             'rejectedDoctors' => $this->adminModel->getRejectedDoctors(),
             'inactiveDoctors' => $this->adminModel->getInactiveDoctors()
@@ -275,8 +295,28 @@ class Pages extends Controller{
             return redirect('Pages/index');
         }
 
+        $pendingVerifications = $this->verificationModel->getPendingDoctorVerificationsForAdmin();
+        $unverifiedDoctors = $this->adminModel->getUnverifiedDoctors();
+        $pendingVerificationsMap = [];
+
+        foreach ($pendingVerifications as $doctor) {
+            $doctorKey = $doctor->user_id ?? $doctor->email ?? null;
+            if ($doctorKey === null) {
+                continue;
+            }
+            $pendingVerificationsMap[$doctorKey] = $doctor;
+        }
+
+        foreach ($unverifiedDoctors as $doctor) {
+            $doctorKey = $doctor->id ?? $doctor->email ?? null;
+            if ($doctorKey === null || isset($pendingVerificationsMap[$doctorKey])) {
+                continue;
+            }
+            $pendingVerificationsMap[$doctorKey] = $doctor;
+        }
+
         $data = [
-            'pendingVerifications' => $this->verificationModel->getPendingDoctorVerificationsForAdmin()
+            'pendingVerifications' => array_values($pendingVerificationsMap)
         ];
 
         $this->view('pages/v_admin_doctor_verification', $data);

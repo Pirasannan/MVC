@@ -252,8 +252,20 @@ class DoctorVerificationManager {
           statusElement.className = 'status-badge ' + (this.currentDoctorStatus === 'inactive' ? 'confirmed' : 'rejected')
         }
 
+        const documentLink = document.getElementById('modal-doctor-document-link')
+        const hasDocument = !!item.dataset.doctorDocument
+        const isVerificationModal = !!documentLink
+
         if (this.approveBtn) {
-          this.approveBtn.style.display = this.currentDoctorStatus === 'suspended' ? 'inline-flex' : 'none'
+          if (isVerificationModal) {
+            this.approveBtn.style.display = hasDocument ? 'inline-flex' : 'none'
+          } else {
+            this.approveBtn.style.display = this.currentDoctorStatus === 'suspended' ? 'inline-flex' : 'none'
+          }
+        }
+
+        if (this.rejectBtn && isVerificationModal) {
+          this.rejectBtn.style.display = hasDocument ? 'inline-flex' : 'none'
         }
 
         if (this.reactivateBtn) {
@@ -268,9 +280,8 @@ class DoctorVerificationManager {
           this.deactivateBtn.style.display = this.currentDoctorStatus === 'inactive' ? 'none' : 'inline-flex'
         }
 
-        const documentLink = document.getElementById('modal-doctor-document-link')
         if (documentLink) {
-          if (item.dataset.doctorDocument) {
+          if (hasDocument) {
             documentLink.href = window.location.origin + '/MVC/' + item.dataset.doctorDocument
             documentLink.style.pointerEvents = 'auto'
             documentLink.style.opacity = '1'

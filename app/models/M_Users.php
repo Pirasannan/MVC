@@ -370,4 +370,16 @@ class M_Users
         $this->db->bind(':email', $email);
         return $this->db->execute();
     }
+
+    public function updateUserStatus($userId, $status) {
+        $this->db->query("UPDATE users SET status = :status WHERE id = :id");
+        $this->db->bind(':status', $status);
+        $this->db->bind(':id', $userId);
+        
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

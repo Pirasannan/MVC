@@ -91,13 +91,14 @@
 }
 
 .dashboard-container.admin .admin-details-card {
-    padding: 18px;
+    padding: 24px;
 }
 
 .dashboard-container.admin .details-title {
-    margin: 0 0 12px;
+    margin: 0 0 16px;
     color: #1f2937;
-    font-size: 28px;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .dashboard-container.admin .details-table {

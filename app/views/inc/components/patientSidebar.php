@@ -29,7 +29,6 @@
 
         <div class="sidebar-bottom nav-menu">
             <a href="<?php echo URLROOT; ?>/Users/logout" class="nav-item-bottom" id="logoutBtn">Logout</a>
-            <a href="<?php echo URLROOT; ?>/Pages/patientSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
         </div>
         <?php require APPROOT.'/views/inc/components/logoutPopup.php'; ?>
 

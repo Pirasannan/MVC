@@ -1,114 +1,198 @@
 <?php 
-    require APPROOT.'/views/inc/header.php'; 
-    $current_page = 'adminProfile';
+require APPROOT.'/views/inc/header.php'; 
+$current_page = 'adminProfile';
+?>
+<link rel='stylesheet' href='<?php echo URLROOT; ?>/css/components/profile/admin_profile.css'>
+
+<?php
+$profileImagePath = trim((string)($data['profile_image'] ?? ($_SESSION['user_profile_image'] ?? '')));
+$profileImagePath = str_replace('\\', '/', $profileImagePath);
+$profileImagePath = preg_replace('#/+#', '/', $profileImagePath);
+$profileImagePath = ltrim($profileImagePath, '/');
+$profileImageUrl = $profileImagePath !== '' ? URLROOT . '/' . $profileImagePath : '';
 ?>
 
-<div class="dashboard-container">
-    <!-- Sidebar Navigation -->
+<div class="dashboard-container admin">
     <?php require APPROOT.'/views/inc/components/adminSidebar.php'; ?>
 
-    <!-- Main Content Area -->
     <main class="main-content">
-        <!-- Top Header -->
         <?php require APPROOT.'/views/inc/components/adminHeader.php'; ?>
 
-
-        <!-- Dashboard Content -->
         <div class="dashboard-content">
-            <!-- Content Sections Row -->
-            <div class="content-sections">
-                <!-- Personal Information Section -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Personal Information</h2>
+            <?php if (!empty($data['profile_success'])): ?>
+                <div class="profile-message success"><?php echo htmlspecialchars($data['profile_success']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['profile_image_success'])): ?>
+                <div class="profile-message success"><?php echo htmlspecialchars($data['profile_image_success']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['profile_image_err'])): ?>
+                <div class="profile-message error"><?php echo htmlspecialchars($data['profile_image_err']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['name_err'])): ?>
+                <div class="profile-message error"><?php echo htmlspecialchars($data['name_err']); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['email_err'])): ?>
+                <div class="profile-message error"><?php echo htmlspecialchars($data['email_err']); ?></div>
+            <?php endif; ?>
+
+            <div class="admin-profile-layout">
+                <div class="admin-profile-card">
+                    <div class="profile-avatar-wrap">
+                        <img
+                            src="<?php echo htmlspecialchars($profileImageUrl); ?>"
+                            alt="Profile picture"
+                            class="profile-avatar-image <?php echo $profileImageUrl !== '' ? '' : 'is-hidden'; ?>"
+                            onerror="this.classList.add('is-hidden'); if(this.nextElementSibling){ this.nextElementSibling.classList.remove('is-hidden'); }"
+                        >
+                        <div class="profile-avatar-circle <?php echo $profileImageUrl !== '' ? 'is-hidden' : ''; ?>"><?php echo strtoupper(substr(trim($data['admin_name']), 0, 1)); ?></div>
                     </div>
-                    <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Full Name</div>
-                                <div class="appointment-date">
-                                    <input type="text" value="John Smith" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Admin ID</div>
-                                <div class="appointment-date">
-                                    <input type="text" value="23545" disabled style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px; background: #f5f5f5;">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Email Address</div>
-                                <div class="appointment-date">
-                                    <input type="email" value="john.smith@medilife.com" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Phone Number</div>
-                                <div class="appointment-date">
-                                    <input type="text" value="+94 77 123 4567" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #e0e0e0; border-radius: 4px;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminProfileUpdate"><button class="action-button">Update Information</button></a>
-                    </div>
+                    <h3 class="admin-name"><?php echo htmlspecialchars($data['admin_name']); ?></h3>
+                    <p class="admin-role"><?php echo htmlspecialchars($data['role']); ?></p>
+                    <button type="button" class="action-button primary profile-edit-btn" id="open-admin-profile-edit-modal-btn">Edit Profile</button>
                 </div>
 
-            <!-- Additional Content Sections Row -->
-            <div class="content-sections">
-                <!-- Admin Activity Log Section -->
-                <div class="content-section full-width">
-                    <div class="section-header">
-                        <h2 class="section-title">Recent Activity</h2>
+                <div class="admin-details-card">
+                    <h3 class="details-title">Personal Information</h3>
+                    <div class="details-table">
+                        <div class="details-row"><span>Email</span><span><?php echo htmlspecialchars($data['admin_email']); ?></span></div>
+                        <div class="details-row"><span>Admin ID</span><span>#<?php echo htmlspecialchars($data['admin_id']); ?></span></div>
+                        <div class="details-row"><span>Role</span><span><span class="status-badge admin"><?php echo htmlspecialchars($data['role']); ?></span></span></div>
+                        <div class="details-row"><span>Account Status</span><span><span class="status-badge active"><?php echo htmlspecialchars(ucfirst($data['status'])); ?></span></span></div>
                     </div>
-                    <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Doctor Verification Approved</div>
-                                <div class="appointment-date">Approved: Dr. Sunil Jayawardena</div>
-                                <div class="prescribed-by">Action performed: 2025-10-18 at 10:15 AM</div>
+                </div>
+            </div>
+
+            <div class="content-section admin-activity-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Activities</h2>
+                </div>
+                <div class="section-content activity-list">
+                    <?php if (!empty($data['recent_activity'])): ?>
+                        <?php foreach ($data['recent_activity'] as $activity): ?>
+                            <?php
+                                $status = strtolower($activity->status ?? 'completed');
+                                $timeValue = $activity->timestamp ?? null;
+                                $formattedTime = $timeValue ? date('M d, Y h:i A', strtotime($timeValue)) : '-';
+                            ?>
+                            <div class="activity-item">
+                                <div class="activity-info">
+                                    <div class="activity-title"><?php echo htmlspecialchars($activity->action ?? 'Activity'); ?></div>
+                                    <div class="activity-details"><?php echo htmlspecialchars($activity->details ?? ''); ?></div>
+                                    <div class="activity-date"><?php echo htmlspecialchars($formattedTime); ?></div>
+                                </div>
+                                <div class="activity-status-wrap">
+                                    <span class="status-badge <?php echo htmlspecialchars($status); ?>"><?php echo htmlspecialchars(ucfirst($status)); ?></span>
+                                </div>
                             </div>
-                            <div class="appointment-status">
-                                <span class="status-badge confirmed">Completed</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">System Notification Sent</div>
-                                <div class="appointment-date">Recipients: All Users</div>
-                                <div class="prescribed-by">Action performed: 2025-10-18 at 9:45 AM</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge confirmed">Completed</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Patient Account Suspended</div>
-                                <div class="appointment-date">Suspended: Yasmin Fonseka</div>
-                                <div class="prescribed-by">Action performed: 2025-10-17 at 4:30 PM</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge scheduled">Completed</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminActivityLog">
-                            <button class="action-button">View Full Activity Log</button>
-                        </a>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="empty-activity">No recent activity available.</div>
+                    <?php endif; ?>
+                </div>
+                <div class="section-footer">
+                    <a href="<?php echo URLROOT; ?>/Pages/adminActivityLog">
+                        <button class="action-button secondary">View Full Activity Log</button>
+                    </a>
                 </div>
             </div>
         </div>
     </main>
+
+    <div class="modal-overlay <?php echo (!empty($data['name_err']) || !empty($data['email_err']) || !empty($data['profile_image_err'])) ? 'active' : ''; ?>" id="admin-profile-edit-modal-overlay">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="admin-profile-edit-modal-title">
+            <div class="modal-header">
+                <h3 id="admin-profile-edit-modal-title">Edit Personal Information</h3>
+                <button type="button" class="modal-close" id="close-admin-profile-edit-modal-btn" aria-label="Close">&times;</button>
+            </div>
+
+            <form action="<?php echo URLROOT; ?>/Pages/adminProfile" method="POST" enctype="multipart/form-data" class="modal-form upload-form">
+                <input type="hidden" name="form_type" value="update_profile_image">
+
+                <div class="modal-field">
+                    <label for="admin_profile_image">Profile Image (JPG/PNG)</label>
+                    <input type="file" id="admin_profile_image" name="profile_image" class="profile-input" accept="image/jpeg,image/jpg,image/png" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="action-button secondary">Upload Picture</button>
+                </div>
+            </form>
+
+            <form action="<?php echo URLROOT; ?>/Pages/adminProfile" method="POST" class="modal-form">
+                <input type="hidden" name="form_type" value="update_profile_details">
+
+                <div class="modal-field">
+                    <label for="admin_user_name">Full Name</label>
+                    <input
+                        type="text"
+                        id="admin_user_name"
+                        name="user_name"
+                        value="<?php echo htmlspecialchars($data['admin_name']); ?>"
+                        class="profile-input <?php echo !empty($data['name_err']) ? 'is-invalid' : ''; ?>"
+                        required
+                    >
+                </div>
+
+                <div class="modal-field">
+                    <label for="admin_user_email">Email Address</label>
+                    <input
+                        type="email"
+                        id="admin_user_email"
+                        name="user_email"
+                        value="<?php echo htmlspecialchars($data['admin_email']); ?>"
+                        class="profile-input <?php echo !empty($data['email_err']) ? 'is-invalid' : ''; ?>"
+                        required
+                    >
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="action-button primary">Save Changes</button>
+                    <button type="button" class="action-button" id="cancel-admin-profile-edit-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const openButton = document.getElementById('open-admin-profile-edit-modal-btn');
+    const closeButton = document.getElementById('close-admin-profile-edit-modal-btn');
+    const cancelButton = document.getElementById('cancel-admin-profile-edit-modal-btn');
+    const modal = document.getElementById('admin-profile-edit-modal-overlay');
+
+    if (!modal || !openButton) {
+        return;
+    }
+
+    const openModal = function () {
+        modal.classList.add('active');
+    };
+
+    const closeModal = function () {
+        modal.classList.remove('active');
+    };
+
+    openButton.addEventListener('click', openModal);
+
+    if (closeButton) {
+        closeButton.addEventListener('click', closeModal);
+    }
+
+    if (cancelButton) {
+        cancelButton.addEventListener('click', closeModal);
+    }
+
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+});
+</script>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

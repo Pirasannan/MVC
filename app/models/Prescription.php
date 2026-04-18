@@ -157,6 +157,19 @@ public function softDeletePrescription($id, $doctor_id) {
         error_log('Prescription soft delete error: ' . $e->getMessage());
         return false;
     }
-}
+}    public function getRecentPrescriptionsByPatient($patient_id) {
+        $this->db->query('
+            SELECT p.*, d.name AS doctor_name, u.name AS patient_name
+            FROM prescriptions p
+            INNER JOIN Users d ON p.doctor_id = d.id
+            INNER JOIN Users u ON p.patient_id = u.id
+            WHERE p.patient_id = :patient_id 
+            AND p.is_deleted = "not_deleted"
+            AND p.created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+            ORDER BY p.created_at DESC
+        ');
+        $this->db->bind(':patient_id', $patient_id);
+        return $this->db->resultSet();
+    }
 }
 ?>

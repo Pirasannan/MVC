@@ -11,8 +11,14 @@ define('DB_NAME', 'mvc_db');
 //APP ROOT
 define('APPROOT', dirname(dirname(__FILE__)));
 
+
 //URL ROOT
-define('URLROOT', 'http://localhost/MVC');
+//comment out the hardcoded URLROOT and use dynamic URLROOT instead
+//define('URLROOT','http://localhost/MVC' );
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+define('URLROOT', $scheme . '://' . $host . '/MVC');
+
 
 //WEBSITENAME
 define('SITENAME', 'MediLink');

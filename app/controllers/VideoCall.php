@@ -1,23 +1,28 @@
 <?php
 require_once APPROOT . '/libraries/StreamToken.php';
 
-class VideoCall extends Controller {
+class VideoCall extends Controller
+{
 
     private $apModel;
+    private $usersModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->apModel = $this->model('Appointment');
+        $this->usersModel = $this->model('M_Users');
     }
 
     // ── Pre-call screen ──────────────────────────────────────────────────────
     // URL: /VideoCall/precall/{appointmentId}
-    public function precall($appointmentId = null) {
+    public function precall($appointmentId = null)
+    {
         $role = $_SESSION['user_role'] ?? null;
         if (!in_array($role, ['doctor', 'patient'], true)) {
             return redirect('Pages/index');
         }
 
-        $appointmentId = (int)$appointmentId;
+        $appointmentId = (int) $appointmentId;
         $apt = $this->apModel->findWithNames($appointmentId);
 
         if (!$apt || strtolower($apt->status) !== 'approved') {
@@ -26,9 +31,11 @@ class VideoCall extends Controller {
         }
 
         // Ownership check
-        $userId = (int)$_SESSION['user_id'];
-        if ($role === 'doctor'  && (int)$apt->doctor_id  !== $userId) return redirect('Pages/index');
-        if ($role === 'patient' && (int)$apt->patient_id !== $userId) return redirect('Pages/index');
+        $userId = (int) $_SESSION['user_id'];
+        if ($role === 'doctor' && (int) $apt->doctor_id !== $userId)
+            return redirect('Pages/index');
+        if ($role === 'patient' && (int) $apt->patient_id !== $userId)
+            return redirect('Pages/index');
 
         $view = $role === 'doctor'
             ? 'pages/Videoconsultation/v_doctor_precall'
@@ -39,13 +46,14 @@ class VideoCall extends Controller {
 
     // ── Live call room ───────────────────────────────────────────────────────
     // URL: /VideoCall/room/{appointmentId}
-    public function room($appointmentId = null) {
+    public function room($appointmentId = null)
+    {
         $role = $_SESSION['user_role'] ?? null;
         if (!in_array($role, ['doctor', 'patient'], true)) {
             return redirect('Pages/index');
         }
 
-        $appointmentId = (int)$appointmentId;
+        $appointmentId = (int) $appointmentId;
         $apt = $this->apModel->findWithNames($appointmentId);
 
         if (!$apt || strtolower($apt->status) !== 'approved') {
@@ -53,21 +61,24 @@ class VideoCall extends Controller {
             return redirect($role === 'doctor' ? 'Appointments/doctor' : 'Appointments/my');
         }
 
-        $userId = (int)$_SESSION['user_id'];
-        if ($role === 'doctor'  && (int)$apt->doctor_id  !== $userId) return redirect('Pages/index');
-        if ($role === 'patient' && (int)$apt->patient_id !== $userId) return redirect('Pages/index');
+        $userId = (int) $_SESSION['user_id'];
+        if ($role === 'doctor' && (int) $apt->doctor_id !== $userId)
+            return redirect('Pages/index');
+        if ($role === 'patient' && (int) $apt->patient_id !== $userId)
+            return redirect('Pages/index');
 
-        $streamUserId = (string)$userId;
-        $userName     = $_SESSION['user_name'] ?? ($role === 'doctor' ? $apt->doctor_name : $apt->patient_name);
+        $streamUserId = (string) $userId;
+        $userName = $_SESSION['user_name'] ?? ($role === 'doctor' ? $apt->doctor_name : $apt->patient_name);
 
         $data = [
-            'appointment'    => $apt,
+            'appointment' => $apt,
             'stream_api_key' => STREAM_API_KEY,
-            'stream_token'   => StreamToken::generate($streamUserId),
-            'call_id'        => 'appointment_' . $appointmentId,
+            'stream_token' => StreamToken::generate($streamUserId),
+            'call_id' => 'appointment_' . $appointmentId,
             'stream_user_id' => $streamUserId,
             'stream_user_name' => htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'),
-            'is_doctor'      => ($role === 'doctor'),
+            'is_doctor' => ($role === 'doctor'),
+            'patients' => ($role === 'doctor') ? $this->usersModel->getPatients() : [],
         ];
 
         $view = $role === 'doctor'

@@ -585,7 +585,19 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_doctor_dashboard', []);
+
+        $appointmentModel = $this->model('Appointment');
+        $doctor_id = $_SESSION['user_id'];
+
+        $todaysAppointments = $appointmentModel->getTodaysAppointmentsByDoctor($doctor_id);
+        $upcomingAppointments = $appointmentModel->getUpcomingAppointmentsByDoctor($doctor_id);
+
+        $data = [
+            'todays_appointments_count' => count($todaysAppointments),
+            'upcoming_appointments' => $upcomingAppointments
+        ];
+
+        $this->view('pages/v_doctor_dashboard', $data);
     }
 
     public function doctorPrescriptions() {
@@ -785,7 +797,22 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_patient_dashboard', []);
+
+        $appointmentModel = $this->model('Appointment');
+        $prescriptionModel = $this->model('Prescription');
+        $patient_id = $_SESSION['user_id'];
+
+        $todaysAppointments = $appointmentModel->getTodaysAppointmentsByPatient($patient_id);
+        $recentPrescriptions = $prescriptionModel->getRecentPrescriptionsByPatient($patient_id);
+        $upcomingAppointments = $appointmentModel->getUpcomingAppointmentsByPatient($patient_id);
+
+        $data = [
+            'todays_appointments_count' => count($todaysAppointments),
+            'recent_prescriptions_count' => count($recentPrescriptions),
+            'upcoming_appointments' => $upcomingAppointments
+        ];
+
+        $this->view('pages/v_patient_dashboard', $data);
     }
 
     public function patientPrescriptions() {

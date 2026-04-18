@@ -289,22 +289,22 @@
     align-items: center;
 }
 
-.report-flag-btn {
-    border: 1px solid #f59e0b;
-    background: #fffbeb;
-    color: #92400e;
-    border-radius: 999px;
-    font-size: 11px;
+.report-user-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
     font-weight: 600;
-    padding: 4px 10px;
+    color: #ffffff;
+    background: #dc2626;
     cursor: pointer;
 }
 
-.report-flag-btn:hover:not(:disabled) {
-    background: #fef3c7;
+.report-user-btn:hover:not(:disabled) {
+    background: #b91c1c;
 }
 
-.report-flag-btn:disabled {
+.report-user-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }

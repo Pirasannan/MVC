@@ -49,7 +49,7 @@
                     </div>
                 </div>
                 <div class="chat-header-right">
-                    <button type="button" class="report-flag-btn" id="reportUserBtn" disabled>Report User</button>
+                    <button type="button" class="report-user-btn" id="reportUserBtn" disabled>Report User</button>
                 </div>
             </div>
 

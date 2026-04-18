@@ -166,6 +166,12 @@ class Appointments extends Controller
             return redirect('Appointments/my');
         }
 
+        $doctorStatus = strtolower((string)$this->userModel->getUserStatusById($doctor_id));
+        if ($doctorStatus !== 'active') {
+            $_SESSION['flash'] = 'Selected doctor is unavailable for appointments.';
+            return redirect('Appointments/my');
+        }
+
         // Fixed duration: 15 minutes
         $dtEndLocal = $dtStartLocal->modify('+15 minutes');
 

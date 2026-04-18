@@ -836,6 +836,7 @@ class Pages extends Controller{
         $doctor_id = $_SESSION['user_id'] ?? null;
         $prescriptions = [];
         $patient_name = null;
+        $doctor_status = strtolower((string)$this->userModel->getUserStatusById((int)$doctor_id));
         
         if ($doctor_id) {
             $prescriptions = $prescriptionModel->getPrescriptionsByDoctor($doctor_id);
@@ -852,7 +853,8 @@ class Pages extends Controller{
         $this->view('pages/v_doctor_prescriptions', [
             'title' => 'My Issued Prescriptions',
             'prescriptions' => $prescriptions,
-            'patient_name' => $patient_name
+            'patient_name' => $patient_name,
+            'doctor_status' => $doctor_status
         ]);
     }
 
@@ -897,6 +899,7 @@ class Pages extends Controller{
         $data = [
             'user_id' => $_SESSION['user_id'],
             'user_name' => $_SESSION['user_name'],
+            'user_status' => $this->userModel->getUserStatusById($_SESSION['user_id']),
             'conversations' => $mockConversations
         ];
         
@@ -1047,6 +1050,19 @@ class Pages extends Controller{
     public function createprescription() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor'){
             redirect('Pages/index');
+            return;
+        }
+
+        $doctorStatus = strtolower((string)$this->userModel->getUserStatusById((int)($_SESSION['user_id'] ?? 0)));
+        if ($doctorStatus === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. You cannot create prescriptions.';
+            redirect('Users/logout');
+            return;
+        }
+
+        if ($doctorStatus === 'suspended') {
+            $_SESSION['flash'] = 'Your account is suspended. You cannot create prescriptions.';
+            redirect('Pages/doctorPrescriptions');
             return;
         }
         

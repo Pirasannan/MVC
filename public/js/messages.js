@@ -11,7 +11,7 @@ let eligibleContacts = [];
 let conversationsCache = [];
 let sidebarSearchTerm = '';
 let selectedAttachmentFile = null;
-let activeMessageActionsId = null;
+let messagingDisabled = false;
 
 // Initialize messaging when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -30,9 +30,11 @@ function initializeMessaging() {
     // Get user info from page data
     const userIdElement = document.querySelector('[data-user-id]');
     const userTypeElement = document.querySelector('[data-user-type]');
+    const messageContainer = document.querySelector('.message-container');
     
     if (userIdElement) currentUserId = userIdElement.dataset.userId;
     if (userTypeElement) currentUserType = userTypeElement.dataset.userType;
+    messagingDisabled = !!(messageContainer && messageContainer.dataset && messageContainer.dataset.messagingDisabled === '1');
 
     // Setup event listeners
     setupEventListeners();
@@ -238,10 +240,20 @@ function createEligibleContactItem(contact) {
     const button = div.querySelector('.start-chat-btn');
     button.addEventListener('click', (event) => {
         event.stopPropagation();
+        if (messagingDisabled) {
+            alert('Your account is suspended or deactivated. Messaging is disabled.');
+            return;
+        }
         startChatWithUser(contact.user_id);
     });
 
-    div.addEventListener('click', () => startChatWithUser(contact.user_id));
+    div.addEventListener('click', () => {
+        if (messagingDisabled) {
+            alert('Your account is suspended or deactivated. Messaging is disabled.');
+            return;
+        }
+        startChatWithUser(contact.user_id);
+    });
     return div;
 }
 
@@ -316,6 +328,11 @@ function showNoConversations() {
 
 // Select a conversation
 async function selectConversation(conversationId, userId, previewUser = null) {
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
+
     selectedConversationId = conversationId;
     lastMessageId = 0;
     
@@ -400,7 +417,6 @@ function displayMessages(messages) {
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.innerHTML = '';
     lastMessageId = 0;
-    hideMessageActions();
     
     if (!messages || messages.length === 0) {
         showEmptyMessages();
@@ -497,39 +513,9 @@ function createMessageBubble(message) {
                 handleDeleteMessage(message);
             });
         }
-
-        if (canManageMessage) {
-            div.addEventListener('contextmenu', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                showMessageActions(div, messageId);
-            });
-        }
     }
     
     return div;
-}
-
-function showMessageActions(messageBubble, messageId) {
-    if (!messageBubble || !messageId) {
-        return;
-    }
-
-    const openedBubble = document.querySelector('.message-bubble.message-actions-open');
-    if (openedBubble && openedBubble !== messageBubble) {
-        openedBubble.classList.remove('message-actions-open');
-    }
-
-    messageBubble.classList.add('message-actions-open');
-    activeMessageActionsId = String(messageId);
-}
-
-function hideMessageActions() {
-    const openedBubble = document.querySelector('.message-bubble.message-actions-open');
-    if (openedBubble) {
-        openedBubble.classList.remove('message-actions-open');
-    }
-    activeMessageActionsId = null;
 }
 
 function parseMessagePayload(rawMessage) {
@@ -612,6 +598,11 @@ function renderAttachmentMarkup(attachment) {
 }
 
 function handleEditMessage(message) {
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
+
     const currentPayload = parseMessagePayload(message.message);
     const currentText = currentPayload.text || '';
     const newText = window.prompt('Edit message', currentText);
@@ -631,6 +622,11 @@ function handleEditMessage(message) {
 
 async function updateMessage(messageId, messageText) {
     if (!messageId || !selectedConversationId) {
+        return;
+    }
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
         return;
     }
 
@@ -658,6 +654,11 @@ async function updateMessage(messageId, messageText) {
 }
 
 function handleDeleteMessage(message) {
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
+
     const confirmed = window.confirm('Delete this message?');
     if (!confirmed) {
         return;
@@ -668,6 +669,11 @@ function handleDeleteMessage(message) {
 
 async function deleteMessage(messageId) {
     if (!messageId || !selectedConversationId) {
+        return;
+    }
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
         return;
     }
 
@@ -702,31 +708,8 @@ function setMessageActionsDisabled(messageBubble, disabled) {
     });
 }
 
-document.addEventListener('click', (event) => {
-    const openedBubble = document.querySelector('.message-bubble.message-actions-open');
-    if (!openedBubble) return;
-
-    if (!openedBubble.contains(event.target)) {
-        hideMessageActions();
-    }
-});
-
-document.addEventListener('contextmenu', (event) => {
-    const bubble = event.target.closest('.message-bubble');
-    if (!bubble) {
-        hideMessageActions();
-    }
-});
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        hideMessageActions();
-    }
-});
-
 // Show empty messages state
 function showEmptyMessages() {
-    hideMessageActions();
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #8696a0; text-align: center;">
@@ -743,6 +726,11 @@ async function sendMessage() {
     const messageInput = document.getElementById('messageInput');
     const rawMessageText = messageInput.value;
     const messageText = rawMessageText.trim();
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
+        return;
+    }
     
     // Validation: Check if conversation is selected
     if (!selectedConversationId) {
@@ -1006,6 +994,11 @@ function searchConversations(event) {
 // Start chat with selected eligible user (creates conversation if needed)
 async function startChatWithUser(recipientId) {
     if (!recipientId) {
+        return;
+    }
+
+    if (messagingDisabled) {
+        alert('Your account is suspended or deactivated. Messaging is disabled.');
         return;
     }
 

@@ -161,6 +161,15 @@ class Users extends Controller {
                 $loggeduser = $this->userModel->login($data['email'], $data['password']);
 
                 if($loggeduser){
+                    $role = strtolower($loggeduser->role ?? '');
+                    $status = strtolower($loggeduser->status ?? 'active');
+
+                    if(($role === 'patient' || $role === 'doctor') && $status === 'inactive'){
+                        $data['password_err'] = 'Your account is deactivated. Please contact admin.';
+                        $this->view('users/v_login', $data);
+                        return;
+                    }
+
                     //user is authenticated
 
                     $this->userModel->logLoginEvent($loggeduser->id, $loggeduser->email, true, '', $ipAddress, $userAgent);
@@ -202,6 +211,8 @@ class Users extends Controller {
         $_SESSION['user_email'] = $user->email;
         $_SESSION['user_role'] = strtolower($user->role ?? '');
         $_SESSION['user_slmc'] = $user->slmc ?? null;
+        $_SESSION['user_status'] = strtolower($user->status ?? 'active');
+        $_SESSION['user_profile_image'] = $this->userModel->getUserProfileImage($user->id);
 
 
         //Role based sessions
@@ -226,6 +237,7 @@ class Users extends Controller {
         unset($_SESSION['user_id']);
         unset($_SESSION['user_name']);
         unset($_SESSION['user_email']);
+        unset($_SESSION['user_profile_image']);
 
         session_destroy();
 

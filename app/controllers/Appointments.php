@@ -2,15 +2,41 @@
 class Appointments extends Controller
 {
     private $apModel;
+    private $userModel;
     public function __construct()
     {
         $this->apModel = $this->model('Appointment');
+        $this->userModel = $this->model('M_Users');
+    }
+
+    private function getCurrentPatientStatus()
+    {
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            return null;
+        }
+
+        return strtolower((string)$this->userModel->getUserStatusById((int)$_SESSION['user_id']));
+    }
+
+    private function getCurrentDoctorStatus()
+    {
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return null;
+        }
+
+        return strtolower((string)$this->userModel->getUserStatusById((int)$_SESSION['user_id']));
     }
 
     // PATIENT
     public function my()
     {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') return redirect('Pages/index');
+
+        $status = $this->getCurrentPatientStatus();
+        if ($status === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+            return redirect('Users/logout');
+        }
 
         $appointments = $this->apModel->getByPatient($_SESSION['user_id']);
 
@@ -24,7 +50,8 @@ class Appointments extends Controller
 
         $data = [
             'appointments' => $appointments,
-            'pending_reschedules' => $pendingReschedules
+            'pending_reschedules' => $pendingReschedules,
+            'patient_status' => $status ?: 'active'
         ];
         $this->view('pages/v_patient_appointments', $data);
     }
@@ -35,9 +62,10 @@ class Appointments extends Controller
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor')
             return redirect('Pages/index');
 
-        $pending   = $this->apModel->getByDoctor($_SESSION['user_id'], 'pending');
-        $approved  = $this->apModel->getByDoctor($_SESSION['user_id'], 'approved');
-        $completed = $this->apModel->getByDoctor($_SESSION['user_id'], 'completed');
+        $doctorStatus = $this->getCurrentDoctorStatus();
+
+        $pending  = $this->apModel->getByDoctor($_SESSION['user_id'], 'pending');
+        $approved = $this->apModel->getByDoctor($_SESSION['user_id'], 'approved');
 
 
 
@@ -91,11 +119,11 @@ class Appointments extends Controller
         /* ===== END CALENDAR BLOCK ===== */
 
         $data = [
-            'pending'   => $pending,
-            'approved'  => $approved,
-            'completed' => $completed,
-            'flash'     => $_SESSION['flash'] ?? null,
-            'cal'       => $cal, // pass to view
+            'pending'  => $pending,
+            'approved' => $approved,
+            'flash'    => $_SESSION['flash'] ?? null,
+            'cal'      => $cal, // pass to view
+            'doctor_status' => $doctorStatus ?: 'active',
         ];
         unset($_SESSION['flash']);
 
@@ -111,6 +139,16 @@ class Appointments extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') return redirect('Appointments/my');
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') return redirect('Pages/index');
+
+        $status = $this->getCurrentPatientStatus();
+        if ($status === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+            return redirect('Users/logout');
+        }
+        if ($status === 'suspended') {
+            $_SESSION['flash'] = 'Your account is suspended. You cannot book appointments.';
+            return redirect('Appointments/my');
+        }
 
         $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
@@ -164,6 +202,16 @@ class Appointments extends Controller
     {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') return redirect('Pages/index');
 
+        $doctorStatus = $this->getCurrentDoctorStatus();
+        if ($doctorStatus === 'inactive') {
+            $_SESSION['flash'] = 'Your account is deactivated. Please contact admin.';
+            return redirect('Users/logout');
+        }
+        if ($doctorStatus === 'suspended') {
+            $_SESSION['flash'] = 'Your account is suspended. You cannot manage appointments.';
+            return redirect('Appointments/doctor');
+        }
+
         $id = (int)$id;
         $new = strtolower($new);
 
@@ -182,6 +230,13 @@ class Appointments extends Controller
     {
         // Only patients should call this (optional but good)
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            http_response_code(403);
+            echo json_encode([]);
+            return;
+        }
+
+        $status = $this->getCurrentPatientStatus();
+        if ($status !== 'active') {
             http_response_code(403);
             echo json_encode([]);
             return;
@@ -245,6 +300,12 @@ class Appointments extends Controller
             return redirect('Pages/index');
         }
 
+        $status = $this->getCurrentPatientStatus();
+        if ($status !== 'active') {
+            $_SESSION['flash'] = 'Your account is not allowed to manage appointments right now.';
+            return redirect('Appointments/my');
+        }
+
         $id = (int)$id;
         $ok = $this->apModel->patientAcceptReschedule($id, $_SESSION['user_id']);
 
@@ -262,6 +323,12 @@ class Appointments extends Controller
     {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
             return redirect('Pages/index');
+        }
+
+        $status = $this->getCurrentPatientStatus();
+        if ($status !== 'active') {
+            $_SESSION['flash'] = 'Your account is not allowed to manage appointments right now.';
+            return redirect('Appointments/my');
         }
 
         $id = (int)$id;

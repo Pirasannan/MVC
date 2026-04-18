@@ -195,5 +195,23 @@ class M_Verification {
         
         return $this->db->resultSet();
     }
+
+    /**
+     * Get pending doctor verifications for admin review.
+     * Returns only doctors who have uploaded a document and are pending review.
+     * @return array
+     */
+    public function getPendingDoctorVerificationsForAdmin(){
+        $this->db->query('SELECT dv.*, u.name as user_name, u.email as user_email, u.status as account_status
+                         FROM doctor_verifications dv
+                         INNER JOIN Users u ON dv.user_id = u.id
+                         WHERE dv.verification_status = :status
+                         AND LOWER(u.role) = :role
+                         ORDER BY dv.uploaded_at DESC');
+        $this->db->bind(':status', 'pending');
+        $this->db->bind(':role', 'doctor');
+
+        return $this->db->resultSet();
+    }
 }
 ?>

@@ -3,6 +3,165 @@
     padding: 24px;
 }
 
+.dashboard-container.patient .dashboard-content {
+    padding-top: 12px;
+}
+
+.profile-message {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-message.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.profile-message.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.profile-image-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.patient-profile-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.patient-profile-card,
+.patient-details-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.patient-profile-card {
+    padding: 20px;
+    text-align: center;
+}
+
+.profile-avatar-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.profile-avatar-circle {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 700;
+    overflow: hidden;
+}
+
+.profile-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.patient-name {
+    margin: 14px 0 2px;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.patient-role {
+    margin: 0 0 14px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile-edit-btn {
+    width: 100%;
+}
+
+.patient-details-card {
+    padding: 16px;
+}
+
+.details-title {
+    margin: 0 0 12px;
+    color: #1f2937;
+    font-size: 30px;
+}
+
+.details-table {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.details-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.details-row:last-child {
+    border-bottom: none;
+}
+
+.details-row > span {
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #1f2937;
+}
+
+.details-row > span:first-child {
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+    border-right: 1px solid #f3f4f6;
+}
+
+.profile-image-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 230px;
+}
+
+.profile-image-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.profile-file-input {
+    width: 100%;
+    font-size: 13px;
+    color: #374151;
+}
+
+.profile-image-actions {
+    display: flex;
+    justify-content: flex-start;
+}
+
 /* Simple Profile Information Items - Like other dashboards */
 .profile-info-item {
     display: flex;
@@ -26,6 +185,197 @@
     font-weight: 500;
     color: #1f2937;
     font-size: 14px;
+}
+
+.name-update-form {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.profile-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.profile-form-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.profile-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #1f2937;
+    background: #ffffff;
+}
+
+.profile-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+
+.profile-input.is-invalid {
+    border-color: #ef4444;
+}
+
+.field-error {
+    color: #b91c1c;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.name-update-actions {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.medical-table-wrapper {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.medical-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.medical-table th,
+.medical-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+.medical-table th {
+    width: 180px;
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.medical-table td {
+    color: #1f2937;
+}
+
+.medical-table tr:last-child th,
+.medical-table tr:last-child td {
+    border-bottom: none;
+}
+
+.deferred-note {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1200;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-card {
+    width: min(780px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 20px 50px rgba(17, 24, 39, 0.25);
+    padding: 18px 18px 16px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1f2937;
+}
+
+.modal-close {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 12px;
+    margin-top: 12px;
+}
+
+.modal-form.upload-form {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.modal-field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.textarea-input {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
 }
 
 /* Simple Status Badges */
@@ -114,4 +464,60 @@
 .setting-description {
     color: #6b7280;
     font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .patient-profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-name,
+    .details-title {
+        font-size: 24px;
+    }
+
+    .details-row {
+        grid-template-columns: 1fr;
+    }
+
+    .details-row > span:first-child {
+        border-right: none;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .profile-image-form {
+        min-width: 100%;
+        width: 100%;
+    }
+
+    .modal-field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .name-update-actions,
+    .modal-actions {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+
+    .name-update-actions .action-button,
+    .modal-actions .action-button {
+        width: 100%;
+    }
+
+    .medical-table th,
+    .medical-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .medical-table th {
+        border-bottom: none;
+        padding-bottom: 6px;
+    }
+
+    .medical-table td {
+        padding-top: 0;
+    }
 }

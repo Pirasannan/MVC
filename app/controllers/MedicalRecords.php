@@ -46,10 +46,12 @@ class MedicalRecords extends Controller {
             redirect('Pages/index');
         }
 
-        // Currently returning empty or all records for future sharing implementation
+        $doctor_id = $_SESSION['user_id'];
+        $records = $this->recordsModel->getSharedRecordsForDoctor($doctor_id);
+
         $data = [
-            'records' => [],
-            'current_page' => 'doctorMedicalrecords' // Retained for sidebar active state
+            'records' => $records,
+            'current_page' => 'doctorMedicalrecords'
         ];
 
         $this->view('pages/v_doctor_medicalrecords', $data);
@@ -285,17 +287,24 @@ class MedicalRecords extends Controller {
 
     // VIEW OR DOWNLOAD
     public function view_file($id, $action = 'view') {
-        if ($_SESSION['user_role'] !== 'patient') {
-            die('Unauthorized');
-        }
+        $user_id = $_SESSION['user_id'];
+        $role = $_SESSION['user_role'];
+        $record = null;
 
-        $patient_id = $_SESSION['user_id'];
-        $record = $this->recordsModel->getRecordById($id, $patient_id);
+        if ($role === 'patient') {
+            $record = $this->recordsModel->getRecordById($id, $user_id);
+        } elseif ($role === 'doctor') {
+            // Check if record is shared with this doctor
+            if ($this->recordsModel->isRecordSharedWith($id, $user_id)) {
+                $record = $this->recordsModel->getRecordByIdOnly($id);
+            }
+        }
 
         if (!$record) {
-            die('Record not found.');
+            die('Unauthorized or Record not found.');
         }
 
+        $patient_id = $record->patient_id;
         $filePath = APPROOT . '/../public/uploads/medical_records/' . $patient_id . '/' . $record->file_name;
 
         if (!file_exists($filePath)) {
@@ -318,5 +327,47 @@ class MedicalRecords extends Controller {
     // API Wrapper for download Action
     public function download($id) {
         $this->view_file($id, 'download');
+    }
+
+    // AJAX: Search for active doctors
+    public function search_doctors() {
+        if ($_SESSION['user_role'] !== 'patient') {
+            http_response_code(403);
+            return;
+        }
+
+        $term = trim($_GET['term'] ?? '');
+        $doctors = $this->recordsModel->getActiveDoctors($term);
+        echo json_encode($doctors);
+    }
+
+    // AJAX: Share a record with a doctor
+    public function share() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $_SESSION['user_role'] !== 'patient') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $recordId = $_POST['record_id'] ?? null;
+        $doctorId = $_POST['doctor_id'] ?? null;
+
+        if (!$recordId || !$doctorId) {
+            echo json_encode(['success' => false, 'message' => 'Missing information']);
+            return;
+        }
+
+        // Verify patient owns the record
+        $record = $this->recordsModel->getRecordById($recordId, $_SESSION['user_id']);
+        if (!$record) {
+            echo json_encode(['success' => false, 'message' => 'Record not found or access denied']);
+            return;
+        }
+
+        if ($this->recordsModel->shareRecord($recordId, $doctorId)) {
+            echo json_encode(['success' => true, 'message' => 'Record successfully shared']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to share record']);
+        }
     }
 }

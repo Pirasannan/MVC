@@ -29,6 +29,13 @@ class M_MedicalRecords {
         return $this->db->single();
     }
 
+    // Get a single record without ownership check (used for shared access)
+    public function getRecordByIdOnly($id) {
+        $this->db->query('SELECT * FROM medical_records WHERE id = :id');
+        $this->db->bind(':id', $id);
+        return $this->db->single();
+    }
+
     // Create a new record
     public function createRecord($data) {
         $this->db->query('
@@ -140,5 +147,77 @@ class M_MedicalRecords {
         }
 
         return $stats;
+    }
+
+    // --- SHARING LOGIC ---
+
+    private function ensureSharedTable() {
+        $this->db->query("
+            CREATE TABLE IF NOT EXISTS `shared_medical_records` (
+                `id`            INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `record_id`     INT(10) UNSIGNED NOT NULL,
+                `doctor_id`     INT(10) UNSIGNED NOT NULL,
+                `shared_at`     DATETIME         DEFAULT CURRENT_TIMESTAMP,
+                INDEX `idx_record_id` (`record_id`),
+                INDEX `idx_doctor_id` (`doctor_id`),
+                UNIQUE KEY `unique_share` (`record_id`, `doctor_id`),
+                CONSTRAINT `fk_shared_medical_record`
+                    FOREIGN KEY (`record_id`) REFERENCES `medical_records`(`id`) ON DELETE CASCADE,
+                CONSTRAINT `fk_shared_doctor`
+                    FOREIGN KEY (`doctor_id`) REFERENCES `Users`(`id`) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ");
+        $this->db->execute();
+    }
+
+    public function shareRecord($recordId, $doctorId) {
+        $this->ensureSharedTable();
+        $this->db->query('
+            INSERT IGNORE INTO shared_medical_records (record_id, doctor_id) 
+            VALUES (:record_id, :doctor_id)
+        ');
+        $this->db->bind(':record_id', $recordId);
+        $this->db->bind(':doctor_id', $doctorId);
+        return $this->db->execute();
+    }
+
+    public function getSharedRecordsForDoctor($doctorId) {
+        $this->ensureSharedTable();
+        $this->db->query('
+            SELECT mr.*, u.name as patient_name 
+            FROM medical_records mr
+            JOIN shared_medical_records smr ON mr.id = smr.record_id
+            JOIN Users u ON mr.patient_id = u.id
+            WHERE smr.doctor_id = :doctor_id
+            ORDER BY smr.shared_at DESC
+        ');
+        $this->db->bind(':doctor_id', $doctorId);
+        return $this->db->resultSet();
+    }
+
+    public function getActiveDoctors($searchTerm = '') {
+        $sql = "SELECT id, name, email FROM Users WHERE role = 'doctor' AND status = 'active'";
+        if (!empty($searchTerm)) {
+            $sql .= " AND (name LIKE :search OR email LIKE :search)";
+        }
+        $sql .= " LIMIT 10";
+
+        $this->db->query($sql);
+        if (!empty($searchTerm)) {
+            $this->db->bind(':search', '%' . $searchTerm . '%');
+        }
+        return $this->db->resultSet();
+    }
+
+    public function isRecordSharedWith($recordId, $doctorId) {
+        $this->ensureSharedTable();
+        $this->db->query('
+            SELECT id FROM shared_medical_records 
+            WHERE record_id = :record_id AND doctor_id = :doctor_id
+        ');
+        $this->db->bind(':record_id', $recordId);
+        $this->db->bind(':doctor_id', $doctorId);
+        $this->db->single();
+        return $this->db->rowCount() > 0;
     }
 }

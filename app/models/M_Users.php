@@ -16,12 +16,13 @@ class M_Users
         }
         
         public function register($data){
-            $this->db->query('INSERT INTO Users(role, name, email, password, slmc) VALUES (:role, :name, :email, :password, :slmc)');
+            $this->db->query('INSERT INTO Users(role, name, email, password, slmc, status) VALUES (:role, :name, :email, :password, :slmc, :status)');
             $this->db->bind(':role', $data['role']);
             $this->db->bind(':name',$data['name']);
             $this->db->bind(':email',$data['email']);
             $this->db->bind(':password',$data['password']);
             $this->db->bind(':slmc', $data['slmc'] ?? null);
+            $this->db->bind(':status', $data['status'] ?? 'active');
 
         if ($this->db->execute()) {
             return true;

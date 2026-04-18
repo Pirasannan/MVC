@@ -83,15 +83,37 @@ class Users extends Controller {
                 return;
             }
 
-            // If we reach here, all validations passed - register the user
-            //Hash the password
+            // If we reach here, all validations passed
+            // Hash the password now
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
                 
-            //Register the user
-            if($this->userModel->register($data)){
-                redirect('Users/login');
+            // Save registration data in session for post-OTP persistence
+            $_SESSION['temp_registration_data'] = [
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'role' => $data['role'],
+                'slmc' => $data['slmc'],
+                'password' => $data['password']
+            ];
+
+            // Generate OTP
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $expiresAt = date('Y-m-d H:i:s', time() + 15 * 60); // 15 mins
+
+            // Save OTP to DB
+            if($this->userModel->saveOtp($data['email'], $otp, $expiresAt)){
+                // Send OTP via email
+                $mailSent = Mailer::sendOtp($data['email'], $data['name'], $otp, 'register');
+
+                if($mailSent){
+                    $_SESSION['registration_otp_email'] = $data['email'];
+                    redirect('Users/verifyRegistrationOtp');
+                } else {
+                    $data['email_err'] = 'Failed to send verification email. Please try again.';
+                    $this->view('users/v_register', $data);
+                }
             } else {
-                die('Something went wrong');
+                die('Something went wrong. Please try again.');
             }
         }
         else {
@@ -539,7 +561,60 @@ class Users extends Controller {
             $this->view('users/v_verify_security_otp', $data);
         }
     }
+    /**
+     * Verify Registration OTP and Finalize Account Creation
+     */
+    public function verifyRegistrationOtp(){
+        if(empty($_SESSION['registration_otp_email']) || empty($_SESSION['temp_registration_data'])){
+            redirect('Users/register');
+            return;
+        }
 
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $otp = trim($_POST['otp'] ?? '');
+            $email = $_SESSION['registration_otp_email'];
+
+            $data = ['otp' => $otp, 'otp_err' => ''];
+
+            if($this->userModel->verifyOtp($email, $otp)){
+                // OTP is valid
+                $this->userModel->markOtpUsed($email, $otp);
+                
+                // Get the stored registration data
+                $regData = $_SESSION['temp_registration_data'];
+                
+                // Set status based on role
+                // admin, patient status - active
+                // doctor status - unverified
+                $role = strtolower($regData['role']);
+                if($role === 'doctor'){
+                    $regData['status'] = 'unverified';
+                } else {
+                    $regData['status'] = 'active';
+                }
+
+                // Finalize registration in DB
+                if($this->userModel->register($regData)){
+                    // Clear temporary data
+                    unset($_SESSION['registration_otp_email']);
+                    unset($_SESSION['temp_registration_data']);
+                    
+                    // Redirect to login with success message
+                    $_SESSION['registration_success'] = true;
+                    redirect('Users/login');
+                } else {
+                    die('Something went wrong during account creation.');
+                }
+            } else {
+                $data['otp_err'] = 'Invalid or expired OTP. Please check your email and try again.';
+                $this->view('users/v_verify_registration_otp', $data);
+            }
+        } else {
+            $data = ['otp' => '', 'otp_err' => ''];
+            $this->view('users/v_verify_registration_otp', $data);
+        }
+    }
 
 
 }

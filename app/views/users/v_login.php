@@ -16,6 +16,13 @@
     <?php unset($_SESSION['password_reset_success']); ?>
   <?php endif; ?>
 
+  <?php if (!empty($_SESSION['registration_success'])): ?>
+    <div class="otp-success-notice" role="alert">
+      Registration successful! You can now log in to your account.
+    </div>
+    <?php unset($_SESSION['registration_success']); ?>
+  <?php endif; ?>
+
 
   <form action="<?php echo URLROOT; ?>/Users/login" method="POST" class="form" novalidate>
     <div class="form-group <?php echo (!empty($data['email_err'])) ? 'error' : ''; ?>">
@@ -64,5 +71,4 @@
 
 </script>
 
-<?php require APPROOT . '/views/inc/footer.php'; ?>
 <?php require APPROOT . '/views/inc/footer.php'; ?>

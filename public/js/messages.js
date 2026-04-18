@@ -67,6 +67,44 @@ function setupEventListeners() {
     if (sendButton) {
         sendButton.addEventListener('click', sendMessage);
     }
+
+    const messagesDisplay = document.getElementById('messagesDisplay');
+    if (messagesDisplay) {
+        messagesDisplay.addEventListener('click', (event) => {
+            // Keep action buttons interactive without toggling the bubble state.
+            if (event.target.closest('.message-action-btn')) {
+                return;
+            }
+
+            const clickedBubble = event.target.closest('.message-bubble.sent');
+            if (!clickedBubble || !messagesDisplay.contains(clickedBubble)) {
+                closeAllMessageActionMenus();
+                return;
+            }
+
+            const hasActions = !!clickedBubble.querySelector('.message-actions');
+            const wasOpen = clickedBubble.classList.contains('show-actions');
+
+            closeAllMessageActionMenus();
+
+            if (hasActions && !wasOpen) {
+                clickedBubble.classList.add('show-actions');
+            }
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('#messagesDisplay')) {
+            return;
+        }
+        closeAllMessageActionMenus();
+    });
+}
+
+function closeAllMessageActionMenus() {
+    document.querySelectorAll('.message-bubble.show-actions').forEach((bubble) => {
+        bubble.classList.remove('show-actions');
+    });
 }
 
 // Setup attachment chooser and preview handlers
@@ -328,11 +366,6 @@ function showNoConversations() {
 
 // Select a conversation
 async function selectConversation(conversationId, userId, previewUser = null) {
-    if (messagingDisabled) {
-        alert('Your account is suspended or deactivated. Messaging is disabled.');
-        return;
-    }
-
     selectedConversationId = conversationId;
     lastMessageId = 0;
     
@@ -477,11 +510,11 @@ function createMessageBubble(message) {
     const text = parsed.text || '';
     const attachmentHtml = attachment ? renderAttachmentMarkup(attachment) : '';
     const messageId = message.message_id !== undefined && message.message_id !== null ? String(message.message_id) : '';
-    const canManageMessage = isSent && !isPending && messageId && !messageId.startsWith('temp-');
-    const actionButtonsHtml = isSent ? `
+    const canManageMessage = isSent && !isPending && messageId && !messageId.startsWith('temp-') && !messagingDisabled;
+    const actionButtonsHtml = canManageMessage ? `
         <div class="message-actions">
-            <button type="button" class="message-action-btn message-edit-btn" ${canManageMessage ? '' : 'disabled'}>Edit</button>
-            <button type="button" class="message-action-btn message-delete-btn" ${canManageMessage ? '' : 'disabled'}>Delete</button>
+            <button type="button" class="message-action-btn message-edit-btn">Edit</button>
+            <button type="button" class="message-action-btn message-delete-btn">Delete</button>
         </div>
     ` : '';
     

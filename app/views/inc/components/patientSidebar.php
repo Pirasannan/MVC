@@ -27,7 +27,7 @@
             ?>
         </nav>
 
-        <div class="sidebar-bottom nav-menu">
+        <div class="sidebar-bottom">
             <a href="<?php echo URLROOT; ?>/Users/logout" class="nav-item-bottom" id="logoutBtn">Logout</a>
         </div>
         <?php require APPROOT.'/views/inc/components/logoutPopup.php'; ?>

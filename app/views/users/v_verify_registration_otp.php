@@ -28,8 +28,11 @@
         <button type="submit" class="submit-button">Verify & Create Account</button>
 
         <div class="single_acc_link">
-            <p class="resend-text">Didn't receive the code? <a class="forgot_pass"
-                    href="<?php echo URLROOT; ?>/Users/register">Go Back to Register</a></p>
+            <a class="resend-otp" href="<?php echo URLROOT; ?>/Users/resendRegistrationOtp">Resend OTP</a>
+        </div>
+
+        <div class="single_acc_link">
+            <a class="forgot_pass" href="<?php echo URLROOT; ?>/Users/register">Cancel</a>
         </div>
 
     </form>
@@ -39,7 +42,7 @@
     // ── 5-minute countdown ────
     (function () {
         const timerEl = document.getElementById('otpTimer');
-        const redirectTo = '<?php echo URLROOT; ?>/Users/register';
+        const redirectTo = <?php echo json_encode(URLROOT . '/Users/register'); ?>;
         if (!timerEl) return;
 
         let totalSeconds = 5 * 60; // 5 minutes

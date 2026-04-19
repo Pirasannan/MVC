@@ -1,4 +1,8 @@
-<?php require APPROOT . '/views/inc/header.php'; ?>
+<?php
+require APPROOT . '/views/inc/header.php';
+$role = $_SESSION['user_role'] ?? 'patient';
+$cancelUrl = URLROOT . '/Pages/' . $role . 'Profile';
+?>
 
 <div class="form_container">
     <div class="logo">
@@ -27,9 +31,13 @@
         <button type="submit" class="submit-button">Confirm Identification</button>
 
         <div class="single_acc_link">
-            <a class="forgot_pass"
+            <a class="resend-otp"
                 href="<?php echo URLROOT; ?>/Users/securityOtp?action=<?php echo $_SESSION['security_action']; ?>">Resend
                 OTP</a>
+        </div>
+
+        <div class="single_acc_link">
+            <a class="forgot_pass" href="<?php echo htmlspecialchars($cancelUrl, ENT_QUOTES, 'UTF-8'); ?>">Cancel</a>
         </div>
 
     </form>
@@ -39,8 +47,7 @@
     // ── 5-minute countdown ────
     (function () {
         const timerEl = document.getElementById('otpTimer');
-        const role = '<?php echo $_SESSION['user_role'] ?? 'patient'; ?>';
-        const redirectTo = '<?php echo URLROOT; ?>/Pages/' + role + 'Profile';
+        const redirectTo = '<?php echo htmlspecialchars($cancelUrl, ENT_QUOTES, 'UTF-8'); ?>';
         if (!timerEl) return;
 
         let totalSeconds = 5 * 60; // 5 minutes

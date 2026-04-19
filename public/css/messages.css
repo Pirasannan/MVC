@@ -487,12 +487,13 @@
 
 .message-input-area {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     flex-shrink: 0;
     gap: 10px;
     padding: 12px 14px;
     border-top: 1px solid var(--msg-line);
     background: var(--msg-surface);
+    --message-control-height: 40px;
 }
 
 .attach-button,
@@ -504,6 +505,7 @@
     font-weight: 600;
     cursor: pointer;
     flex-shrink: 0;
+    height: var(--message-control-height);
 }
 
 .attach-button {
@@ -523,6 +525,8 @@
 .input-wrapper {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
 }
 
 .message-input {
@@ -532,6 +536,7 @@
     padding: 10px 12px;
     font-size: 0.9rem;
     resize: none;
+    min-height: var(--message-control-height);
     max-height: 100px;
     outline: none;
     line-height: 1.35;

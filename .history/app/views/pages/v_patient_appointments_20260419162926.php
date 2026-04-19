@@ -68,12 +68,6 @@ $getDoctorStatusReason = static function ($appointment): string {
 
     foreach ($list as $appointment) {
       $startsAt = (string)($appointment->starts_at ?? '');
-      $status = strtolower((string)($appointment->status ?? ''));
-
-      if (in_array($status, ['rejected', 'cancelled', 'completed'], true)) {
-        $pastAppointments[] = $appointment;
-        continue;
-      }
 
       if ($startsAt === '') {
         $upcomingAppointments[] = $appointment;

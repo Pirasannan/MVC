@@ -68,12 +68,6 @@ $getDoctorStatusReason = static function ($appointment): string {
 
     foreach ($list as $appointment) {
       $startsAt = (string)($appointment->starts_at ?? '');
-      $status = strtolower((string)($appointment->status ?? ''));
-
-      if (in_array($status, ['rejected', 'cancelled', 'completed'], true)) {
-        $pastAppointments[] = $appointment;
-        continue;
-      }
 
       if ($startsAt === '') {
         $upcomingAppointments[] = $appointment;
@@ -92,7 +86,7 @@ $getDoctorStatusReason = static function ($appointment): string {
       }
     }
 
-    $renderAppointmentTable = static function (array $appointments, string $emptyMessage, bool $allowJoinConsultation = true) use ($formatLocalDateTime, $getDoctorStatusReason, $isSuspendedPatient): void {
+    $renderAppointmentTable = static function (array $appointments, string $emptyMessage) use ($formatLocalDateTime, $getDoctorStatusReason, $isSuspendedPatient): void {
   ?>
     <?php if (empty($appointments)): ?>
       <div class="p-empty"><?= htmlspecialchars($emptyMessage) ?></div>
@@ -157,7 +151,7 @@ $getDoctorStatusReason = static function ($appointment): string {
                          onclick="return confirm('Decline this reschedule proposal?')">Decline</a>
                     </div>
                   </div>
-                <?php elseif ($status === 'approved' && $allowJoinConsultation): ?>
+                <?php elseif ($status === 'approved'): ?>
                   <?php if ($isSuspendedPatient): ?>
                     <button
                       type="button"
@@ -278,7 +272,7 @@ $getDoctorStatusReason = static function ($appointment): string {
         <h3>Upcoming</h3>
         <span class="hint">Your scheduled sessions</span>
       </div>
-      <?php $renderAppointmentTable($upcomingAppointments, 'No upcoming appointments.', true); ?>
+      <?php $renderAppointmentTable($upcomingAppointments, 'No upcoming appointments.'); ?>
     </div>
   </section>
 
@@ -289,7 +283,7 @@ $getDoctorStatusReason = static function ($appointment): string {
         <h3>Past Appointments</h3>
         <span class="hint">Your completed and earlier sessions</span>
       </div>
-      <?php $renderAppointmentTable($pastAppointments, 'No past appointments yet.', false); ?>
+      <?php $renderAppointmentTable($pastAppointments, 'No past appointments yet.'); ?>
     </div>
   </section>
 

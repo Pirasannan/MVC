@@ -1,23 +1,32 @@
+/* Universal Reset for this component */
+.prescription-overlay,
+.prescription-overlay * {
+    box-sizing: border-box;
+}
+
 /* Overlay background blur */
 .prescription-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(15, 23, 42, 0.6);
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.7);
     backdrop-filter: blur(8px);
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 10000;
+    overflow-y: auto;
+    padding: 20px;
 }
 
 /* Modal container */
 .prescription-modal {
     background: #ffffff;
-    width: 850px;
-    max-width: 95%;
+    width: 100%;
+    max-width: 850px;
+    margin: auto;
     max-height: 90vh;
     border-radius: 16px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -71,12 +80,33 @@
 
 /* Prescription Content Area */
 .prescription-content {
-    padding: 40px 50px;
+    padding: 30px 40px;
     overflow-y: auto;
+    overflow-x: hidden;
     background: white;
     font-family: 'Inter', -apple-system, sans-serif;
     color: #334155;
     line-height: 1.5;
+    flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+    .prescription-content {
+        padding: 20px;
+    }
+    
+    .patient-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    .patient-field.text-right {
+        text-align: left !important;
+    }
+    
+    .instructions-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 /* Letterhead */
@@ -138,6 +168,8 @@
 .value {
     color: #0f172a;
     font-weight: 500;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* RX Section */
@@ -394,14 +426,24 @@
     }
 
     @page {
-        margin: 1.5cm;
-        size: auto;
+        margin: 1cm;
+        size: A4 portrait;
     }
 
-    /* Layout adjustments for print */
-    .patient-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+    .prescription-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+
+    /* Adjust typography for print to ensure it fits */
+    .doctor-details h1 { font-size: 20pt !important; }
+    .rx-symbol { font-size: 36pt !important; }
+    
+    .medication-table th, 
+    .medication-table td {
+        padding: 10px 8px !important;
     }
 }
 

@@ -24,6 +24,20 @@ const MESSAGE_USER_REPORT_REASONS = [
     'Fake profile'
 ];
 
+// Suppress the noisy failed-send popup while keeping other alerts unchanged.
+if (typeof window !== 'undefined' && !window.__messagesAlertPatched) {
+    window.__messagesAlertPatched = true;
+    const originalAlert = window.alert;
+    window.alert = function(message) {
+        const text = String(message || '').toLowerCase().trim();
+        if (text === 'failed to send message' || text.includes('failed to send message')) {
+            console.warn('Suppressed alert:', message);
+            return;
+        }
+        return originalAlert.call(window, message);
+    };
+}
+
 // Initialize messaging when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeMessaging();
@@ -42,9 +56,20 @@ function initializeMessaging() {
     const userIdElement = document.querySelector('[data-user-id]');
     const userTypeElement = document.querySelector('[data-user-type]');
     const messageContainer = document.querySelector('.message-container');
+    const appConfig = window.APP_CONFIG || {};
     
-    if (userIdElement) currentUserId = userIdElement.dataset.userId;
-    if (userTypeElement) currentUserType = userTypeElement.dataset.userType;
+    if (userIdElement && userIdElement.dataset.userId) {
+        currentUserId = String(userIdElement.dataset.userId);
+    } else if (appConfig.userId !== undefined && appConfig.userId !== null) {
+        currentUserId = String(appConfig.userId);
+    }
+
+    if (userTypeElement && userTypeElement.dataset.userType) {
+        currentUserType = String(userTypeElement.dataset.userType);
+    } else if (appConfig.userRole) {
+        currentUserType = String(appConfig.userRole);
+    }
+
     messagingDisabled = !!(messageContainer && messageContainer.dataset && messageContainer.dataset.messagingDisabled === '1');
 
     // Setup event listeners
@@ -985,6 +1010,18 @@ async function sendMessage() {
     messageInput.value = '';
     messageInput.style.height = 'auto';
     const pendingBubble = addMessageToDisplay(optimisticMessage, true);
+
+    const handleSendFailure = (messageTextToShow) => {
+        if (pendingBubble && pendingBubble.parentNode) {
+            pendingBubble.parentNode.removeChild(pendingBubble);
+        }
+        if (messageTextToShow) {
+            console.warn('Send message failed:', messageTextToShow);
+        }
+        if (selectedConversationId) {
+            loadMessages(selectedConversationId);
+        }
+    };
     
     try {
         const formData = new FormData();
@@ -1006,10 +1043,7 @@ async function sendMessage() {
             data = JSON.parse(responseText);
         } catch (parseError) {
             console.error('Non-JSON response from sendMessage:', responseText);
-            if (pendingBubble) {
-                pendingBubble.classList.remove('pending');
-            }
-            loadMessages(selectedConversationId);
+            handleSendFailure('Could not send message. Please try again.');
             return;
         }
         
@@ -1041,16 +1075,12 @@ async function sendMessage() {
             loadConversations();
         } else {
             console.error('Failed to send message:', data.message || 'Unknown error');
-            if (pendingBubble) {
-                pendingBubble.classList.remove('pending');
-            }
+            handleSendFailure(data.message || 'Failed to send message');
             loadConversations();
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        if (pendingBubble) {
-            pendingBubble.classList.remove('pending');
-        }
+        handleSendFailure('Network error while sending message.');
         loadConversations();
     }
 }

@@ -44,9 +44,11 @@ $profileImageUrl = $profileImagePath !== '' ? URLROOT . '/' . $profileImagePath 
             <div class="patient-profile-layout">
                 <div class="patient-profile-card">
                     <div class="profile-avatar-wrap">
-                        <img src="<?php echo htmlspecialchars($profileImageUrl); ?>" alt="Profile picture"
-                            class="profile-avatar-image <?php echo $profileImageUrl !== '' ? '' : 'is-hidden'; ?>"
-                            onerror="this.classList.add('is-hidden'); if(this.nextElementSibling){ this.nextElementSibling.classList.remove('is-hidden'); }">
+                        <?php if ($profileImageUrl !== ''): ?>
+                            <img src="<?php echo htmlspecialchars($profileImageUrl); ?>" alt="Profile picture"
+                                class="profile-avatar-image"
+                                onerror="this.classList.add('is-hidden'); if(this.nextElementSibling){ this.nextElementSibling.classList.remove('is-hidden'); }">
+                        <?php endif; ?>
                         <div class="profile-avatar-circle <?php echo $profileImageUrl !== '' ? 'is-hidden' : ''; ?>">
                             <?php echo strtoupper(substr(trim($data['user_name']), 0, 1)); ?></div>
                     </div>

@@ -35,8 +35,13 @@ class Message {
             FROM conversations c
             LEFT JOIN Users u1 ON c.user1_id = u1.id
             LEFT JOIN Users u2 ON c.user2_id = u2.id
-            LEFT JOIN messages m ON c.conversation_id = m.conversation_id 
-                AND m.created_at = c.last_message_time
+            LEFT JOIN messages m ON m.message_id = (
+                SELECT mm.message_id
+                FROM messages mm
+                WHERE mm.conversation_id = c.conversation_id
+                ORDER BY mm.created_at DESC, mm.message_id DESC
+                LIMIT 1
+            )
             WHERE c.user1_id = :user_id OR c.user2_id = :user_id
             ORDER BY c.last_message_time DESC
         ');
@@ -131,10 +136,14 @@ class Message {
     private function updateConversationTime($conversationId) {
         $this->db->query('
             UPDATE conversations 
-            SET last_message_time = NOW()
+            SET last_message_time = COALESCE(
+                (SELECT MAX(created_at) FROM messages WHERE conversation_id = :conversation_id_latest),
+                NOW()
+            )
             WHERE conversation_id = :conversation_id
         ');
 
+        $this->db->bind(':conversation_id_latest', $conversationId);
         $this->db->bind(':conversation_id', $conversationId);
         $this->db->execute();
     }

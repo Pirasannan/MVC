@@ -344,7 +344,7 @@ class Pages extends Controller{
         }
 
         $accountUpdated = $this->adminModel->approveDoctor($doctor_id);
-        $verificationUpdated = $this->verificationModel->updateStatus((int)$verification->id, 'verified');
+        $verificationUpdated = $this->verificationModel->updateStatus((int)$verification->id, 'verified', null);
         
         if ($accountUpdated && $verificationUpdated) {
             echo json_encode(['success' => true, 'message' => 'Doctor approved successfully']);

@@ -105,9 +105,16 @@ class M_Admin
 
     public function getVerifiedDoctors()
     {
-        $this->db->query('SELECT * FROM Users WHERE role = :role AND status = :status ORDER BY updated_at DESC');
+        $this->db->query('SELECT u.*
+                         FROM Users u
+                         INNER JOIN doctor_verifications dv ON dv.user_id = u.id
+                         WHERE u.role = :role
+                         AND u.status = :status
+                         AND dv.verification_status = :verification_status
+                         ORDER BY u.updated_at DESC');
         $this->db->bind(':role', 'Doctor');
         $this->db->bind(':status', 'active');
+        $this->db->bind(':verification_status', 'verified');
         return $this->db->resultSet();
     }
 

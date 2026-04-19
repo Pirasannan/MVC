@@ -69,7 +69,7 @@ class M_Verification {
             $binds[':verification_status'] = $data['verification_status'];
         }
         
-        if(isset($data['rejection_reason'])){
+        if(array_key_exists('rejection_reason', $data)){
             $fields[] = 'rejection_reason = :rejection_reason';
             $binds[':rejection_reason'] = $data['rejection_reason'];
         }
@@ -135,7 +135,9 @@ class M_Verification {
             $data['verified_at'] = date('Y-m-d H:i:s');
         }
         
-        if($reason !== null){
+        if($status === 'verified'){
+            $data['rejection_reason'] = null;
+        } elseif($reason !== null){
             $data['rejection_reason'] = $reason;
         }
         

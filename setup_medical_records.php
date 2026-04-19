@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup'])) {
 
     <?php if (!empty($messages)): ?>
     <div class="success">
-        <strong>✅ Setup completed successfully!</strong>
+        <strong> Setup completed successfully!</strong>
         <ul>
             <?php foreach ($messages as $m): ?>
             <li><?= $m ?></li>
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup'])) {
 
     <?php if (!empty($errors)): ?>
     <div class="error">
-        <strong>❌ Errors occurred:</strong>
+        <strong> Errors occurred:</strong>
         <ul><?php foreach ($errors as $e): ?><li><?= $e ?></li><?php endforeach; ?></ul>
     </div>
     <?php endif; ?>

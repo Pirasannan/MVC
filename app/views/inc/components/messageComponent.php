@@ -54,6 +54,9 @@
                         <h3 class="chat-user-name" id="chatUserName">User Name</h3>
                     </div>
                 </div>
+                <div class="chat-header-right">
+                    <button type="button" class="report-flag-btn" id="reportUserBtn" disabled>Report User</button>
+                </div>
             </div>
 
             <!-- Messages Display Area -->

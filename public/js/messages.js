@@ -516,6 +516,10 @@ function canCurrentUserReportInMessages() {
 
 function canReportSelectedCounterpart() {
     const role = String(selectedConversationUserRole || '').toLowerCase();
+    if (!role) {
+        // Conversation payload may briefly miss role info; allow and rely on server validation.
+        return true;
+    }
     return role === 'doctor' || role === 'patient';
 }
 

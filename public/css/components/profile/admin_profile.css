@@ -221,7 +221,7 @@
     background: #4a90e2;
     color: #ffffff;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 0px;
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
@@ -250,6 +250,8 @@
 
 .dashboard-container.admin .action-button.secondary:hover {
     background: #e2e8f0;
+    transform: translateY(-1px);
+
 }
 
 .dashboard-container.admin .modal-overlay {

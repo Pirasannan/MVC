@@ -26,7 +26,7 @@ $current_page = 'patientPrescriptions';
                 <div class="section-content" id="prescription-list">
                     <?php if (!empty($data['prescriptions'])): ?>
                         <?php foreach ($data['prescriptions'] as $p): ?>
-                            <div class="medication-item" onclick="openPrescriptionModal(event)">
+                            <div class="medication-item <?= ($p->is_deleted === 'deleted') ? 'deleted-item' : '' ?>" onclick="openPrescriptionModal(event, <?= $p->id ?>)">
                                 <div class="medication-info">
                                     <div class="medication-name"><?= htmlspecialchars($p->diagnosis) ?></div>
                                     <div class="medication-details">
@@ -37,6 +37,11 @@ $current_page = 'patientPrescriptions';
                                     <div class="prescribed-by">
                                         Prescribed by Dr. <?= htmlspecialchars($p->doctor_name) ?>
                                     </div>
+                                    <?php if ($p->is_deleted === 'deleted'): ?>
+                                        <div class="deleted-status" style="color: #dc3545; font-size: 12px; margin-top: 4px;">
+                                            <strong>DELETED</strong>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="medication-date">
                                     <div class="prescription-date">

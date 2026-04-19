@@ -145,7 +145,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 10px 5px;
     border: none;
     border-radius: 8px;
     text-decoration: none;
@@ -168,12 +168,12 @@
 }
 
 .action-button.secondary {
-    background: #6b7280;
-    color: white;
+    background: #eef2f7;
+    color: #0f172a;
 }
 
 .action-button.secondary:hover {
-    background: #4b5563;
+    background: #e2e8f0;
     transform: translateY(-1px);
 }
 
@@ -186,6 +186,27 @@
     background: #dc2626;
     transform: translateY(-1px);
 }
+
+.dashboard-container.admin .action-button.danger {
+    background: #ef4444;
+    color: white;
+}
+
+.dashboard-container.admin .action-button.danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.dashboard-container.doctor .action-button.danger {
+    background: #ef4444;
+    color: white;
+}
+
+.dashboard-container.doctor .action-button.danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
 
 /* .action-button:not(.primary):not(.secondary):not(.danger) {
     background: #10b981;

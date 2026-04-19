@@ -697,11 +697,26 @@
     }
 }
 
+@media (max-width: 1024px) {
+    .dashboard-container.admin .main-content,
+    .dashboard-container.doctor .main-content,
+    .dashboard-container.patient .main-content {
+        height: auto;
+        overflow: visible;
+    }
+
+    .message-container {
+        min-height: calc(100dvh - 180px);
+    }
+}
+
 @media (max-width: 768px) {
+
     .message-container {
         position: relative;
         grid-template-columns: 1fr;
-        min-height: 500px;
+        min-height: calc(100dvh - 210px);
+        padding: 8px;
     }
 
     .chat-conversations-sidebar,

@@ -19,6 +19,10 @@ class Message {
                     WHEN c.user1_id = :user_id THEN u2.name
                     ELSE u1.name
                 END as user_name,
+                CASE
+                    WHEN c.user1_id = :user_id THEN LOWER(u2.role)
+                    ELSE LOWER(u1.role)
+                END as user_role,
                 CASE 
                     WHEN c.user1_id = :user_id THEN c.user2_id
                     ELSE c.user1_id
@@ -253,23 +257,7 @@ class Message {
             return false;
         }
 
-        // MySQL returns 0 affected rows if the value is unchanged.
-        // Treat this as success when the target row exists and belongs to the user.
-        if ($this->db->rowCount() > 0) {
-            return true;
-        }
-
-        $this->db->query('
-            SELECT message_id
-            FROM messages
-            WHERE message_id = :message_id
-              AND sender_id = :user_id
-            LIMIT 1
-        ');
-        $this->db->bind(':message_id', $messageId);
-        $this->db->bind(':user_id', $userId);
-
-        return $this->db->single() ? true : false;
+        return $this->db->rowCount() > 0;
     }
 
     // Recalculate the latest message timestamp after a delete
@@ -278,12 +266,13 @@ class Message {
             UPDATE conversations
             SET last_message_time = COALESCE(
                 (SELECT MAX(created_at) FROM messages WHERE conversation_id = :conversation_id_max),
-                created_at
+                (SELECT created_at FROM conversations WHERE conversation_id = :conversation_id_created)
             )
             WHERE conversation_id = :conversation_id_where
         ');
 
         $this->db->bind(':conversation_id_max', $conversationId);
+        $this->db->bind(':conversation_id_created', $conversationId);
         $this->db->bind(':conversation_id_where', $conversationId);
         return $this->db->execute();
     }
@@ -311,13 +300,12 @@ class Message {
         return $this->db->execute();
     }
 
-    // Ensure doctor/patient pairs can chat only if they had at least one appointment record.
-    // Include pending to allow new chats before appointment approval.
+    // Ensure doctor/patient pairs can chat only if they had at least one approved/completed appointment
     public function hasAppointmentHistoryBetweenUsers($user1Id, $user2Id) {
         $this->db->query('
             SELECT COUNT(*) as total
             FROM appointments
-            WHERE status IN ("pending", "approved", "completed")
+            WHERE status IN ("approved", "completed")
               AND (
                     (patient_id = :user1_id AND doctor_id = :user2_id)
                  OR (patient_id = :user2_id AND doctor_id = :user1_id)

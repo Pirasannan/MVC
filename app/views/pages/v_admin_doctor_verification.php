@@ -29,11 +29,14 @@
                         <?php if (!empty($pendingVerifications)): ?>
                             <?php foreach ($pendingVerifications as $verification): ?>
                                 <?php
-                                    $doctorId = (int)($verification->user_id ?? 0);
-                                    $doctorName = $verification->user_name ?? '';
+                                    $doctorId = (int)($verification->user_id ?? $verification->id ?? 0);
+                                    $doctorName = $verification->user_name ?? $verification->name ?? '';
                                     $doctorEmail = $verification->user_email ?? $verification->email ?? '';
-                                    $uploadedAt = $verification->uploaded_at ?? '';
+                                    $uploadedAt = $verification->uploaded_at ?? $verification->created_at ?? '';
                                     $documentPath = $verification->photo_path ?? '';
+                                    $hasDocument = !empty($documentPath);
+                                    $doctorStatus = $verification->verification_status ?? $verification->status ?? 'pending';
+                                    $statusLabel = $hasDocument ? 'Document Uploaded' : 'Awaiting Upload';
                                 ?>
                                 <div
                                     class="appointment-item"
@@ -42,6 +45,7 @@
                                     data-doctor-email="<?php echo htmlspecialchars($doctorEmail); ?>"
                                     data-doctor-created="<?php echo htmlspecialchars($uploadedAt); ?>"
                                     data-doctor-document="<?php echo htmlspecialchars($documentPath); ?>"
+                                    data-doctor-status="<?php echo htmlspecialchars($doctorStatus); ?>"
                                 >
                                     <div class="appointment-info">
                                         <div class="doctor-name"><?php echo htmlspecialchars($doctorName); ?></div>
@@ -51,7 +55,7 @@
                                         <div class="prescribed-by">Email: <?php echo htmlspecialchars($doctorEmail); ?></div>
                                     </div>
                                     <div class="appointment-status">
-                                        <span class="status-badge pending">Pending</span>
+                                        <span class="status-badge pending"><?php echo htmlspecialchars($statusLabel); ?></span>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

@@ -252,8 +252,20 @@ class DoctorVerificationManager {
           statusElement.className = 'status-badge ' + (this.currentDoctorStatus === 'inactive' ? 'confirmed' : 'rejected')
         }
 
+        const documentLink = document.getElementById('modal-doctor-document-link')
+        const hasDocument = !!item.dataset.doctorDocument
+        const isVerificationModal = !!documentLink
+
         if (this.approveBtn) {
-          this.approveBtn.style.display = this.currentDoctorStatus === 'suspended' ? 'inline-flex' : 'none'
+          if (isVerificationModal) {
+            this.approveBtn.style.display = hasDocument ? 'inline-flex' : 'none'
+          } else {
+            this.approveBtn.style.display = this.currentDoctorStatus === 'suspended' ? 'inline-flex' : 'none'
+          }
+        }
+
+        if (this.rejectBtn && isVerificationModal) {
+          this.rejectBtn.style.display = hasDocument ? 'inline-flex' : 'none'
         }
 
         if (this.reactivateBtn) {
@@ -268,9 +280,8 @@ class DoctorVerificationManager {
           this.deactivateBtn.style.display = this.currentDoctorStatus === 'inactive' ? 'none' : 'inline-flex'
         }
 
-        const documentLink = document.getElementById('modal-doctor-document-link')
         if (documentLink) {
-          if (item.dataset.doctorDocument) {
+          if (hasDocument) {
             documentLink.href = window.location.origin + '/MVC/' + item.dataset.doctorDocument
             documentLink.style.pointerEvents = 'auto'
             documentLink.style.opacity = '1'
@@ -729,6 +740,207 @@ class PatientVerificationManager {
   }
 }
 
+class SystemNotificationManager {
+  constructor() {
+    this.overlay = document.getElementById('system-notification-overlay')
+    if (!this.overlay) {
+      return
+    }
+
+    this.card = this.overlay.querySelector('.system-notification-card')
+    this.titleEl = document.getElementById('system-notification-title')
+    this.messageEl = document.getElementById('system-notification-message')
+    this.timeEl = document.getElementById('system-notification-time')
+    this.closeBtn = this.overlay.querySelector('.system-notification-close')
+    this.ackBtn = document.getElementById('system-notification-ack')
+    this.activeNotificationId = null
+    this.isOpen = false
+    this.isFetching = false
+    this.pollIntervalMs = 30000
+    this.storageKey = this.getStorageKey()
+
+    this.bindEvents()
+    this.startPolling()
+  }
+
+  getStorageKey() {
+    const userId = window.APP_CONFIG && window.APP_CONFIG.userId ? window.APP_CONFIG.userId : 'guest'
+    return `system_notification_seen_${userId}`
+  }
+
+  getBaseUrl() {
+    const urlRoot = window.APP_CONFIG && window.APP_CONFIG.urlRoot ? window.APP_CONFIG.urlRoot : window.location.origin
+    return urlRoot.replace(/\/$/, '')
+  }
+
+  getLocalSeenId() {
+    try {
+      const value = localStorage.getItem(this.storageKey)
+      return value ? parseInt(value, 10) : null
+    } catch (error) {
+      return null
+    }
+  }
+
+  setLocalSeenId(notificationId) {
+    try {
+      localStorage.setItem(this.storageKey, String(notificationId))
+    } catch (error) {
+      // Ignore storage failures
+    }
+  }
+
+  bindEvents() {
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener('click', () => this.acknowledge())
+    }
+
+    if (this.ackBtn) {
+      this.ackBtn.addEventListener('click', () => this.acknowledge())
+    }
+
+    this.overlay.addEventListener('click', (event) => {
+      if (event.target === this.overlay) {
+        this.acknowledge()
+      }
+    })
+  }
+
+  startPolling() {
+    if (!window.APP_CONFIG || !window.APP_CONFIG.isAuthenticated) {
+      return
+    }
+
+    this.fetchLatest()
+    this.pollTimer = setInterval(() => this.fetchLatest(), this.pollIntervalMs)
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.fetchLatest()
+      }
+    })
+  }
+
+  stopPolling() {
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer)
+      this.pollTimer = null
+    }
+  }
+
+  fetchLatest() {
+    if (this.isFetching) {
+      return
+    }
+
+    this.isFetching = true
+    const url = `${this.getBaseUrl()}/Pages/getLatestNotification`
+
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+      .then(response => {
+        if (response.status === 403) {
+          this.stopPolling()
+          return null
+        }
+        if (!response.ok) {
+          throw new Error('Failed to fetch notification')
+        }
+        return response.json()
+      })
+      .then(data => {
+        if (!data || !data.success || !data.hasNew || !data.notification) {
+          return
+        }
+
+        const notificationId = parseInt(data.notification.id, 10)
+        if (!notificationId) {
+          return
+        }
+
+        const localSeenId = this.getLocalSeenId()
+        if (localSeenId && notificationId <= localSeenId) {
+          return
+        }
+
+        this.showNotification(data.notification)
+      })
+      .catch(() => {
+        // Silent failure to avoid interrupting users
+      })
+      .finally(() => {
+        this.isFetching = false
+      })
+  }
+
+  showNotification(notification) {
+    if (!notification) {
+      return
+    }
+
+    const notificationId = parseInt(notification.id, 10)
+    if (this.isOpen && this.activeNotificationId === notificationId) {
+      return
+    }
+
+    this.activeNotificationId = notificationId
+    this.isOpen = true
+
+    const type = (notification.notification_type || 'info').toLowerCase()
+    const typeClass = `system-notification-card--${type}`
+    const typeClasses = ['system-notification-card--info', 'system-notification-card--success', 'system-notification-card--warning', 'system-notification-card--error']
+
+    if (this.card) {
+      this.card.classList.remove(...typeClasses)
+      this.card.classList.add(typeClass)
+    }
+
+    if (this.titleEl) {
+      this.titleEl.textContent = notification.title || 'System Notification'
+    }
+    if (this.messageEl) {
+      this.messageEl.textContent = notification.message || ''
+    }
+    if (this.timeEl) {
+      this.timeEl.textContent = notification.created_at ? `Published: ${notification.created_at}` : ''
+    }
+
+    this.overlay.classList.add('is-visible')
+    this.overlay.setAttribute('aria-hidden', 'false')
+  }
+
+  hideNotification() {
+    this.overlay.classList.remove('is-visible')
+    this.overlay.setAttribute('aria-hidden', 'true')
+    this.isOpen = false
+  }
+
+  acknowledge() {
+    const notificationId = this.activeNotificationId
+    this.hideNotification()
+
+    if (!notificationId) {
+      return
+    }
+
+    this.setLocalSeenId(notificationId)
+    this.markSeen(notificationId)
+    this.activeNotificationId = null
+  }
+
+  markSeen(notificationId) {
+    const url = `${this.getBaseUrl()}/Pages/markNotificationSeen`
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ notification_id: notificationId })
+    }).catch(() => {
+      // Ignore failures; local storage prevents repeated popups in-session
+    })
+  }
+}
+
 // Prescription Manager - now handled by modal-manager.js
 
 // Initialize the application
@@ -737,4 +949,5 @@ document.addEventListener("DOMContentLoaded", () => {
   window.pageManager = new PageManager()
   window.doctorVerificationManager = new DoctorVerificationManager()
   window.patientVerificationManager = new PatientVerificationManager()
+  window.systemNotificationManager = new SystemNotificationManager()
 })

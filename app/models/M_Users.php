@@ -16,12 +16,13 @@ class M_Users
         }
         
         public function register($data){
-            $this->db->query('INSERT INTO Users(role, name, email, password, slmc) VALUES (:role, :name, :email, :password, :slmc)');
+            $this->db->query('INSERT INTO Users(role, name, email, password, slmc, status) VALUES (:role, :name, :email, :password, :slmc, :status)');
             $this->db->bind(':role', $data['role']);
             $this->db->bind(':name',$data['name']);
             $this->db->bind(':email',$data['email']);
             $this->db->bind(':password',$data['password']);
             $this->db->bind(':slmc', $data['slmc'] ?? null);
+            $this->db->bind(':status', $data['status'] ?? 'active');
 
         if ($this->db->execute()) {
             return true;
@@ -129,6 +130,58 @@ class M_Users
             $this->db->bind(':user_id', (int)$userId);
 
             return $this->db->execute();
+        }
+
+        private function ensureNotificationSeenColumn(){
+            $this->db->query("SELECT COUNT(*) AS column_count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'last_notification_seen_id'");
+            $columnCheck = $this->db->single();
+
+            if ((int)($columnCheck->column_count ?? 0) === 0) {
+                $this->db->query('ALTER TABLE Users ADD COLUMN last_notification_seen_id INT NULL DEFAULT NULL');
+                $this->db->execute();
+            }
+        }
+
+        public function getLastNotificationSeenId($userId){
+            $this->ensureNotificationSeenColumn();
+
+            $this->db->query('SELECT last_notification_seen_id FROM Users WHERE id = :user_id LIMIT 1');
+            $this->db->bind(':user_id', (int)$userId);
+            $row = $this->db->single();
+
+            if (!$row || !isset($row->last_notification_seen_id)) {
+                return null;
+            }
+
+            return $row->last_notification_seen_id !== null ? (int)$row->last_notification_seen_id : null;
+        }
+
+        public function updateLastNotificationSeenId($userId, $notificationId){
+            $this->ensureNotificationSeenColumn();
+
+            $this->db->query('UPDATE Users SET last_notification_seen_id = :notification_id WHERE id = :user_id');
+            $this->db->bind(':notification_id', (int)$notificationId);
+            $this->db->bind(':user_id', (int)$userId);
+            return $this->db->execute();
+        }
+
+        public function getActiveUsersByRole($role){
+            $this->db->query('SELECT id, name, email FROM Users WHERE LOWER(role) = :role AND LOWER(status) = :status');
+            $this->db->bind(':role', strtolower($role));
+            $this->db->bind(':status', 'active');
+            return $this->db->resultSet();
+        }
+
+        public function getAllActiveUsers(){
+            $this->db->query('SELECT id, name, email, LOWER(role) AS role FROM Users WHERE LOWER(status) = :status');
+            $this->db->bind(':status', 'active');
+            return $this->db->resultSet();
+        }
+
+        public function getUserContactById($userId){
+            $this->db->query('SELECT id, name, email, LOWER(role) AS role, LOWER(status) AS status FROM Users WHERE id = :user_id LIMIT 1');
+            $this->db->bind(':user_id', (int)$userId);
+            return $this->db->single();
         }
 
         private function ensurePatientMedicalInfoTable(){
@@ -369,5 +422,17 @@ class M_Users
         $this->db->bind(':password', $hashedPassword);
         $this->db->bind(':email', $email);
         return $this->db->execute();
+    }
+
+    public function updateUserStatus($userId, $status) {
+        $this->db->query("UPDATE users SET status = :status WHERE id = :id");
+        $this->db->bind(':status', $status);
+        $this->db->bind(':id', $userId);
+        
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

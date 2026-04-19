@@ -52,7 +52,9 @@ $profileImageUrl = $profileImagePath !== '' ? URLROOT . '/' . $profileImagePath 
                     </div>
                     <h3 class="admin-name"><?php echo htmlspecialchars($data['admin_name']); ?></h3>
                     <p class="admin-role"><?php echo htmlspecialchars($data['role']); ?></p>
-                    <button type="button" class="action-button primary profile-edit-btn" id="open-admin-profile-edit-modal-btn">Edit Profile</button>
+                    <button type="button" class="action-button primary profile-edit-btn" id="open-admin-profile-edit-modal-btn">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
                 </div>
 
                 <div class="admin-details-card">
@@ -62,6 +64,36 @@ $profileImageUrl = $profileImagePath !== '' ? URLROOT . '/' . $profileImagePath 
                         <div class="details-row"><span>Admin ID</span><span>#<?php echo htmlspecialchars($data['admin_id']); ?></span></div>
                         <div class="details-row"><span>Role</span><span><span class="status-badge admin"><?php echo htmlspecialchars($data['role']); ?></span></span></div>
                         <div class="details-row"><span>Account Status</span><span><span class="status-badge active"><?php echo htmlspecialchars(ucfirst($data['status'])); ?></span></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-details-card security-card full-width">
+                <h3 class="details-title"><i class="fas fa-user-lock"></i> Security & Credential Management</h3>
+                <div class="security-info-grid">
+                    <div class="security-item">
+                        <div class="security-icon-circle">
+                            <i class="fas fa-password"></i>
+                        </div>
+                        <div class="security-text">
+                            <h4>Administrative Password</h4>
+                            <p>Update your administrative password to maintain system integrity. A strong password is essential for high-level access nodes.</p>
+                        </div>
+                        <a href="<?php echo URLROOT; ?>/Users/securityOtp?action=password" class="action-button secondary">
+                            <i class="fas fa-shield-alt"></i> Change Password
+                        </a>
+                    </div>
+                    <div class="security-item">
+                        <div class="security-icon-circle danger">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                        <div class="security-text">
+                            <h4>System Deactivation</h4>
+                            <p>Deactivating your administrative account will revoke all system privileges. This is a critical action requiring OTP verification.</p>
+                        </div>
+                        <a href="<?php echo URLROOT; ?>/Users/securityOtp?action=deactivate" class="action-button danger">
+                            <i class="fas fa-exclamation-triangle"></i> Deactivate Admin
+                        </a>
                     </div>
                 </div>
             </div>

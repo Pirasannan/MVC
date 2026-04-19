@@ -72,11 +72,30 @@
     font-size: 20px;
 }
 
-.stat-icon.blue { background: #dbeafe; color: #1d4ed8; }
-.stat-icon.green { background: #dcfce7; color: #16a34a; }
-.stat-icon.orange { background: #fef3c7; color: #d97706; }
-.stat-icon.purple { background: #f3e8ff; color: #a855f7; }
-.stat-icon.pink { background: #fce7f3; color: #9f1239; }
+.stat-icon.blue {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.stat-icon.green {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.stat-icon.orange {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.stat-icon.purple {
+    background: #f3e8ff;
+    color: #a855f7;
+}
+
+.stat-icon.pink {
+    background: #fce7f3;
+    color: #9f1239;
+}
 
 /* Patient Search Panel Styles */
 .patient-search-panel {
@@ -312,10 +331,25 @@
     white-space: nowrap;
 }
 
-.badge-lab { background: #dbeafe; color: #1d4ed8; }
-.badge-scan { background: #fce7f3; color: #9f1239; }
-.badge-note { background: #fef3c7; color: #d97706; }
-.badge-prescription { background: #dcfce7; color: #16a34a; }
+.badge-lab {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-scan {
+    background: #fce7f3;
+    color: #9f1239;
+}
+
+.badge-note {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.badge-prescription {
+    background: #dcfce7;
+    color: #16a34a;
+}
 
 .record-meta {
     display: flex;
@@ -423,6 +457,7 @@
     justify-content: center;
     z-index: 1000;
 }
+
 
 .medical-upload-container {
     background: white;

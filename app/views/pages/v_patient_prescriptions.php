@@ -17,11 +17,11 @@ $current_page = 'patientPrescriptions';
             <div class="content-sections">
                 <!-- Prescriptions Section -->
                 <div class="content-section full-width">
-                    <div class="prescription-header">
+                    <!-- <div class="prescription-header">
                         <div class="section-header-content">
                             <h2 class="section-title">My Prescriptions</h2>
                         </div>
-                    </div>
+                    </div> -->
 
                 <div class="section-content" id="prescription-list">
                     <?php if (!empty($data['prescriptions'])): ?>

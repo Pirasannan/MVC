@@ -15,7 +15,7 @@
     <div class="chat-conversations-sidebar">
         <!-- Search Bar -->
         <div class="conversations-header">
-            <h2 class="conversations-title">Chats</h2>
+            <!-- <h2 class="conversations-title">Chats</h2> -->
             <div class="search-container">
                 <input type="text" id="searchConversations" class="search-input" placeholder="Search or start new chat">
                 <span class="search-icon"></span>

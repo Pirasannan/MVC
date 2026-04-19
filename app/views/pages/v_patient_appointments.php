@@ -43,10 +43,10 @@ $getDoctorStatusReason = static function ($appointment): string {
         <?php require APPROOT.'/views/inc/components/patientHeader.php'; ?>
 
         <!-- Main Content Area -->
-  <div class="patient-appointments-head">
+  <!-- <div class="patient-appointments-head">
     <h2>My Appointments</h2>
     <span class="sub">View history and request a new booking</span>
-  </div>
+  </div> -->
 
   <?php if(isset($_SESSION['flash'])){ echo '<p>'.htmlspecialchars($_SESSION['flash']).'</p>'; unset($_SESSION['flash']); } ?>
 

@@ -36,15 +36,9 @@ class ModalManager {
       modal.style.display = 'flex';
       modal.style.visibility = 'visible';
       modal.style.opacity = '1';
+      // Rely on CSS for most positioning and dimensions
       modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100vw';
-      modal.style.height = '100vh';
-      modal.style.background = 'rgba(0, 0, 0, 0.5)';
       modal.style.zIndex = '9999';
-      modal.style.justifyContent = 'center';
-      modal.style.alignItems = 'center';
 
       // Make sure the modal content has white background
       const modalContent = modal.querySelector('.prescription-modal');

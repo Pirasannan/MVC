@@ -13,7 +13,7 @@
                 ['label' => 'Appointments', 'action' => 'doctorAppointments', 'icon' => 'appoinments.svg'],
                 ['label' => 'Prescriptions', 'action' => 'doctorPrescriptions', 'icon' => 'prescriptions.svg'],
                 ['label' => 'Messages', 'action' => 'doctorMessages', 'icon' => 'message.svg'],
-                ['label' => 'Medical Records', 'action' => 'doctorMedicalrecords', 'icon' => 'medical_records.svg'],
+                ['label' => 'Medical Records', 'action' => 'doctorMedicalrecords', 'icon' => 'prescriptions.svg'],
                 ['label' => 'Profile', 'action' => 'doctorProfile', 'icon' => 'profile.svg']
             ];
 

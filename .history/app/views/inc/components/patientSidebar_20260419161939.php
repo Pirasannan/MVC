@@ -9,12 +9,12 @@
     <nav class="nav-menu">
         <?php
             $menu_items = [
-                ['label' => 'Dashboard', 'action' => 'doctorDashboard', 'icon' => 'dashboard.svg'],
-                ['label' => 'Appointments', 'action' => 'doctorAppointments', 'icon' => 'appoinments.svg'],
-                ['label' => 'Prescriptions', 'action' => 'doctorPrescriptions', 'icon' => 'prescriptions.svg'],
-                ['label' => 'Messages', 'action' => 'doctorMessages', 'icon' => 'message.svg'],
-                ['label' => 'Medical Records', 'action' => 'doctorMedicalrecords', 'icon' => 'medical_records.svg'],
-                ['label' => 'Profile', 'action' => 'doctorProfile', 'icon' => 'profile.svg']
+                ['label' => 'Dashboard', 'action' => 'patientDashboard', 'icon' => 'dashboard.svg'],
+                ['label' => 'Appointments', 'action' => 'patientAppointments', 'icon' => 'appoinments.svg'],
+                ['label' => 'Prescriptions', 'action' => 'patientPrescriptions', 'icon' => 'prescriptions.svg'],
+                ['label' => 'Messages', 'action' => 'patientMessages', 'icon' => 'message.svg'],
+                ['label' => 'Medical Records', 'action' => 'patientMedicalrecords', 'icon' => 'prescriptions.svg'],
+                ['label' => 'Profile', 'action' => 'patientProfile', 'icon' => 'profile.svg']
             ];
 
             foreach ($menu_items as $item) {
@@ -44,5 +44,3 @@
 </aside>
 
 <?php require APPROOT.'/views/inc/components/logoutPopup.php'; ?>
-
-   

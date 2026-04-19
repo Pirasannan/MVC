@@ -73,7 +73,7 @@ $canCreatePrescription = ($doctorStatus === 'active');
                         <div class="section-content" id="doctor-prescription-list">
                             <?php if (!empty($data['prescriptions'])): ?>
                                 <?php foreach ($data['prescriptions'] as $p): ?>
-                                    <div class="medication-item <?= ($p->is_deleted === 'deleted') ? 'deleted-item' : '' ?>" onclick="openPrescriptionModal(event)">
+                                    <div class="medication-item <?= ($p->is_deleted === 'deleted') ? 'deleted-item' : '' ?>" onclick="openPrescriptionModal(event, <?= $p->id ?>)">
                                         <div class="medication-info">
                                             <div class="medication-name"><?= htmlspecialchars($p->diagnosis) ?></div>
                                             <div class="medication-details">

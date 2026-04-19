@@ -19,10 +19,10 @@ class ModalManager {
 
     // Close modals when clicking outside
     document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal') || 
-          e.target.classList.contains('popup-overlay') || 
-          e.target.classList.contains('prescription-overlay') ||
-          e.target.classList.contains('res-modal')) {
+      if (e.target.classList.contains('modal') ||
+        e.target.classList.contains('popup-overlay') ||
+        e.target.classList.contains('prescription-overlay') ||
+        e.target.classList.contains('res-modal')) {
         this.closeModal(e.target);
       }
     });
@@ -45,7 +45,7 @@ class ModalManager {
       modal.style.zIndex = '9999';
       modal.style.justifyContent = 'center';
       modal.style.alignItems = 'center';
-      
+
       // Make sure the modal content has white background
       const modalContent = modal.querySelector('.prescription-modal');
       if (modalContent) {
@@ -69,7 +69,7 @@ class ModalManager {
     if (typeof modal === 'string') {
       modal = document.getElementById(modal);
     }
-    
+
     if (modal) {
       modal.style.display = 'none';
       if (this.activeModal === modal) {
@@ -80,21 +80,85 @@ class ModalManager {
   }
 
   // Prescription modal functions
-  openPrescriptionModal(event) {
-    console.log('openPrescriptionModal called');
-    
+  openPrescriptionModal(event, prescriptionId) {
+    console.log('openPrescriptionModal called for ID:', prescriptionId);
+
     // Only open modal if the click is not on a button or link within the prescription item
-    // Allow clicks on the prescription item itself, but block clicks on action buttons
-    if (event.target.tagName === 'A' || 
-        event.target.tagName === 'BUTTON' || 
-        event.target.closest('a') || 
-        event.target.closest('button')) {
-      console.log('Click blocked - button/link detected');
+    if (event.target.tagName === 'A' ||
+      event.target.tagName === 'BUTTON' ||
+      event.target.closest('a') ||
+      event.target.closest('button')) {
       return;
     }
-    
-    console.log('Opening prescription modal');
-    this.openModal('prescriptionPopup');
+
+    if (!prescriptionId) {
+      console.error('No prescription ID provided');
+      return;
+    }
+
+    // Show loading state if you want, or just fetch
+    fetch(window.location.origin + '/MVC/Pages/getPrescriptionJSON/' + prescriptionId)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        this.populatePrescriptionModal(data);
+        this.openModal('prescriptionPopup');
+      })
+      .catch(error => {
+        console.error('Error fetching prescription:', error);
+        alert('Failed to load prescription details. Please try again.');
+      });
+  }
+
+  populatePrescriptionModal(data) {
+    // Helper to set text or default
+    const setT = (id, val, def = 'N/A') => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val || def;
+    };
+
+    setT('modal-doctor-name', 'Dr. ' + data.doctor_name);
+    setT('modal-doctor-qualifications', data.doctor_qualifications || 'Medical Professional'); // Assuming qualifications might be added later or use generic
+    setT('modal-doctor-slmc', 'SLMC: ' + (data.doctor_slmc || 'Verified'));
+    setT('modal-doctor-contact', `Email: ${data.doctor_email}`);
+
+    setT('modal-patient-name', data.patient_name);
+    setT('modal-date', new Date(data.created_at).toLocaleDateString());
+    setT('modal-ref-no', 'RX-' + data.id.toString().padStart(5, '0'));
+
+    // Calculate Age
+    let age = 'N/A';
+    if (data.date_of_birth) {
+      const birthDate = new Date(data.date_of_birth);
+      const today = new Date();
+      age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+    }
+
+    // Gender - if available, otherwise skip
+    const gender = data.gender || 'Not Specified';
+    setT('modal-patient-meta', `${age} Years / ${gender}`);
+
+    setT('modal-diagnosis', data.diagnosis);
+    setT('modal-drug-name', data.drug_name);
+    setT('modal-drug-meta', `${data.formulation || ''} | ${data.route || ''} | ${data.meal_relation || ''}`);
+
+    setT('modal-dosage', data.dose_amount + ' ' + data.dose_unit);
+    setT('modal-frequency', data.frequency + (data.time_of_day ? ` (${data.time_of_day})` : ''));
+
+    let duration = data.duration_value ? `${data.duration_value} ${data.duration_type}` : 'Until stopped';
+    setT('modal-duration', duration);
+
+    setT('modal-special-instructions', data.special_instructions, 'None');
+    setT('modal-pharmacy-note', data.pharmacy_note, 'No additional notes');
+
+    setT('modal-valid-until', data.valid_until ? new Date(data.valid_until).toLocaleDateString() : 'Indefinite');
+    setT('modal-doctor-footer-name', 'Dr. ' + data.doctor_name);
   }
 
   closePrescriptionModal() {
@@ -106,10 +170,10 @@ class ModalManager {
     const resApptId = btn.getAttribute('data-id');
     const cur = btn.getAttribute('data-current') || '';
     const form = document.getElementById('resForm');
-    
+
     if (form) {
       form.action = window.location.origin + '/MVC/Appointments/reschedule/' + resApptId;
-      
+
       const input = form.querySelector('input[name="new_datetime"]');
       if (input) {
         if (cur && cur.indexOf('T') === -1) {
@@ -119,7 +183,7 @@ class ModalManager {
         }
       }
     }
-    
+
     this.openModal('resModal');
   }
 
@@ -146,24 +210,24 @@ class ModalManager {
 
   // Toggle all prescriptions
   toggleAllPrescriptions() {
-    const list = document.getElementById('prescription-list') || 
-                 document.getElementById('doctor-prescription-list');
+    const list = document.getElementById('prescription-list') ||
+      document.getElementById('doctor-prescription-list');
     const btn = document.getElementById('view-all-btn');
-    
+
     if (list && btn) {
       list.classList.toggle('expanded');
-      btn.textContent = list.classList.contains('expanded') 
-        ? 'Show Less' 
+      btn.textContent = list.classList.contains('expanded')
+        ? 'Show Less'
         : 'View All Prescriptions';
     }
   }
 }
 
 // Initialize modal manager
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   window.modalManager = new ModalManager();
   console.log('Modal manager initialized');
-  
+
   // Test if modal exists
   const modal = document.getElementById('prescriptionPopup');
   console.log('Prescription modal found:', modal);
@@ -174,10 +238,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Global functions for backward compatibility
-function openPrescriptionModal(event) {
+function openPrescriptionModal(event, prescriptionId) {
   console.log('Global openPrescriptionModal called');
   if (window.modalManager) {
-    window.modalManager.openPrescriptionModal(event);
+    window.modalManager.openPrescriptionModal(event, prescriptionId);
   } else {
     console.error('Modal manager not initialized yet');
   }
@@ -215,18 +279,18 @@ function confirmDeletePrescription(event, prescriptionId) {
 }
 
 // Handle delete confirmation
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const cancelBtn = document.getElementById('cancelDelete');
   const confirmBtn = document.getElementById('confirmDelete');
-  
+
   if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() {
+    cancelBtn.addEventListener('click', function () {
       window.modalManager.closeDeleteModal();
     });
   }
-  
+
   if (confirmBtn) {
-    confirmBtn.addEventListener('click', function() {
+    confirmBtn.addEventListener('click', function () {
       const prescriptionId = this.getAttribute('data-prescription-id');
       if (prescriptionId) {
         window.location.href = window.location.origin + '/MVC/Doctor/deletePrescription/' + prescriptionId;

@@ -181,32 +181,5 @@ $recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
 
 <?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?> 
 
-<style>
-.appointment-reason-link {
-    margin-top: 8px;
-    border: none;
-    background: transparent;
-    color: #1d4ed8;
-    font-size: 13px;
-    padding: 0;
-    text-decoration: underline;
-    cursor: pointer;
-}
-</style>
-
-<script>
-function openDashboardAppointmentReasonModal(triggerBtn) {
-    const statusLabel = triggerBtn?.dataset?.statusLabel || 'Appointment';
-    const reason = triggerBtn?.dataset?.reason || 'No reason provided.';
-
-    document.getElementById('dashboardAppointmentReasonTitle').textContent = statusLabel + ' Reason';
-    document.getElementById('dashboardAppointmentReasonText').textContent = reason;
-    document.getElementById('dashboardAppointmentReasonModal').style.display = 'flex';
-}
-
-function closeDashboardAppointmentReasonModal() {
-    document.getElementById('dashboardAppointmentReasonModal').style.display = 'none';
-}
-</script>
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

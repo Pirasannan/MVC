@@ -411,8 +411,8 @@
   align-items: start;
 }
 
-.field-doctor { grid-column: span 6; }
-.field-date { grid-column: span 3; }
+.field-doctor { grid-column: span 7; }
+.field-date { grid-column: span 2; }
 .field-time { grid-column: span 3; }
 .field-reason { grid-column: span 12; }
 
@@ -439,14 +439,12 @@
 .field{ display:flex; flex-direction:column; gap:8px; }
 .label{ font-size:14px; color:#374151; font-weight:600; }
 .input, .select, .textarea{
-  width:100%;
   border:1px solid var(--line);
   border-radius:10px;
   min-height:44px;
   padding:10px 12px;
   background:#fff;
   color:var(--text);
-  box-sizing:border-box;
   outline:none;
   transition:border-color .15s, box-shadow .15s;
 }
@@ -466,116 +464,9 @@
 
 .time-select {
   appearance: none;
-  min-height: 40px;
-  height: 40px;
-  padding-top: 7px;
-  padding-bottom: 7px;
   padding-right: 38px;
-  font-size: 13px;
-  line-height: 1.2;
   font-weight: 600;
   cursor: pointer;
-}
-
-.time-select-wrap--enhanced::after {
-  display: none;
-}
-
-.time-select-native {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-  width: 0;
-  height: 0;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-}
-
-.time-select-trigger {
-  width: 100%;
-  min-height: 40px;
-  height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  color: #64748b;
-  padding: 7px 36px 7px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  text-align: left;
-  cursor: pointer;
-  position: relative;
-  transition: border-color .15s, box-shadow .15s;
-}
-
-.time-select-trigger::after {
-  content: '';
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #64748b;
-  border-bottom: 2px solid #64748b;
-  transform: translateY(-65%) rotate(45deg);
-  pointer-events: none;
-}
-
-.time-select-wrap--enhanced.is-open .time-select-trigger,
-.time-select-trigger:focus {
-  border-color: rgba(37,99,235,.5);
-  box-shadow: 0 0 0 4px rgba(37,99,235,.08);
-  outline: none;
-}
-
-.time-select-trigger.is-selected {
-  color: var(--text);
-}
-
-.time-select-wrap--enhanced.is-open .time-select-trigger::after {
-  transform: translateY(-40%) rotate(-135deg);
-}
-
-.time-select-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 40;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
-  max-height: 180px;
-  overflow-y: auto;
-  padding: 4px;
-}
-
-.time-select-option {
-  width: 100%;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: #1f2937;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.15;
-  padding: 6px 8px;
-  cursor: pointer;
-}
-
-.time-select-option:hover,
-.time-select-option:focus {
-  background: #f3f4f6;
-  outline: none;
-}
-
-.time-select-option.is-selected {
-  background: #eaf2ff;
-  color: #1d4ed8;
 }
 
 .time-select-wrap::after {
@@ -592,9 +483,6 @@
 }
 
 .time-select option {
-  font-size: 13px;
-  line-height: 1.1;
-  padding: 3px 8px;
   font-weight: 500;
 }
 
@@ -617,10 +505,6 @@
   box-shadow: none;
   transition: background-color 0.2s ease, border-color 0.2s ease;
   width: max-content;
-}
-
-.p-form #request-appointment-btn {
-  align-self: flex-start;
 }
 
 .join-consultation-btn i,
@@ -703,12 +587,6 @@
 .cell-list .p{color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .more{color:#6b7280;font-size:.85rem}
 @media (max-width:900px){.cell-list li .p{display:none}}
-
-@media (max-width:900px){
-  .p-form #request-appointment-btn {
-    width: 100%;
-  }
-}
 
 .res-modal {
   position: fixed; inset: 0; background: rgba(0,0,0,.45);

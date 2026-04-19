@@ -178,7 +178,6 @@ $recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
     </div>
 
 <!-- Include Prescription Modal -->
-
 <?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?> 
 
 <style>

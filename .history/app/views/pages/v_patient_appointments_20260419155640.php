@@ -233,7 +233,7 @@ $getDoctorStatusReason = static function ($appointment): string {
             <div class="time-select-wrap">
               <select class="input select time-select" id="from" name="from" required>
                 <option value="">Select a time slot</option>
-                <?php for ($hour = 6; $hour <= 21; $hour++): ?>
+                <?php for ($hour = 8; $hour <= 17; $hour++): ?>
                   <?php foreach ([0, 15, 30, 45] as $minute): ?>
                     <?php
                       $value = sprintf('%02d:%02d', $hour, $minute);
@@ -244,7 +244,7 @@ $getDoctorStatusReason = static function ($appointment): string {
                 <?php endfor; ?>
               </select>
             </div>
-            <div class="help">Each appointment is a 15-minute session.</div>
+            <div class="help">Available slots: 8:00 AM to 5:45 PM (15-minute intervals).</div>
           </div>
 
           <div class="field field-reason">
@@ -339,96 +339,8 @@ $getDoctorStatusReason = static function ($appointment): string {
   const idInput   = document.getElementById('doctor_id');
   const box       = document.getElementById('doctor_suggestions');
   const form      = document.getElementById('apptForm');
-  const timeSelect = document.getElementById('from');
   const patientStatus = (form?.dataset?.patientStatus || '').toLowerCase();
   let timer;
-
-  function initCompactTimeSelect(selectEl){
-    if(!selectEl) return;
-
-    const wrap = selectEl.closest('.time-select-wrap');
-    if(!wrap || wrap.dataset.enhanced === '1') return;
-
-    wrap.dataset.enhanced = '1';
-    wrap.classList.add('time-select-wrap--enhanced');
-    selectEl.classList.add('time-select-native');
-
-    const trigger = document.createElement('button');
-    trigger.type = 'button';
-    trigger.className = 'time-select-trigger';
-    trigger.setAttribute('aria-haspopup', 'listbox');
-    trigger.setAttribute('aria-expanded', 'false');
-
-    const menu = document.createElement('div');
-    menu.className = 'time-select-menu';
-    menu.setAttribute('role', 'listbox');
-    menu.hidden = true;
-
-    Array.from(selectEl.options).forEach((option, idx) => {
-      if(idx === 0) return;
-
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'time-select-option';
-      item.dataset.value = option.value;
-      item.textContent = option.textContent;
-      item.addEventListener('click', () => {
-        selectEl.value = option.value;
-        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-        closeMenu();
-      });
-
-      menu.appendChild(item);
-    });
-
-    function syncSelection(){
-      const selected = selectEl.options[selectEl.selectedIndex];
-      const hasValue = !!(selected && selected.value);
-
-      trigger.textContent = hasValue ? selected.textContent : 'Select a time slot';
-      trigger.classList.toggle('is-selected', hasValue);
-
-      Array.from(menu.querySelectorAll('.time-select-option')).forEach((item) => {
-        item.classList.toggle('is-selected', item.dataset.value === selectEl.value);
-      });
-    }
-
-    function openMenu(){
-      menu.hidden = false;
-      wrap.classList.add('is-open');
-      trigger.setAttribute('aria-expanded', 'true');
-    }
-
-    function closeMenu(){
-      menu.hidden = true;
-      wrap.classList.remove('is-open');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
-
-    trigger.addEventListener('click', () => {
-      if(menu.hidden) {
-        openMenu();
-      } else {
-        closeMenu();
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if(!wrap.contains(e.target)) closeMenu();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape') closeMenu();
-    });
-
-    selectEl.addEventListener('change', syncSelection);
-
-    wrap.appendChild(trigger);
-    wrap.appendChild(menu);
-    syncSelection();
-  }
-
-  initCompactTimeSelect(timeSelect);
 
   function clearSuggestions(){
     box.innerHTML = '';

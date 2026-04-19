@@ -179,7 +179,6 @@ $recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
 
 <!-- Include Prescription Modal -->
 
-<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?> 
 
 <style>
 .appointment-reason-link {

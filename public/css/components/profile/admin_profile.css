@@ -250,6 +250,8 @@
 
 .dashboard-container.admin .action-button.secondary:hover {
     background: #e2e8f0;
+    transform: translateY(-1px);
+
 }
 
 .dashboard-container.admin .modal-overlay {

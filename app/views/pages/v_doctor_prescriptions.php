@@ -19,25 +19,25 @@ $canCreatePrescription = ($doctorStatus === 'active');
             
             <?php if (isset($_GET['created']) && $_GET['created'] == '1'): ?>
                 <div class="success-message" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-                    ✅ Prescription created successfully<?php if (!empty($data['patient_name'])): ?> for <?php echo htmlspecialchars($data['patient_name']); ?><?php endif; ?>
+                     Prescription created successfully<?php if (!empty($data['patient_name'])): ?> for <?php echo htmlspecialchars($data['patient_name']); ?><?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['updated']) && $_GET['updated'] == '1'): ?>
                 <div class="success-message" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-                    ✅ Prescription updated successfully<?php if (!empty($data['patient_name'])): ?> for <?php echo htmlspecialchars($data['patient_name']); ?><?php endif; ?>
+                     Prescription updated successfully<?php if (!empty($data['patient_name'])): ?> for <?php echo htmlspecialchars($data['patient_name']); ?><?php endif; ?>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['deleted']) && $_GET['deleted'] == '1'): ?>
                 <div class="success-message" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-                    ✅ Prescription deleted successfully
+                     Prescription deleted successfully
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_GET['error']) && $_GET['error'] == '1'): ?>
                 <div class="error-message" style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
-                    ❌ Error deleting prescription. Please try again.
+                     Error deleting prescription. Please try again.
                 </div>
             <?php endif; ?>
 

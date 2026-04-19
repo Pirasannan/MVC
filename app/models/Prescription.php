@@ -69,6 +69,27 @@ class Prescription {
         return $this->db->single();
     }
 
+    public function getPrescriptionDetails($id) {
+        $this->db->query('
+            SELECT 
+                p.*, 
+                d.name AS doctor_name, 
+                d.email AS doctor_email,
+                d.slmc AS doctor_slmc,
+                u.name AS patient_name,
+                m.date_of_birth,
+                m.blood_type,
+                m.allergies
+            FROM prescriptions p
+            INNER JOIN Users d ON p.doctor_id = d.id
+            INNER JOIN Users u ON p.patient_id = u.id
+            LEFT JOIN patient_medical_info m ON p.patient_id = m.patient_id
+            WHERE p.id = :id
+        ');
+        $this->db->bind(':id', $id);
+        return $this->db->single();
+    }
+
 public function updatePrescription($data) {
     try {
         $this->db->query('

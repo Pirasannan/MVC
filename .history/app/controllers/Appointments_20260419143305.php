@@ -3,7 +3,6 @@ class Appointments extends Controller
 {
     private $apModel;
     private $userModel;
-    private const LOCAL_TIMEZONE = 'Asia/Colombo';
     public function __construct()
     {
         $this->apModel = $this->model('Appointment');
@@ -77,7 +76,8 @@ class Appointments extends Controller
             $monthStr = date('Y-m');
         }
 
-        $tzLocal = new DateTimeZone(self::LOCAL_TIMEZONE);
+        $tzLocal = new DateTimeZone('Asia/Colombo');
+        $tzUTC   = new DateTimeZone('UTC');
 
         $firstLocal = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $monthStr . '-01 00:00:00', $tzLocal);
         $daysInMonth = (int)$firstLocal->format('t');
@@ -88,14 +88,15 @@ class Appointments extends Controller
         $dowLast = (int)$lastLocal->format('N');
         $gridEndLocal = $lastLocal->modify('+' . (7 - $dowLast) . ' days')->setTime(23, 59, 59);
 
-        $fetchStartLocal = $firstLocal->format('Y-m-d H:i:s');
-        $fetchEndLocal   = $lastLocal->format('Y-m-d H:i:s');
+        $fetchStartUtc = $firstLocal->setTimezone($tzUTC)->format('Y-m-d H:i:s');
+        $fetchEndUtc   = $lastLocal->setTimezone($tzUTC)->format('Y-m-d H:i:s');
 
-        $rows = $this->apModel->getApprovedBetweenForDoctor((int)$_SESSION['user_id'], $fetchStartLocal, $fetchEndLocal);
+        $rows = $this->apModel->getApprovedBetweenForDoctor((int)$_SESSION['user_id'], $fetchStartUtc, $fetchEndUtc);
 
         $byDate = [];
         foreach ($rows as $r) {
-            $dtLocal = new DateTimeImmutable($r->starts_at, $tzLocal);
+            $dtUtc   = new DateTimeImmutable($r->starts_at, $tzUTC);
+            $dtLocal = $dtUtc->setTimezone($tzLocal);
             $key = $dtLocal->format('Y-m-d');
             if (!isset($byDate[$key])) $byDate[$key] = [];
             $byDate[$key][] = [
@@ -158,8 +159,8 @@ class Appointments extends Controller
         $from = trim($_POST['from'] ?? '');
         $reason = trim($_POST['reason'] ?? '');
 
-        // Parse the user's chosen local time.
-        $tzLocal = new DateTimeZone(self::LOCAL_TIMEZONE);
+        // Parse the user's chosen local time in Asia/Colombo
+        $tzLocal = new DateTimeZone('Asia/Colombo');
         $dtStartLocal = DateTimeImmutable::createFromFormat('Y-m-d H:i', "$date $from", $tzLocal);
 
         if (!$doctor_id || !$dtStartLocal) {
@@ -176,11 +177,16 @@ class Appointments extends Controller
         // Fixed duration: 15 minutes
         $dtEndLocal = $dtStartLocal->modify('+15 minutes');
 
-        // Compare against "now" in local time.
-        $nowLocal = new DateTimeImmutable('now', $tzLocal);
+        // Convert to UTC for storage & comparisons
+        $tzUTC = $tzLocal;
+        $dtStartUTC = $dtStartLocal;
+        $dtEndUTC   = $dtEndLocal;
+
+        // Compare against "now" in the SAME reference timezone (UTC)
+        $nowUTC = new DateTimeImmutable('now', $tzUTC);
 
         // Small grace (60s) to avoid edge cases if seconds differ
-        if ($dtStartLocal <= $nowLocal->modify('+60 seconds')) {
+        if ($dtStartUTC <= $nowUTC->modify('+60 seconds')) {
             $_SESSION['flash'] = 'Start time must be in the future.';
             return redirect('Appointments/my');
         }
@@ -188,8 +194,8 @@ class Appointments extends Controller
         $ok = $this->apModel->request([
             'patient_id' => $_SESSION['user_id'],
             'doctor_id'  => $doctor_id,
-            'starts_at'  => $dtStartLocal->format('Y-m-d H:i:s'),
-            'ends_at'    => $dtEndLocal->format('Y-m-d H:i:s'),
+            'starts_at'  => $dtStartUTC->format('Y-m-d H:i:s'),
+            'ends_at'    => $dtEndUTC->format('Y-m-d H:i:s'),
             'reason'     => $reason
         ]);
 

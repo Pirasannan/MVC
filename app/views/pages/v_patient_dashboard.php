@@ -112,11 +112,16 @@ $recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
                                         $doseText = trim((string)($prescription->dose_amount ?? '') . ' ' . (string)($prescription->dose_unit ?? ''));
                                         $medicationDetails = trim(($doseText !== '' ? $doseText : 'No dose specified') . ', ' . ($prescription->frequency ?? 'As directed'));
                                     ?>
-                                    <div class="medication-item">
+                                    <div class="medication-item <?= ($prescription->is_deleted === 'deleted') ? 'deleted-item' : '' ?>" onclick="openPrescriptionModal(event, <?= $prescription->id ?>)">
                                         <div class="medication-info">
                                             <div class="medication-name"><?php echo htmlspecialchars($prescription->drug_name ?? 'Prescription'); ?></div>
                                             <div class="medication-details"><?php echo htmlspecialchars($medicationDetails); ?></div>
                                             <div class="prescribed-by">Prescribed by Dr. <?php echo htmlspecialchars($prescription->doctor_name ?? 'Unknown'); ?></div>
+                                            <?php if (($prescription->is_deleted ?? 'not_deleted') === 'deleted'): ?>
+                                                <div class="deleted-status" style="color: #dc3545; font-size: 11px; margin-top: 4px;">
+                                                    <strong>DELETED</strong>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="medication-date">
                                             <div class="prescription-date"><?php echo htmlspecialchars($prescribedDate); ?></div>
@@ -141,5 +146,8 @@ $recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
             </div>
         </main>
     </div>
+
+<!-- Include Prescription Modal -->
+<?php require APPROOT.'/views/pages/prescriptions/view_prescription.php'; ?> 
 
 <?php require APPROOT.'/views/inc/footer.php'; ?>

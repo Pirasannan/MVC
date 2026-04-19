@@ -616,6 +616,29 @@ class Users extends Controller {
         }
     }
 
+    /**
+     * Resend Registration OTP
+     */
+    public function resendRegistrationOtp(){
+        if(empty($_SESSION['registration_otp_email']) || empty($_SESSION['temp_registration_data'])){
+            redirect('Users/register');
+            return;
+        }
+
+        $email = $_SESSION['registration_otp_email'];
+        $regData = $_SESSION['temp_registration_data'];
+        $name = $regData['name'] ?? $email;
+
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $expiresAt = date('Y-m-d H:i:s', time() + 15 * 60);
+
+        if($this->userModel->saveOtp($email, $otp, $expiresAt)){
+            Mailer::sendOtp($email, $name, $otp, 'register');
+        }
+
+        redirect('Users/verifyRegistrationOtp');
+    }
+
 
 }
 

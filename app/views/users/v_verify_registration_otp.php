@@ -16,19 +16,9 @@
     <form action="<?php echo URLROOT; ?>/Users/verifyRegistrationOtp" method="POST" class="form" novalidate>
 
         <div class="form-group otp-input-group <?php echo (!empty($data['otp_err'])) ? 'error' : ''; ?>">
-            <input
-                type="text"
-                name="otp"
-                id="otp"
-                class="form-input otp-input"
-                value="<?php echo htmlspecialchars($data['otp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                maxlength="6"
-                inputmode="numeric"
-                pattern="\d{6}"
-                autocomplete="one-time-code"
-                required
-                placeholder="••••••"
-            >
+            <input type="text" name="otp" id="otp" class="form-input otp-input"
+                value="<?php echo htmlspecialchars($data['otp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" maxlength="6"
+                inputmode="numeric" pattern="\d{6}" autocomplete="one-time-code" required placeholder="••••••">
             <label class="form-label" for="otp">Verification Code</label>
             <?php if (!empty($data['otp_err'])): ?>
                 <span class="Form-Invalid" role="alert"><?php echo htmlspecialchars($data['otp_err']); ?></span>
@@ -37,8 +27,9 @@
 
         <button type="submit" class="submit-button">Verify & Create Account</button>
 
-        <div class="account-links">
-            <p class="resend-text">Didn't receive the code? <a class="resend-otp" href="<?php echo URLROOT; ?>/Users/register">Go Back to Register</a></p>
+        <div class="single_acc_link">
+            <p class="resend-text">Didn't receive the code? <a class="forgot_pass"
+                    href="<?php echo URLROOT; ?>/Users/register">Go Back to Register</a></p>
         </div>
 
     </form>

@@ -36,12 +36,12 @@ class Mailer
         try {
             // ── Server Settings ──────────────────────────────────────────
             $mail->isSMTP();
-            $mail->Host       = MAIL_HOST;
-            $mail->SMTPAuth   = true;
-            $mail->Username   = MAIL_USERNAME;
-            $mail->Password   = MAIL_PASSWORD;
+            $mail->Host = MAIL_HOST;
+            $mail->SMTPAuth = true;
+            $mail->Username = MAIL_USERNAME;
+            $mail->Password = MAIL_PASSWORD;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = MAIL_PORT;
+            $mail->Port = MAIL_PORT;
 
             // ── From ─────────────────────────────────────────────────────
             $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
@@ -53,7 +53,7 @@ class Mailer
             // ── Content ──────────────────────────────────────────────────
             $mail->isHTML(true);
             $mail->Subject = $subject;
-            $mail->Body    = $htmlBody;
+            $mail->Body = $htmlBody;
             $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $htmlBody));
 
             $mail->send();
@@ -110,7 +110,7 @@ class Mailer
     {
         $year = date('Y');
         $title = ($type === 'register') ? 'Account Verification' : 'Password Reset Request';
-        $mainText = ($type === 'register') 
+        $mainText = ($type === 'register')
             ? 'Thank you for choosing MediLink. Use the verification code below to complete your registration and activate your account.'
             : 'We received a request to reset your MediLink password. Use the verification code below to proceed with the reset.';
 
@@ -140,9 +140,6 @@ class Mailer
                             <tr>
                                 <td style="padding:40px;">
                                     <p style="margin:0 0 16px;font-size:16px;color:#1a1a2e;">Hi <strong>{$name}</strong>,</p>
-                                    <p style="margin:0 0 28px;font-size:15px;color:#555;line-height:1.6;">
-                                        {$mainText} This code is valid for <strong>15 minutes</strong>.
-                                    </p>
 
                                     <!-- OTP Box -->
                                     <table width="100%" cellpadding="0" cellspacing="0" border="0">

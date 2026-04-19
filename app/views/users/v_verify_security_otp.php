@@ -15,19 +15,9 @@
     <form action="<?php echo URLROOT; ?>/Users/verifySecurityOtp" method="POST" class="form" novalidate>
 
         <div class="form-group otp-input-group <?php echo (!empty($data['otp_err'])) ? 'error' : ''; ?>">
-            <input
-                type="text"
-                name="otp"
-                id="otp"
-                class="form-input otp-input"
-                value="<?php echo htmlspecialchars($data['otp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-                maxlength="6"
-                inputmode="numeric"
-                pattern="\d{6}"
-                autocomplete="one-time-code"
-                required
-                placeholder="••••••"
-            >
+            <input type="text" name="otp" id="otp" class="form-input otp-input"
+                value="<?php echo htmlspecialchars($data['otp'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" maxlength="6"
+                inputmode="numeric" pattern="\d{6}" autocomplete="one-time-code" required placeholder="••••••">
             <label class="form-label" for="otp">6-Digit OTP</label>
             <?php if (!empty($data['otp_err'])): ?>
                 <span class="Form-Invalid" role="alert"><?php echo htmlspecialchars($data['otp_err']); ?></span>
@@ -36,8 +26,10 @@
 
         <button type="submit" class="submit-button">Confirm Identification</button>
 
-        <div class="account-links">
-            <a class="resend-otp" href="<?php echo URLROOT; ?>/Users/securityOtp?action=<?php echo $_SESSION['security_action']; ?>">Resend OTP</a>
+        <div class="single_acc_link">
+            <a class="forgot_pass"
+                href="<?php echo URLROOT; ?>/Users/securityOtp?action=<?php echo $_SESSION['security_action']; ?>">Resend
+                OTP</a>
         </div>
 
     </form>
@@ -46,7 +38,7 @@
 <script>
     // ── 5-minute countdown ────
     (function () {
-        const timerEl   = document.getElementById('otpTimer');
+        const timerEl = document.getElementById('otpTimer');
         const role = '<?php echo $_SESSION['user_role'] ?? 'patient'; ?>';
         const redirectTo = '<?php echo URLROOT; ?>/Pages/' + role + 'Profile';
         if (!timerEl) return;

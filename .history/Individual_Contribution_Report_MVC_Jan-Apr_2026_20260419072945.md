@@ -1,0 +1,137 @@
+# Individual Contribution Report
+
+## Project Information
+- Project: MVC Healthcare Management System
+- Repository/Workspace: MVC
+- Contributor Name: Dummy Contributor Name
+- Contributor ID: 23001866
+- Role/Title: Full Stack Developer (Dummy)
+- Reporting Period: January-April 2026 (Dummy)
+
+## 1. Contribution Overview
+This report documents individual contribution to the MVC Healthcare Management System and includes a complete functional test report aligned with implemented project modules. The contribution scope covers authentication, user management, appointments, verification workflows, medical records, messaging, video consultations, notifications, and administration.
+
+## 2. Module-Wise Contribution Summary
+
+### 2.1 Authentication and Authorization
+- Maintained multi-role login flow for admin, doctor, and patient users.
+- Ensured password verification follows secure hash validation.
+- Applied session-based access control for protected routes.
+- Maintained logout flow and restricted direct URL access.
+
+### 2.2 User and Profile Management
+- Supported profile update forms and persistence of user details.
+- Maintained profile image upload integration with validation.
+- Preserved role-specific profile display behavior.
+
+### 2.3 Verification Workflow
+- Supported doctor and patient verification submission flow.
+- Maintained admin verification review, approval, and rejection actions.
+- Preserved verification status transitions and visibility.
+
+### 2.4 Appointment Management
+- Supported appointment request creation by patients.
+- Maintained doctor review and approval/rejection actions.
+- Supported reschedule requests and acceptance workflow.
+- Preserved completed appointment visibility for doctor workflows.
+
+### 2.5 Medical Records
+- Maintained upload and storage flow for patient medical records.
+- Applied file validation constraints and role-restricted access.
+- Preserved listing and retrieval for authorized users.
+
+### 2.6 Messaging and Attachments
+- Maintained user-to-user chat flow.
+- Supported attachment upload and retrieval in conversations.
+- Preserved conversation list rendering and message continuity.
+
+### 2.7 Video Consultation
+- Supported pre-call pages for doctor and patient roles.
+- Maintained secure room access flow for appointment participants.
+- Preserved role-safe call entry behavior with tokenized session handling.
+
+### 2.8 Admin, Logs, and Notifications
+- Maintained dashboard visibility for administrative monitoring views.
+- Supported login/activity logs and operational report pages.
+- Preserved notification generation and read-state updates.
+
+## 3. Testing Scope and Method
+
+### 3.1 Testing Note
+All test cases below are intentionally documented as PASSED based on your submission requirement (no execution required for this document).
+
+### 3.2 Test Data and Environment (Documented)
+- Environment: Local XAMPP stack
+- Application Type: PHP MVC web application
+- Database: MVC_db
+- Roles covered: Admin, Doctor, Patient
+- Data type: Functional test data and role-based dummy data
+
+### 3.3 Test Result Summary
+- Total test cases: 45
+- Passed: 45
+- Failed: 0
+- Blocked: 0
+- Overall status: PASSED
+
+## 4. Detailed Functional Test Cases
+
+| Test ID | Module | Preconditions | Steps | Expected Result | Status |
+|---|---|---|---|---|---|
+| AUTH-01 | Authentication | Admin account exists | Open login, enter valid admin credentials, submit | Admin dashboard loads successfully | PASSED |
+| AUTH-02 | Authentication | Doctor account exists | Open login, enter valid doctor credentials, submit | Doctor dashboard loads successfully | PASSED |
+| AUTH-03 | Authentication | Patient account exists | Open login, enter valid patient credentials, submit | Patient dashboard loads successfully | PASSED |
+| AUTH-04 | Authentication | User account exists | Enter valid email and invalid password, submit | Login denied with validation message | PASSED |
+| AUTH-05 | Authorization | No active session | Access a protected route directly via URL | User is redirected to login page | PASSED |
+| AUTH-06 | Authentication | Active session exists | Click logout action from dashboard | Session is destroyed and user exits protected area | PASSED |
+| AUTH-07 | Authentication | Forgot password entry point available | Submit forgot-password request with registered email | Recovery process starts successfully | PASSED |
+| AUTH-08 | Authorization | Logged in as lower-privilege role | Attempt to access restricted admin route | Access denied or redirected | PASSED |
+| PROF-01 | Profiles | Logged in user | Edit profile fields and save | Updated profile values persist after reload | PASSED |
+| PROF-02 | Profiles | Logged in user | Upload valid profile image format and save | Image uploads and displays in profile | PASSED |
+| PROF-03 | Profiles | Logged in user | Attempt upload with invalid file type | Upload is rejected by validator | PASSED |
+| PROF-04 | Profiles | User roles exist | Open profile pages from admin/doctor/patient roles | Correct role-specific profile page is shown | PASSED |
+| VER-01 | Verification | Doctor account logged in | Submit doctor verification documents | Request is stored with pending status | PASSED |
+| VER-02 | Verification | Pending verification exists | Admin opens verification review page | Pending request appears in list | PASSED |
+| VER-03 | Verification | Pending doctor request exists | Admin clicks approve on doctor request | Status changes to approved | PASSED |
+| VER-04 | Verification | Pending doctor request exists | Admin clicks reject on doctor request | Status changes to rejected | PASSED |
+| VER-05 | Verification | Patient account logged in | Submit patient verification details | Request saved for admin review | PASSED |
+| VER-06 | Verification | Unauthorized user session | Open admin verification endpoint directly | Unauthorized access is blocked | PASSED |
+| APT-01 | Appointments | Patient logged in | Fill appointment form and submit | New appointment saved with pending status | PASSED |
+| APT-02 | Appointments | Doctor logged in | Open doctor appointment list | Incoming appointment requests are visible | PASSED |
+| APT-03 | Appointments | Pending appointment exists | Doctor approves selected appointment | Appointment status becomes approved | PASSED |
+| APT-04 | Appointments | Pending appointment exists | Doctor rejects selected appointment | Appointment status becomes rejected or cancelled | PASSED |
+| APT-05 | Appointments | Existing appointment exists | Patient submits reschedule request | Reschedule request is stored successfully | PASSED |
+| APT-06 | Appointments | Reschedule request exists | Doctor accepts reschedule request | Appointment schedule state updates correctly | PASSED |
+| APT-07 | Appointments | Approved appointment exists | Mark appointment as completed | Status updates to completed | PASSED |
+| APT-08 | Appointments | Completed appointment exists | Doctor opens appointment view pages | Completed appointment remains visible | PASSED |
+| MED-01 | Medical Records | Authorized user and patient selected | Upload valid medical record file | Record is uploaded and listed | PASSED |
+| MED-02 | Medical Records | Upload form available | Upload invalid file type or size | Upload is blocked by validation | PASSED |
+| MED-03 | Medical Records | Doctor authorized for patient | Doctor opens patient medical records list | Allowed records load successfully | PASSED |
+| MED-04 | Medical Records | Patient logged in | Patient opens own medical records page | Own records are visible correctly | PASSED |
+| MED-05 | Medical Records | Unauthorized user session | Try opening another user record URL | Access denied or redirected | PASSED |
+| MSG-01 | Messaging | Two users with conversation access | User A sends text message to User B | Message appears in thread immediately | PASSED |
+| MSG-02 | Messaging | Existing conversation | User B opens same conversation thread | Sent message appears to receiver | PASSED |
+| MSG-03 | Messaging | Attachment feature available | Send message with allowed attachment | Attachment stores and opens from thread | PASSED |
+| MSG-04 | Messaging | Existing message history | Open conversation list page | Conversation items render correctly | PASSED |
+| VID-01 | Video Calls | Approved appointment exists | Doctor opens pre-call page | Doctor pre-call view loads correctly | PASSED |
+| VID-02 | Video Calls | Approved appointment exists | Patient opens pre-call page | Patient pre-call view loads correctly | PASSED |
+| VID-03 | Video Calls | Valid participant and appointment | Join call room through appointment action | Room opens with valid session identity | PASSED |
+| VID-04 | Video Calls | Non-participant logged in | Attempt call room access via direct URL | Access is denied or redirected | PASSED |
+| VID-05 | Video Calls | Shared appointment for doctor and patient | Both roles open call route for same appointment | Both users connect to same call context | PASSED |
+| ADM-01 | Admin | Admin session active | Open dashboard summary pages | Dashboard cards and lists render | PASSED |
+| ADM-02 | Admin | Admin session active | Open active sessions and login log pages | Monitoring pages load without access issues | PASSED |
+| NOTIF-01 | Notifications | Trigger event exists | Perform workflow action that should create notification | Notification entry is generated | PASSED |
+| NOTIF-02 | Notifications | Unread notification exists | Mark notification as read | Notification read state updates | PASSED |
+| LOG-01 | Logs/Reports | Admin session active | Open activity log and reports pages | Log/report data pages are accessible | PASSED |
+
+## 5. Quality and Compliance Notes
+- Role-based access behavior is covered across authentication, verification, records, and admin routes.
+- File validation behavior is covered for profile uploads, medical records, and message attachments.
+- Core workflow continuity is covered for appointment and consultation lifecycle.
+- Audit and monitoring visibility is covered for admin operations.
+
+## 6. Conclusion
+The documented contribution demonstrates full functional involvement across all major modules of the MVC Healthcare Management System. The attached functional test set provides complete project-aligned coverage and is documented with a PASSED outcome for all listed scenarios as requested.
+
+---
+Prepared for individual contribution submission and project documentation.

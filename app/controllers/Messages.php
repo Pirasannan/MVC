@@ -163,6 +163,7 @@ class Messages extends Controller {
         try {
             // Security: Verify user has access to this conversation
             if (!$this->messageModel->hasAccessToConversation($conversationId, $userId)) {
+                error_log('Messages::sendMessage access denied - user_id=' . (int)$userId . ', conversation_id=' . (int)$conversationId);
                 echo json_encode(['success' => false, 'message' => 'Access denied']);
                 return;
             }
@@ -235,12 +236,19 @@ class Messages extends Controller {
                     'attachment' => $attachmentData
                 ]);
             } else {
+                error_log(
+                    'Messages::sendMessage failed insert - user_id=' . (int)$userId
+                    . ', conversation_id=' . (int)$conversationId
+                    . ', has_attachment=' . ($attachmentData ? '1' : '0')
+                    . ', message_length=' . strlen($messageText)
+                );
                 echo json_encode([
                     'success' => false,
                     'message' => 'Failed to send message'
                 ]);
             }
         } catch (Exception $e) {
+            error_log('Messages::sendMessage exception - user_id=' . (int)$userId . ', conversation_id=' . (int)$conversationId . ', error=' . $e->getMessage());
             echo json_encode([
                 'success' => false,
                 'message' => 'Error sending message'
@@ -690,7 +698,10 @@ class Messages extends Controller {
         try {
             // Security: Verify role-based authorization before creating conversation
             if (!$this->canUsersMessage($userId, $recipientId)) {
-                echo json_encode(['success' => false, 'message' => 'Unauthorized - users cannot message each other']);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Cannot start chat. Ensure doctor-patient users have at least one pending/approved/completed appointment.'
+                ]);
                 return;
             }
             
@@ -719,6 +730,7 @@ class Messages extends Controller {
                 }
             }
         } catch (Exception $e) {
+            error_log('Messages::createConversation error: ' . $e->getMessage());
             echo json_encode([
                 'success' => false,
                 'message' => 'Error creating conversation'
@@ -885,6 +897,7 @@ class Messages extends Controller {
                 'success' => true
             ]);
         } catch (Exception $e) {
+            error_log('Messages::sendMessage error: ' . $e->getMessage());
             echo json_encode([
                 'success' => false
             ]);

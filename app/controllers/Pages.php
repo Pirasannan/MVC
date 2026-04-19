@@ -242,11 +242,32 @@ class Pages extends Controller{
             return;
         }
 
+        $pendingVerifications = $this->verificationModel->getPendingDoctorVerificationsForAdmin();
+        $unverifiedDoctors = $this->adminModel->getUnverifiedDoctors();
+        $pendingDoctorsMap = [];
+
+        foreach ($pendingVerifications as $doctor) {
+            $doctorKey = $doctor->user_id ?? $doctor->email ?? null;
+            if ($doctorKey === null) {
+                continue;
+            }
+            $pendingDoctorsMap[$doctorKey] = $doctor;
+        }
+
+        foreach ($unverifiedDoctors as $doctor) {
+            $doctorKey = $doctor->id ?? $doctor->email ?? null;
+            if ($doctorKey === null || isset($pendingDoctorsMap[$doctorKey])) {
+                continue;
+            }
+            $pendingDoctorsMap[$doctorKey] = $doctor;
+        }
+
 		// Get data from model
 		$data = [
 			'stats' => $this->adminModel->getDashboardStats(),
-			'pendingDoctors' => $this->adminModel->getPendingDoctorsForDashboard(),
+			'pendingDoctors' => array_values($pendingDoctorsMap),
 			'pendingPatients' => $this->adminModel->getPendingPatientsForDashboard(),
+            'loginLogs' => $this->adminModel->getLoginLogs(3),
 			'recentActivity' => $this->adminModel->getRecentActivityForDashboard()
 		];
 

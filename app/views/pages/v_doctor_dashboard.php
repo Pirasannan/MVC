@@ -40,12 +40,6 @@
                             <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['unreadMessagesCount'] ?? 0)); ?></div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3 class="stat-title">Pending Prescriptions</h3>
-                            <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['pendingPrescriptionsCount'] ?? 0)); ?></div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Content Sections Row -->

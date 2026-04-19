@@ -27,89 +27,91 @@
                         <div class="stat-number"><?php echo (int)($data['stats']['total_patients'] ?? 0); ?></div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-content">
-                        <h3 class="stat-title no-margin">Consultations</h3>
-                        <h4 class="stat-subtitle">Last Week</h4>
-                        <div class="stat-number"><?php echo (int)($data['stats']['consultations_last_week'] ?? 0); ?></div>
-                    </div>
-                </div>
             </div>
 
             <!-- Content Sections Row -->
             <div class="content-sections">
-                <!-- Pending Doctor Verifications Section -->
+                <!-- Pending Verifications Section -->
                 <div class="content-section">
                     <div class="section-header">
-                        <h2 class="section-title">Pending Doctor Verifications</h2>
+                        <h2 class="section-title">Pending Verifications</h2>
                     </div>
                     <div class="section-content">
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Rajesh Kumar</div>
-                                <div class="appointment-date">Submitted: 2025-10-15 | Cardiology</div>
-                                <div class="prescribed-by">NIC & Medical License uploaded</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Nisha Perera</div>
-                                <div class="appointment-date">Submitted: 2025-10-16 | General Practice</div>
-                                <div class="prescribed-by">NIC & Medical License uploaded</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
-                        <div class="appointment-item">
-                            <div class="appointment-info">
-                                <div class="doctor-name">Dr. Amara Fernando</div>
-                                <div class="appointment-date">Submitted: 2025-10-17 | Pediatrics</div>
-                                <div class="prescribed-by">NIC & Medical License uploaded</div>
-                            </div>
-                            <div class="appointment-status">
-                                <span class="status-badge pending">Pending Review</span>
-                            </div>
-                        </div>
+                        <?php $pendingDoctors = $data['pendingDoctors'] ?? []; ?>
+                        <?php if (!empty($pendingDoctors)): ?>
+                            <?php foreach ($pendingDoctors as $doctor): ?>
+                                <?php
+                                    $doctorName = $doctor->user_name ?? $doctor->name ?? '';
+                                    $doctorEmail = $doctor->user_email ?? $doctor->email ?? '';
+                                    $submittedAt = $doctor->uploaded_at ?? $doctor->created_at ?? '';
+                                    $hasDocument = !empty($doctor->photo_path);
+                                ?>
+                                <div class="appointment-item">
+                                    <div class="appointment-info">
+                                        <div class="doctor-name"><?php echo htmlspecialchars($doctorName); ?></div>
+                                        <div class="appointment-date">Email: <?php echo htmlspecialchars($doctorEmail); ?></div>
+                                        <div class="prescribed-by">Submitted: <?php echo htmlspecialchars($submittedAt); ?></div>
+                                    </div>
+                                    <div class="appointment-status">
+                                        <span class="status-badge pending"><?php echo $hasDocument ? 'Document Uploaded' : 'Pending Review'; ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state">No pending verifications.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminDoctorVerification"><button class="action-button">View All Verifications</button></a>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminDoctorVerification"><button class="action-button">Review Documents</button></a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Additional Content Sections Row -->
+
+            <!-- Login Logs Row -->
             <div class="content-sections">
-                <!-- System Activity Log Section -->
-                <div class="content-section">
+                <div class="content-section full-width">
                     <div class="section-header">
-                        <h2 class="section-title">Recent System Activity</h2>
+                        <h2 class="section-title">Recent Login Activity</h2>
                     </div>
                     <div class="section-content">
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Doctor Account Approved</div>
-                                <div class="medication-details">Dr. Sunil Jayawardena verified and activated</div>
-                                <div class="prescribed-by">Action by: Admin User</div>
-                            </div>
-                            <div class="medication-date">5 hours ago</div>
-                        </div>
-                        <div class="medication-item">
-                            <div class="medication-info">
-                                <div class="medication-name">Patient Flagged Content</div>
-                                <div class="medication-details">Inappropriate message reported in consultation chat</div>
-                                <div class="prescribed-by">Status: Under Review</div>
-                            </div>
-                            <div class="medication-date">1 day ago</div>
-                        </div>
+                        <?php $loginLogs = $data['loginLogs'] ?? []; ?>
+
+                        <?php if (!empty($loginLogs)): ?>
+                            <?php foreach ($loginLogs as $log): ?>
+                                <?php
+                                    $statusClass = $log->action === 'login_success' ? 'confirmed' : 'rejected';
+                                    $statusText = $log->action === 'login_success' ? 'Success' : 'Failed';
+                                    $userName = $log->user_name ?? 'Unknown';
+                                    $userEmail = $log->user_email ?? 'unknown';
+                                    $userRole = $log->user_role ?? 'unknown';
+                                ?>
+                                <div class="appointment-item">
+                                    <div class="appointment-info">
+                                        <div class="doctor-name">Login <?php echo htmlspecialchars($statusText); ?></div>
+                                        <div class="appointment-date">
+                                            User: <?php echo htmlspecialchars($userName); ?> (<?php echo htmlspecialchars($userEmail); ?>)
+                                        </div>
+                                        <div class="appointment-date">
+                                            Role: <?php echo htmlspecialchars($userRole); ?>
+                                        </div>
+                                        <div class="appointment-date">
+                                            IP: <?php echo htmlspecialchars($log->ip_address ?? 'unknown'); ?>
+                                        </div>
+                                        <div class="prescribed-by">
+                                            Timestamp: <?php echo htmlspecialchars($log->created_at ?? ''); ?>
+                                        </div>
+                                    </div>
+                                    <div class="appointment-status">
+                                        <span class="status-badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="empty-state">No login activity found.</p>
+                        <?php endif; ?>
                     </div>
                     <div class="section-footer">
-                        <a href="<?php echo URLROOT; ?>/Pages/adminSystemActivityLog">
-                            <button class="action-button secondary">View Full Activity Log</button>
-                        </a>
+                        <a href="<?php echo URLROOT; ?>/Pages/adminLoginLogs"><button class="action-button secondary">View All Login Logs</button></a>
                     </div>
                 </div>
             </div>

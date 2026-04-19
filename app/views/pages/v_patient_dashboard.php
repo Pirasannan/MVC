@@ -30,12 +30,6 @@ $recentPrescriptions = $dashboard['recentPrescriptions'] ?? [];
                     </div>
                     <div class="stat-card">
                         <div class="stat-content">
-                            <h3 class="stat-title">Active Medications</h3>
-                            <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['activeMedicationsCount'] ?? 0)); ?></div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
                             <h3 class="stat-title">Unread Messages</h3>
                             <div class="stat-number"><?php echo htmlspecialchars((string)($dashboard['unreadMessagesCount'] ?? 0)); ?></div>
                         </div>

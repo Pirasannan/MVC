@@ -17,7 +17,7 @@
             <!-- Back Navigation -->
             <div class="back-navigation">
                 <a href="<?php echo URLROOT; ?>/Pages/adminNotifications" class="back-button">
-                    <i class="fas fa-arrow-left"></i> Back to Notifications
+                    Back to Notifications
                 </a>
             </div>
 

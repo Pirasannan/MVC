@@ -12,6 +12,31 @@ let conversationsCache = [];
 let sidebarSearchTerm = '';
 let selectedAttachmentFile = null;
 let messagingDisabled = false;
+let selectedConversationUserId = null;
+let selectedConversationUserName = '';
+let selectedConversationUserRole = '';
+
+const MESSAGE_USER_REPORT_REASONS = [
+    'Abuse or harassment',
+    'Fraud or scam',
+    'No-show / missed appointment',
+    'Inappropriate behavior',
+    'Fake profile'
+];
+
+// Suppress the noisy failed-send popup while keeping other alerts unchanged.
+if (typeof window !== 'undefined' && !window.__messagesAlertPatched) {
+    window.__messagesAlertPatched = true;
+    const originalAlert = window.alert;
+    window.alert = function(message) {
+        const text = String(message || '').toLowerCase().trim();
+        if (text === 'failed to send message' || text.includes('failed to send message')) {
+            console.warn('Suppressed alert:', message);
+            return;
+        }
+        return originalAlert.call(window, message);
+    };
+}
 
 // Initialize messaging when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -31,9 +56,20 @@ function initializeMessaging() {
     const userIdElement = document.querySelector('[data-user-id]');
     const userTypeElement = document.querySelector('[data-user-type]');
     const messageContainer = document.querySelector('.message-container');
+    const appConfig = window.APP_CONFIG || {};
     
-    if (userIdElement) currentUserId = userIdElement.dataset.userId;
-    if (userTypeElement) currentUserType = userTypeElement.dataset.userType;
+    if (userIdElement && userIdElement.dataset.userId) {
+        currentUserId = String(userIdElement.dataset.userId);
+    } else if (appConfig.userId !== undefined && appConfig.userId !== null) {
+        currentUserId = String(appConfig.userId);
+    }
+
+    if (userTypeElement && userTypeElement.dataset.userType) {
+        currentUserType = String(userTypeElement.dataset.userType);
+    } else if (appConfig.userRole) {
+        currentUserType = String(appConfig.userRole);
+    }
+
     messagingDisabled = !!(messageContainer && messageContainer.dataset && messageContainer.dataset.messagingDisabled === '1');
 
     // Setup event listeners
@@ -52,6 +88,8 @@ function initializeMessaging() {
     }
 
     setupAttachmentHandlers();
+    setupReportHandlers();
+    updateReportButtonState();
 }
 
 // Setup event listeners
@@ -368,6 +406,10 @@ function showNoConversations() {
 async function selectConversation(conversationId, userId, previewUser = null) {
     selectedConversationId = conversationId;
     lastMessageId = 0;
+    selectedConversationUserId = userId ? String(userId) : null;
+    selectedConversationUserName = (previewUser && previewUser.name) ? previewUser.name : '';
+    selectedConversationUserRole = (previewUser && previewUser.role) ? String(previewUser.role) : '';
+    updateReportButtonState();
     
     // Update active state
     document.querySelectorAll('.conversation-item').forEach(item => {
@@ -426,6 +468,164 @@ function applyChatHeaderUser(user) {
 
     if (avatarEl) avatarEl.textContent = initials;
     if (nameEl) nameEl.textContent = userName;
+
+    selectedConversationUserId = safeUser.id !== undefined && safeUser.id !== null
+        ? String(safeUser.id)
+        : selectedConversationUserId;
+    selectedConversationUserName = userName;
+    selectedConversationUserRole = String(safeUser.type || safeUser.user_role || selectedConversationUserRole || '');
+    updateReportButtonState();
+}
+
+function setupReportHandlers() {
+    const reportBtn = document.getElementById('reportUserBtn');
+    const modal = document.getElementById('messageReportModal');
+    const closeBtn = document.getElementById('messageReportCloseBtn');
+    const cancelBtn = document.getElementById('messageReportCancelBtn');
+    const form = document.getElementById('messageReportForm');
+
+    if (reportBtn) {
+        reportBtn.addEventListener('click', openMessageReportModal);
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeMessageReportModal);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeMessageReportModal);
+    }
+
+    if (modal) {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeMessageReportModal();
+            }
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', submitMessageReport);
+    }
+}
+
+function canCurrentUserReportInMessages() {
+    const role = String(currentUserType || '').toLowerCase();
+    return role === 'doctor' || role === 'patient';
+}
+
+function canReportSelectedCounterpart() {
+    const role = String(selectedConversationUserRole || '').toLowerCase();
+    return role === 'doctor' || role === 'patient';
+}
+
+function updateReportButtonState() {
+    const reportBtn = document.getElementById('reportUserBtn');
+    if (!reportBtn) return;
+
+    const canUse = !!selectedConversationId
+        && !!selectedConversationUserId
+        && canCurrentUserReportInMessages()
+        && canReportSelectedCounterpart();
+
+    reportBtn.disabled = !canUse;
+}
+
+function setMessageReportReasonOptions() {
+    const reasonSelect = document.getElementById('messageReportReason');
+    if (!reasonSelect) return;
+
+    reasonSelect.innerHTML = '<option value="">Select a reason</option>';
+    MESSAGE_USER_REPORT_REASONS.forEach((label) => {
+        const option = document.createElement('option');
+        option.value = label;
+        option.textContent = label;
+        reasonSelect.appendChild(option);
+    });
+}
+
+function openMessageReportModal() {
+    if (!canCurrentUserReportInMessages()) {
+        alert('Only doctors and patients can submit reports.');
+        return;
+    }
+
+    if (!selectedConversationId || !selectedConversationUserId) {
+        alert('Select a conversation first.');
+        return;
+    }
+
+    if (!canReportSelectedCounterpart()) {
+        alert('Only doctor or patient users can be reported from messages.');
+        return;
+    }
+
+    const modal = document.getElementById('messageReportModal');
+    const conversationInput = document.getElementById('messageReportConversationId');
+    const userInput = document.getElementById('messageReportUserId');
+    const descriptionInput = document.getElementById('messageReportDescription');
+
+    if (!modal || !conversationInput || !userInput) {
+        return;
+    }
+
+    setMessageReportReasonOptions();
+    conversationInput.value = String(selectedConversationId);
+    userInput.value = String(selectedConversationUserId);
+    if (descriptionInput) {
+        descriptionInput.value = '';
+        descriptionInput.placeholder = selectedConversationUserName
+            ? `Add details about ${selectedConversationUserName}`
+            : 'Add details';
+    }
+
+    modal.style.display = 'flex';
+}
+
+function closeMessageReportModal() {
+    const modal = document.getElementById('messageReportModal');
+    const form = document.getElementById('messageReportForm');
+
+    if (form) {
+        form.reset();
+    }
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function submitMessageReport(event) {
+    event.preventDefault();
+
+    const form = document.getElementById('messageReportForm');
+    if (!form) return;
+
+    const formData = new FormData(form);
+    const payload = new URLSearchParams(formData);
+
+    try {
+        const response = await fetch(`${URLROOT}/Messages/submitUserReport`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: payload.toString()
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            alert(result.message || 'Could not submit report.');
+            return;
+        }
+
+        alert(result.message || 'Report submitted successfully.');
+        closeMessageReportModal();
+    } catch (error) {
+        console.error('Report submission failed:', error);
+        alert('Could not submit report. Please try again.');
+    }
 }
 
 // Load messages for conversation
@@ -806,6 +1006,18 @@ async function sendMessage() {
     messageInput.value = '';
     messageInput.style.height = 'auto';
     const pendingBubble = addMessageToDisplay(optimisticMessage, true);
+
+    const handleSendFailure = (messageTextToShow) => {
+        if (pendingBubble && pendingBubble.parentNode) {
+            pendingBubble.parentNode.removeChild(pendingBubble);
+        }
+        if (messageTextToShow) {
+            console.warn('Send message failed:', messageTextToShow);
+        }
+        if (selectedConversationId) {
+            loadMessages(selectedConversationId);
+        }
+    };
     
     try {
         const formData = new FormData();
@@ -827,10 +1039,7 @@ async function sendMessage() {
             data = JSON.parse(responseText);
         } catch (parseError) {
             console.error('Non-JSON response from sendMessage:', responseText);
-            if (pendingBubble) {
-                pendingBubble.classList.remove('pending');
-            }
-            loadMessages(selectedConversationId);
+            handleSendFailure('Could not send message. Please try again.');
             return;
         }
         
@@ -862,16 +1071,12 @@ async function sendMessage() {
             loadConversations();
         } else {
             console.error('Failed to send message:', data.message || 'Unknown error');
-            if (pendingBubble) {
-                pendingBubble.classList.remove('pending');
-            }
+            handleSendFailure(data.message || 'Failed to send message');
             loadConversations();
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        if (pendingBubble) {
-            pendingBubble.classList.remove('pending');
-        }
+        handleSendFailure('Network error while sending message.');
         loadConversations();
     }
 }

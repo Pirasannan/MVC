@@ -3,6 +3,8 @@ require APPROOT.'/views/inc/header.php';
 $current_page = 'patientPrecall';
 $apt = $data['appointment'];
 $appointmentId = (int)$apt->id;
+$apt = $data['appointment'];
+$appointmentId = (int)$apt->id;
 ?>
 
 <div class="precall-container">
@@ -21,7 +23,11 @@ $appointmentId = (int)$apt->id;
         <!-- Patient Info -->
         <div class="patient-info-card">
             <div class="patient-avatar"></div>
+            <div class="patient-avatar"></div>
             <div class="patient-details">
+                <h3><?= htmlspecialchars($apt->doctor_name) ?></h3>
+                <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
+                <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>
                 <h3><?= htmlspecialchars($apt->doctor_name) ?></h3>
                 <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
                 <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>
@@ -70,18 +76,18 @@ $appointmentId = (int)$apt->id;
                     </button>
                 </div>
 
-                <!-- Consultation Details -->
-                <div class="consultation-details">
-                    <h3>Consultation Details</h3>
-                    <div class="details-grid">
-                        <div class="detail-item">
-                            <strong>Doctor:</strong> <?= htmlspecialchars($apt->doctor_name) ?>
-                        </div>
-                        <div class="detail-item">
-                            <strong>Reason:</strong> <?= htmlspecialchars($apt->reason ?? '—') ?>
-                        </div>
-                    </div>
+        <!-- Consultation Details -->
+        <div class="consultation-details">
+            <h3>Consultation Details</h3>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <strong>Doctor:</strong> <?= htmlspecialchars($apt->doctor_name) ?>
                 </div>
+                <div class="detail-item">
+                    <strong>Reason:</strong> <?= htmlspecialchars($apt->reason ?? '—') ?>
+                </div>
+            </div>
+        </div>
 
                 <!-- Action Buttons -->
                 <div class="precall-actions">
@@ -148,6 +154,7 @@ document.getElementById('speakerBtn').addEventListener('click', function() {
     }
 });
 
+// (navigation handled by the <a> link)
 // (navigation handled by the <a> link)
 </script>
 

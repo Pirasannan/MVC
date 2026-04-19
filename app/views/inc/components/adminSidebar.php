@@ -14,7 +14,9 @@
                     'Doctors' => 'adminDoctors',
                     'Patients' => 'adminPatients',
                     'Notifications' => 'adminNotifications',
+                    'Reports' => 'adminReports',
                     'Messages' => 'adminMessages',
+                    'Login Logs' => 'adminLoginLogs',
                     'Profile' => 'adminProfile'
                 ];
 
@@ -29,7 +31,6 @@
 
         <div class="sidebar-bottom">
             <a href='#'class="nav-item-bottom" id="logoutBtn">Logout</a>
-            <a href="<?php echo URLROOT; ?>/Pages/adminSettings" class="nav-item-bottom" id="settingsBtn">Settings</a>
         </div>
         <?php require APPROOT.'/views/inc/components/logoutPopup.php'; ?>
     </aside>

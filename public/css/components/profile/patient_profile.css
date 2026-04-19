@@ -27,17 +27,10 @@
     border: 1px solid #fecaca;
 }
 
-.profile-image-area {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 16px;
-}
-
 .patient-profile-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 16px;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
     align-items: start;
 }
 
@@ -45,8 +38,8 @@
 .patient-details-card {
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .patient-profile-card {
@@ -57,6 +50,12 @@
 .profile-avatar-wrap {
     display: flex;
     justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.is-hidden {
+    display: none !important;
 }
 
 .profile-avatar-circle {
@@ -74,8 +73,10 @@
 }
 
 .profile-avatar-image {
-    width: 100%;
-    height: 100%;
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    display: block;
     object-fit: cover;
 }
 
@@ -98,13 +99,14 @@
 }
 
 .patient-details-card {
-    padding: 16px;
+    padding: 24px;
 }
 
 .details-title {
-    margin: 0 0 12px;
+    margin: 0 0 16px;
     color: #1f2937;
-    font-size: 30px;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .details-table {

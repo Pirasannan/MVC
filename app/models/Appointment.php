@@ -3,6 +3,14 @@ class Appointment {
     private $db;
     public function __construct(){ $this->db = new Database(); }
 
+    private function tableExists($tableName){
+        $this->db->query('SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = :db AND table_name = :table LIMIT 1');
+        $this->db->bind(':db', DB_NAME);
+        $this->db->bind(':table', $tableName);
+        $result = $this->db->single();
+        return isset($result->total) && (int)$result->total > 0;
+    }
+
     public function create($data){
         $this->db->query("INSERT INTO appointments
             (patient_id, doctor_id, slot_id, starts_at, ends_at, status, reason, notes, video_room_token)
@@ -195,6 +203,28 @@ public function getApprovedBetweenForDoctor(int $doctorId, string $startUtc, str
     $this->db->bind(':start', $startUtc);
     $this->db->bind(':end',   $endUtc);
     return $this->db->resultSet();
+}
+
+public function createReport(array $data): bool {
+    if (!$this->tableExists('reports')) {
+        return false;
+    }
+
+    $this->db->query("INSERT INTO reports
+        (reporter_type, reporter_id, reported_type, reported_id, report_type, reason, description, status)
+        VALUES
+        (:reporter_type, :reporter_id, :reported_type, :reported_id, :report_type, :reason, :description, :status)");
+
+    $this->db->bind(':reporter_type', $data['reporter_type']);
+    $this->db->bind(':reporter_id', (int)$data['reporter_id']);
+    $this->db->bind(':reported_type', $data['reported_type']);
+    $this->db->bind(':reported_id', isset($data['reported_id']) ? (int)$data['reported_id'] : null);
+    $this->db->bind(':report_type', $data['report_type']);
+    $this->db->bind(':reason', $data['reason']);
+    $this->db->bind(':description', $data['description'] ?? null);
+    $this->db->bind(':status', $data['status'] ?? 'pending');
+
+    return $this->db->execute();
 }
 
 

@@ -1,0 +1,999 @@
+<?php 
+
+class Pages extends Controller{
+    private $pagesModel;
+    private $adminModel;
+    private $appointmentModel;
+    private $prescriptionModel;
+    private $messageModel;
+    public function __construct() {
+        
+        $this->pagesModel = $this->model('M_Pages');
+        $this->adminModel = $this->model('M_Admin');
+        $this->appointmentModel = $this->model('Appointment');
+        $this->prescriptionModel = $this->model('Prescription');
+        $this->messageModel = $this->model('Message');
+    
+    }
+    
+    
+    public function index() {
+        $this->view('pages/v_index');
+    }
+
+    public function error() {
+        $this->view('pages/error');
+    }
+
+
+    public function adminProfile() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+        $this->view('pages/v_admin_profile', []);
+    }
+
+    public function doctorVideoConsultation() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_doctor_videoconsultation', $data);
+    }
+
+    public function patientVideoConsultation() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_patient_videoconsultation', $data);
+    }
+
+    public function doctorPrecall() {
+        // Precall now requires an appointment ID — use VideoCall/precall/{id}
+        redirect('Appointments/doctor');
+    }
+
+    public function patientPrecall() {
+        // Precall now requires an appointment ID — use VideoCall/precall/{id}
+        redirect('Appointments/my');
+    }
+
+    public function doctorVideoCall() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_doctor_videocall', $data);
+    }
+
+    public function patientVideoCall() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'patient_name' => 'Sarah Wilson',
+            'doctor_name' => 'Dr. John Smith',
+            'appointment_time' => 'Today at 2:30 PM',
+            'appointment_type' => 'Follow-up Consultation'
+        ];
+        
+        $this->view('pages/Videoconsultation/v_patient_videocall', $data);
+    }
+
+
+    public function adminDashboard() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+
+		// Get data from model
+		$data = [
+			'stats' => $this->adminModel->getDashboardStats(),
+			'pendingDoctors' => $this->adminModel->getPendingDoctorsForDashboard(),
+			'pendingPatients' => $this->adminModel->getPendingPatientsForDashboard(),
+			'recentActivity' => $this->adminModel->getRecentActivityForDashboard()
+		];
+
+		// Pass data to view
+		$this->view('pages/v_admin_dashboard', $data);
+    }
+
+    public function adminDoctors() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+        $data = [
+            'pendingDoctors' => $this->adminModel->getPendingDoctors(),
+            'verifiedDoctors' => $this->adminModel->getVerifiedDoctors(),
+            'rejectedDoctors' => $this->adminModel->getRejectedDoctors(),
+            'inactiveDoctors' => $this->adminModel->getInactiveDoctors()
+        ];
+        $this->view('pages/v_admin_doctors', $data);
+    }
+
+    public function adminDoctorVerification() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'pendingDoctors' => $this->adminModel->getPendingDoctors()
+        ];
+
+        $this->view('pages/v_admin_doctor_verification', $data);
+    }
+
+    public function approveDoctor() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $doctor_id = $input['doctor_id'] ?? null;
+
+        if (!$doctor_id) {
+            echo json_encode(['success' => false, 'message' => 'Doctor ID required']);
+            return;
+        }
+
+        $result = $this->adminModel->approveDoctor($doctor_id);
+        
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Doctor approved successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to approve doctor']);
+        }
+    }
+
+    public function rejectDoctor() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $doctor_id = $input['doctor_id'] ?? null;
+        $reason = $input['reason'] ?? null;
+
+        if (!$doctor_id || !$reason) {
+            echo json_encode(['success' => false, 'message' => 'Doctor ID and reason required']);
+            return;
+        }
+
+        $result = $this->adminModel->rejectDoctor($doctor_id, $reason);
+        
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Doctor rejected successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to reject doctor']);
+        }
+    }
+
+    public function approvePatient() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $patient_id = $input['patient_id'] ?? null;
+
+        if (!$patient_id) {
+            echo json_encode(['success' => false, 'message' => 'Patient ID required']);
+            return;
+        }
+
+        $result = $this->adminModel->approvePatient($patient_id);
+        
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Patient approved successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to approve patient']);
+        }
+    }
+
+    public function rejectPatient() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $patient_id = $input['patient_id'] ?? null;
+        $reason = $input['reason'] ?? null;
+
+        if (!$patient_id || !$reason) {
+            echo json_encode(['success' => false, 'message' => 'Patient ID and reason required']);
+            return;
+        }
+
+        $result = $this->adminModel->rejectPatient($patient_id, $reason);
+        
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Patient rejected successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to reject patient']);
+        }
+    }
+
+    public function adminPatients() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+
+        $data = [
+            'pendingPatients' => $this->adminModel->getPendingPatients(),
+            'verifiedPatients' => $this->adminModel->getVerifiedPatients(),
+            'rejectedPatients' => $this->adminModel->getRejectedPatients(),
+            'inactivePatients' => $this->adminModel->getInactivePatients()
+        ];
+
+        $this->view('pages/v_admin_patients', $data);
+    }
+
+    public function adminNotifications() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+
+        $data = [
+            'recentNotifications' => $this->adminModel->getRecentNotifications(5),
+            'resolvedReports' => $this->adminModel->getResolvedReports()
+        ];
+
+        $this->view('pages/v_admin_notifications', $data);
+    }
+
+    public function sendNotification() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        // Detect request type: JSON or form POST
+        $isJsonRequest = $this->isJsonRequest();
+        
+        // Parse input based on request type
+        if ($isJsonRequest) {
+            $input = json_decode(file_get_contents('php://input'), true);
+        } else {
+            $input = $_POST;
+        }
+        
+        // Build data array
+        $data = [
+            'recipient_type' => $input['recipient_type'] ?? '',
+            'recipient_id' => $input['recipient_id'] ?? null,
+            'title' => $input['title'] ?? '',
+            'message' => $input['message'] ?? '',
+            'notification_type' => $input['notification_type'] ?? 'info'
+        ];
+
+        // Validate recipient_type
+        $validRecipients = ['all', 'admin', 'doctor', 'patient'];
+        if (empty($data['recipient_type']) || !in_array($data['recipient_type'], $validRecipients)) {
+            $errorMsg = 'Invalid recipient type';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
+            return;
+        }
+
+        // Validate title and message
+        if (empty(trim($data['title'])) || empty(trim($data['message']))) {
+            $errorMsg = 'Title and message are required';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
+            return;
+        }
+
+        // Insert notification via model
+        $result = $this->adminModel->createNotification($data);
+        
+        if ($result) {
+            if ($isJsonRequest) {
+                echo json_encode(['success' => true, 'message' => 'Notification sent successfully']);
+            } else {
+                redirect('Pages/adminNotifications?sent=1');
+            }
+        } else {
+            $errorMsg = 'Failed to send notification';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
+        }
+    }
+
+    /**
+     * Helper method to detect if request is JSON
+     */
+    private function isJsonRequest() {
+        return !empty($_SERVER['CONTENT_TYPE']) && 
+               strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+    }
+
+    public function adminAllDoctors() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'verifiedDoctors' => $this->adminModel->getVerifiedDoctors()
+        ];
+
+        $this->view('pages/v_admin_all_doctors', $data);
+    }
+
+    public function adminRejectedDoctors() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'rejectedDoctors' => $this->adminModel->getRejectedDoctors()
+        ];
+
+        $this->view('pages/v_admin_rejected_doctors', $data);
+    }
+
+    public function adminPatientVerification() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'pendingPatients' => $this->adminModel->getPendingPatients()
+        ];
+
+        $this->view('pages/v_admin_patient_verification', $data);
+    }
+
+    public function adminAllPatients() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'verifiedPatients' => $this->adminModel->getVerifiedPatients()
+        ];
+
+        $this->view('pages/v_admin_all_patients', $data);
+    }
+
+    public function adminRejectedPatients() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'rejectedPatients' => $this->adminModel->getRejectedPatients()
+        ];
+
+        $this->view('pages/v_admin_rejected_patients', $data);
+    }
+
+    public function adminInactivePatients() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'inactivePatients' => $this->adminModel->getInactivePatients()
+        ];
+
+        $this->view('pages/v_admin_inactive_patients', $data);
+    }
+
+    public function adminReports() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'callReports' => $this->adminModel->getPendingCallReports(),
+            'userReports' => $this->adminModel->getPendingUserReports(),
+            'resolvedReports' => $this->adminModel->getResolvedReports(),
+            'flash' => $_SESSION['flash'] ?? null,
+        ];
+
+        unset($_SESSION['flash']);
+
+        $this->view('pages/v_admin_reports', $data);
+    }
+
+    public function adminAllNotifications() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'allNotifications' => $this->adminModel->getAllNotifications()
+        ];
+
+        $this->view('pages/v_admin_all_notifications', $data);
+    }
+
+    public function adminResolvedReports() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'resolvedReports' => $this->adminModel->getResolvedReports()
+        ];
+
+        $this->view('pages/v_admin_resolved_reports', $data);
+    }
+
+    public function resolveReport($reportId = null) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return redirect('Pages/adminReports');
+        }
+
+        $reportId = (int)$reportId;
+        $resolution = trim($_POST['resolution'] ?? '');
+
+        if ($reportId <= 0 || $resolution === '') {
+            $_SESSION['flash'] = 'Resolution note is required.';
+            return redirect('Pages/adminReports');
+        }
+
+        $ok = $this->adminModel->resolveReport($reportId, (int)$_SESSION['user_id'], $resolution);
+        $_SESSION['flash'] = $ok
+            ? 'Report marked as resolved.'
+            : 'Could not resolve report. It may already be resolved.';
+
+        return redirect('Pages/adminReports');
+    }
+
+    public function adminProfileUpdate() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        // Show alert that profile was updated
+        echo "<script>alert('Profile updated successfully!'); window.history.back();</script>";
+        exit;
+    }
+
+    public function adminChangePassword() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $this->view('pages/v_admin_change_password', []);
+    }
+
+    public function adminActiveSessions() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'activeSessions' => $this->adminModel->getActiveSessions($_SESSION['user_id'])
+        ];
+
+        $this->view('pages/v_admin_active_sessions', $data);
+    }
+
+    public function adminSecurityOverview() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'securityInfo' => $this->adminModel->getSecurityOverview($_SESSION['user_id'])
+        ];
+
+        $this->view('pages/v_admin_security_overview', $data);
+    }
+
+    public function adminActivityLog() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'activityLog' => $this->adminModel->getAdminActivityLog($_SESSION['user_id'])
+        ];
+
+        $this->view('pages/v_admin_activity_log', $data);
+    }
+
+    public function adminSystemActivityLog() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'systemActivity' => $this->adminModel->getSystemActivityLog()
+        ];
+
+        $this->view('pages/v_admin_system_activity_log', $data);
+    }
+
+    public function adminLoginLogs() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'loginLogs' => $this->adminModel->getLoginLogs()
+        ];
+
+        $this->view('pages/v_admin_login_logs', $data);
+    }
+
+    public function adminRecords() {
+        
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+        $this->view('pages/v_admin_records', []);
+    }
+
+
+    public function adminSettings() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+         redirect('Pages/index');
+         return;
+        }
+        $this->view('pages/v_admin_settings', []);
+    }
+
+
+
+
+
+
+    public function doctorDashboard() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+
+        $doctorId = $_SESSION['user_id'] ?? null;
+        $dashboardData = $this->buildDoctorDashboardData($doctorId);
+        $dashboardData['title'] = 'Doctor Dashboard';
+
+        $this->view('pages/v_doctor_dashboard', $dashboardData);
+    }
+
+    private function buildDoctorDashboardData($doctorId) {
+        $today = new DateTimeImmutable('today');
+        $now = new DateTimeImmutable('now');
+
+        $appointments = $doctorId ? $this->appointmentModel->getByDoctor($doctorId) : [];
+        $prescriptions = $doctorId ? $this->prescriptionModel->getPrescriptionsByDoctor($doctorId) : [];
+
+        $todayAppointments = 0;
+        $upcomingAppointments = [];
+        $prescribedPatientIds = [];
+
+        foreach ($prescriptions as $prescription) {
+            if (($prescription->is_deleted ?? 'not_deleted') !== 'deleted') {
+                $prescribedPatientIds[$prescription->patient_id] = true;
+            }
+        }
+
+        foreach ($appointments as $appointment) {
+            $startsAt = new DateTimeImmutable($appointment->starts_at);
+            $status = strtolower((string)($appointment->status ?? ''));
+            $isActiveStatus = !in_array($status, ['cancelled', 'rejected'], true);
+
+            if ($startsAt->format('Y-m-d') === $today->format('Y-m-d') && $isActiveStatus) {
+                $todayAppointments++;
+            }
+
+            if ($startsAt >= $now && $isActiveStatus) {
+                $upcomingAppointments[] = $appointment;
+            }
+        }
+
+        usort($upcomingAppointments, function ($left, $right) {
+            return strtotime($left->starts_at) <=> strtotime($right->starts_at);
+        });
+
+        $recentPrescriptions = [];
+        foreach ($prescriptions as $prescription) {
+            if (($prescription->is_deleted ?? 'not_deleted') !== 'deleted') {
+                $recentPrescriptions[] = $prescription;
+            }
+        }
+        $recentPrescriptions = array_slice($recentPrescriptions, 0, 3);
+
+        $pendingPrescriptionPatients = [];
+        foreach ($appointments as $appointment) {
+            $startsAt = new DateTimeImmutable($appointment->starts_at);
+            $status = strtolower((string)($appointment->status ?? ''));
+
+            if ($startsAt > $now || !in_array($status, ['approved', 'completed'], true)) {
+                continue;
+            }
+
+            if (!isset($prescribedPatientIds[$appointment->patient_id])) {
+                $pendingPrescriptionPatients[$appointment->patient_id] = true;
+            }
+        }
+
+        return [
+            'todayAppointmentsCount' => $todayAppointments,
+            'prescribedPatientsCount' => count($prescribedPatientIds),
+            'unreadMessagesCount' => $doctorId ? (int) $this->messageModel->getUnreadCount($doctorId) : 0,
+            'pendingPrescriptionsCount' => count($pendingPrescriptionPatients),
+            'upcomingAppointments' => $upcomingAppointments,
+            'recentPrescriptions' => $recentPrescriptions,
+        ];
+    }
+
+    public function doctorPrescriptions() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        $prescriptionModel = $this->model('Prescription');
+        $doctor_id = $_SESSION['user_id'] ?? null;
+        $prescriptions = [];
+        $patient_name = null;
+        
+        if ($doctor_id) {
+            $prescriptions = $prescriptionModel->getPrescriptionsByDoctor($doctor_id);
+            
+            // If prescription was just created or updated, get the patient name from the most recent prescription
+            if ((isset($_GET['created']) && $_GET['created'] == '1') || (isset($_GET['updated']) && $_GET['updated'] == '1')) {
+                if (!empty($prescriptions)) {
+                    $most_recent = $prescriptions[0]; // First prescription is most recent due to ORDER BY created_at DESC
+                    $patient_name = $most_recent->patient_name ?? 'Patient';
+                }
+            }
+        }
+        
+        $this->view('pages/v_doctor_prescriptions', [
+            'title' => 'My Issued Prescriptions',
+            'prescriptions' => $prescriptions,
+            'patient_name' => $patient_name
+        ]);
+    }
+
+    public function doctorMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        // Mock data for demo purposes (replace with database calls when ready)
+        $mockConversations = [
+            (object)[
+                'patient_id' => 1,
+                'patient_name' => 'Sarah Johnson',
+                'last_message' => 'Thank you for the prescription. I have a question about the dosage timing.',
+                'last_message_time' => '2024-01-25 10:30:00',
+                'unread_count' => 2
+            ],
+            (object)[
+                'patient_id' => 2,
+                'patient_name' => 'Michael Chen',
+                'last_message' => 'The lab results look good. When should I schedule my next appointment?',
+                'last_message_time' => '2024-01-24 14:15:00',
+                'unread_count' => 0
+            ],
+            (object)[
+                'patient_id' => 3,
+                'patient_name' => 'Emma Davis',
+                'last_message' => 'I am experiencing some side effects from the new medication.',
+                'last_message_time' => '2024-01-23 16:45:00',
+                'unread_count' => 1
+            ],
+            (object)[
+                'patient_id' => 4,
+                'patient_name' => 'Robert Wilson',
+                'last_message' => 'Thank you for the quick response. I feel much better now.',
+                'last_message_time' => '2024-01-22 11:20:00',
+                'unread_count' => 0
+            ]
+        ];
+        
+        $data = [
+            'user_id' => $_SESSION['user_id'],
+            'user_name' => $_SESSION['user_name'],
+            'conversations' => $mockConversations
+        ];
+        
+        $this->view('pages/messages/v_doctor_messages', $data);
+    }
+
+    public function doctorMedicalrecords() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        redirect('MedicalRecords/doctor');
+    }
+
+    Public function doctorprofile() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            return redirect('Pages/index');
+        }
+        
+        // Load verification model to get verification status
+        $verificationModel = $this->model('M_Verification');
+        $userId = $_SESSION['user_id'];
+        $userEmail = $_SESSION['user_email'];
+        $userName = $_SESSION['user_name'];
+        
+        // Get verification data
+        $verification = $verificationModel->getVerificationByUserId($userId);
+        
+        $data = [
+            'user_id' => $userId,
+            'user_email' => $userEmail,
+            'user_name' => $userName,
+            'verification' => $verification
+        ];
+        
+        $this->view('pages/v_doctor_profile', $data);
+    }
+
+    public function doctorAppointments() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        // Redirect to the proper Appointments controller method
+        redirect('Appointments/doctor');
+    }
+
+    public function createprescription() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor'){
+            redirect('Pages/index');
+            return;
+        }
+        
+        $usersModel = $this->model('M_Users');
+        $patients = $usersModel->getPatients();
+        
+        $this->view('pages/v_doctor_create_prescription', [
+            'patients' => $patients
+        ]);
+    }
+
+    
+
+    public function doctorSettings() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'doctor') {
+         redirect('Pages/index');
+         return;
+        }
+        $this->view('pages/v_doctor_settings', []);
+    }
+
+    
+
+
+
+    
+    public function patientDashboard() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+
+        $patientId = $_SESSION['user_id'] ?? null;
+        $dashboardData = $this->buildPatientDashboardData($patientId);
+        $dashboardData['title'] = 'Patient Dashboard';
+
+        $this->view('pages/v_patient_dashboard', $dashboardData);
+    }
+
+    private function buildPatientDashboardData($patientId) {
+        $today = new DateTimeImmutable('today');
+        $now = new DateTimeImmutable('now');
+
+        $appointments = $patientId ? $this->appointmentModel->getByPatient($patientId) : [];
+        $todayAppointments = 0;
+        $upcomingAppointments = [];
+
+        foreach ($appointments as $appointment) {
+            $startsAt = new DateTimeImmutable($appointment->starts_at);
+            $status = strtolower((string)($appointment->status ?? ''));
+
+            if ($startsAt->format('Y-m-d') === $today->format('Y-m-d')) {
+                $todayAppointments++;
+            }
+
+            if ($startsAt >= $now && !in_array($status, ['cancelled', 'rejected', 'completed'], true)) {
+                $upcomingAppointments[] = $appointment;
+            }
+        }
+
+        usort($upcomingAppointments, function ($left, $right) {
+            return strtotime($left->starts_at) <=> strtotime($right->starts_at);
+        });
+
+        $prescriptions = $patientId ? $this->prescriptionModel->getPrescriptionsByPatient($patientId) : [];
+        $activeMedications = [];
+        $recentPrescriptions = array_slice($prescriptions, 0, 3);
+
+        foreach ($prescriptions as $prescription) {
+            $isDeleted = strtolower((string)($prescription->is_deleted ?? 'not_deleted')) === 'not_deleted';
+            $validUntil = !empty($prescription->valid_until)
+                ? new DateTimeImmutable($prescription->valid_until)
+                : null;
+
+            if ($isDeleted && (!$validUntil || $validUntil >= $today)) {
+                $activeMedications[] = $prescription;
+            }
+        }
+
+        $unreadMessages = $patientId ? (int) $this->messageModel->getUnreadCount($patientId) : 0;
+
+        return [
+            'todayAppointmentsCount' => $todayAppointments,
+            'activeMedicationsCount' => count($activeMedications),
+            'unreadMessagesCount' => $unreadMessages,
+            'recentPrescriptionsCount' => count($recentPrescriptions),
+            'upcomingAppointments' => $upcomingAppointments,
+            'recentPrescriptions' => $recentPrescriptions,
+        ];
+    }
+
+    public function patientPrescriptions() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         redirect('Pages/index');
+         return;
+        }
+        $prescriptionModel = $this->model('Prescription');
+        $patient_id = $_SESSION['user_id'] ?? null;
+        $prescriptions = [];
+        if ($patient_id) {
+            $prescriptions = $prescriptionModel->getPrescriptionsByPatient($patient_id);
+        }
+        $this->view('pages/v_patient_prescriptions', [
+            'title' => 'My Prescriptions',
+            'prescriptions' => $prescriptions
+        ]);
+    }
+    
+    public function patientProfile() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            return redirect('Pages/index');
+        }
+        
+        // Get patient data from session
+        $userId = $_SESSION['user_id'];
+        $userEmail = $_SESSION['user_email'];
+        $userName = $_SESSION['user_name'];
+        
+        $data = [
+            'user_id' => $userId,
+            'user_email' => $userEmail,
+            'user_name' => $userName
+        ];
+        
+        $this->view('pages/v_patient_profile', $data);
+    }
+    
+    public function patientMedicalrecords() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         redirect('Pages/index');
+         return;
+        }
+        redirect('MedicalRecords/patient');
+    }
+
+    public function patientAppointments() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         redirect('Pages/index');
+         return;
+        }
+        
+        // Redirect to the proper Appointments controller method
+        redirect('Appointments/my');
+    }
+
+    public function patientBookAppointment() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         redirect('Pages/index');
+         return;
+        }
+        
+        // Redirect to the patient appointments page where they can book new appointments
+        redirect('Appointments/my');
+    }
+
+    public function patientSettings() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+         redirect('Pages/index');
+         return;
+        }
+        $this->view('pages/v_patient_settings', []);
+    }
+
+    public function adminMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'user_id' => $_SESSION['user_id'],
+            'user_name' => $_SESSION['user_name']
+        ];
+        
+        $this->view('pages/messages/v_admin_messages', $data);
+    }
+
+    public function patientMessages() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'patient') {
+            redirect('Pages/index');
+            return;
+        }
+        
+        $data = [
+            'user_id' => $_SESSION['user_id'],
+            'user_name' => $_SESSION['user_name']
+        ];
+        
+        $this->view('pages/messages/v_patient_messages', $data);
+    }
+
+}   
+
+?>

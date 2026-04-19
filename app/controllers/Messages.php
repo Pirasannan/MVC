@@ -2,6 +2,7 @@
 class Messages extends Controller {
     private $messageModel;
     private $userModel;
+    private $appointmentModel;
 
     public function __construct() {
         // Check if user is logged in
@@ -11,6 +12,7 @@ class Messages extends Controller {
 
         $this->messageModel = $this->model('Message');
         $this->userModel = $this->model('M_Users');
+        $this->appointmentModel = $this->model('Appointment');
     }
 
     private function getCurrentMessagingStatus() {
@@ -349,15 +351,15 @@ class Messages extends Controller {
                 return $result;
             }
 
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
-            $allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
             $maxFileSize = 10485760; // 10MB
 
             $originalName = $file['name'] ?? 'attachment';
             $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
             if (!in_array($extension, $allowedExtensions, true)) {
-                $result['errors'][] = 'Only JPG, PNG, and PDF files are allowed';
+                $result['errors'][] = 'Only JPG, PNG, WEBP, and PDF files are allowed';
                 return $result;
             }
 
@@ -478,6 +480,120 @@ class Messages extends Controller {
         if (is_file($absolutePath)) {
             @unlink($absolutePath);
         }
+    }
+
+    public function submitUserReport() {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            return;
+        }
+
+        $role = strtolower((string)($_SESSION['user_role'] ?? ''));
+        if (!in_array($role, ['doctor', 'patient'], true)) {
+            echo json_encode(['success' => false, 'message' => 'Only doctors and patients can submit reports.']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = [];
+        }
+
+        $conversationId = (int)($_POST['conversation_id'] ?? ($input['conversation_id'] ?? 0));
+        $reportedUserId = (int)($_POST['reported_user_id'] ?? ($input['reported_user_id'] ?? 0));
+        $reason = trim((string)($_POST['reason'] ?? ($input['reason'] ?? '')));
+        $description = trim((string)($_POST['description'] ?? ($input['description'] ?? '')));
+        $currentUserId = (int)($_SESSION['user_id'] ?? 0);
+
+        if ($conversationId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid conversation.']);
+            return;
+        }
+
+        if ($reason === '') {
+            echo json_encode(['success' => false, 'message' => 'Reason is required.']);
+            return;
+        }
+
+        if (!$this->messageModel->hasAccessToConversation($conversationId, $currentUserId)) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $conversation = $this->messageModel->getConversationById($conversationId);
+        if (!$conversation) {
+            echo json_encode(['success' => false, 'message' => 'Conversation not found.']);
+            return;
+        }
+
+        $counterpartId = 0;
+        if ((int)$conversation->user1_id === $currentUserId) {
+            $counterpartId = (int)$conversation->user2_id;
+        } elseif ((int)$conversation->user2_id === $currentUserId) {
+            $counterpartId = (int)$conversation->user1_id;
+        }
+
+        if ($counterpartId <= 0 || $counterpartId === $currentUserId) {
+            echo json_encode(['success' => false, 'message' => 'Invalid participant selected for report.']);
+            return;
+        }
+
+        if ($reportedUserId > 0 && $reportedUserId !== $counterpartId) {
+            echo json_encode(['success' => false, 'message' => 'Invalid participant selected for report.']);
+            return;
+        }
+
+        $counterpartUser = $this->userModel->getUserById($counterpartId);
+        if (!$counterpartUser) {
+            echo json_encode(['success' => false, 'message' => 'Reported user not found.']);
+            return;
+        }
+
+        $counterpartRole = strtolower((string)($counterpartUser->user_role ?? ''));
+        if (!in_array($counterpartRole, ['doctor', 'patient'], true)) {
+            echo json_encode(['success' => false, 'message' => 'Only doctor or patient users can be reported from messages.']);
+            return;
+        }
+
+        $allMessages = $this->messageModel->getMessages($conversationId);
+        $latestMessage = !empty($allMessages) ? end($allMessages) : null;
+        $latestPayload = $latestMessage ? $this->decodeMessagePayload($latestMessage->message ?? '') : ['text' => '', 'attachment' => null];
+
+        $latestSnippet = trim((string)($latestPayload['text'] ?? ''));
+        if ($latestSnippet === '') {
+            $latestSnippet = !empty($latestPayload['attachment']) ? '(Attachment only)' : '(No message text)';
+        }
+        if (strlen($latestSnippet) > 180) {
+            $latestSnippet = substr($latestSnippet, 0, 180) . '...';
+        }
+
+        $details = 'Context: Conversation #' . $conversationId
+            . '. Reported user ID: ' . $counterpartId
+            . '. Latest message: ' . $latestSnippet;
+
+        if ($description !== '') {
+            $details .= ' | Reporter note: ' . $description;
+        }
+
+        $saved = $this->appointmentModel->createReport([
+            'reporter_type' => ucfirst($role),
+            'reporter_id' => $currentUserId,
+            'reported_type' => ucfirst($counterpartRole),
+            'reported_id' => $counterpartId,
+            'report_type' => 'User Report',
+            'reason' => $reason,
+            'description' => $details,
+            'status' => 'pending',
+        ]);
+
+        if (!$saved) {
+            echo json_encode(['success' => false, 'message' => 'Could not submit report right now.']);
+            return;
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Report submitted successfully.']);
     }
 
     // Get new messages since last check

@@ -361,6 +361,18 @@
     box-shadow: 0 6px 12px rgba(107, 114, 128, 0.3);
 }
 
+.action-button.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+}
+
+.action-button.danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+}
+
 /* Responsive Design - Better mobile centering */
 @media (max-width: 768px) {
     .profile-container {
@@ -492,4 +504,96 @@
     margin: 0 auto 24px auto;
     text-align: center;
     max-width: 600px;
+}
+
+/* Premium Security Card Styling */
+.security-card.full-width {
+    margin-top: 24px;
+    width: 100%;
+    max-width: 100%;
+    padding: 24px !important;
+}
+
+.security-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.security-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.security-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    border-color: #3b82f6;
+}
+
+.security-icon-circle {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    background: #eff6ff;
+    color: #4a90e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.security-icon-circle.danger {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.security-text {
+    flex: 1;
+}
+
+.security-text h4 {
+    margin: 0 0 6px 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.security-text p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.security-item .action-button {
+    min-width: 160px;
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+    .security-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .security-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .security-item .action-button {
+        width: 100%;
+        max-width: none;
+    }
 }

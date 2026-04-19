@@ -6,7 +6,11 @@
     $isSuspendedAccount = ($currentUserStatus === 'suspended' && $isRestrictedMessagingRole);
     $isDeactivatedAccount = ($currentUserStatus === 'inactive' && $isRestrictedMessagingRole);
 ?>
-<div class="message-container" data-messaging-disabled="<?php echo ($isSuspendedAccount || $isDeactivatedAccount) ? '1' : '0'; ?>">
+<div
+    class="message-container"
+    data-messaging-disabled="<?php echo ($isSuspendedAccount || $isDeactivatedAccount) ? '1' : '0'; ?>"
+    data-user-id="<?php echo (int)($_SESSION['user_id'] ?? 0); ?>"
+    data-user-type="<?php echo htmlspecialchars((string)($_SESSION['user_role'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
     <!-- Left Sidebar - Conversations List -->
     <div class="chat-conversations-sidebar">
         <!-- Search Bar -->
@@ -59,7 +63,7 @@
 
             <!-- Message Input Area -->
             <div class="message-input-area">
-                <input type="file" id="chatAttachmentInput" class="chat-attachment-input" accept="image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf" hidden>
+                <input type="file" id="chatAttachmentInput" class="chat-attachment-input" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" hidden>
                 <button class="attach-button" id="attachButton" type="button" title="Attach file" <?php echo ($isSuspendedAccount || $isDeactivatedAccount) ? 'disabled' : ''; ?>>Attach</button>
                 <div class="input-wrapper">
                     <textarea 
@@ -84,6 +88,32 @@
                     <span class="attachment-preview-name" id="attachmentPreviewName"></span>
                 </div>
                 <button type="button" class="attachment-preview-remove" id="removeAttachmentBtn">×</button>
+            </div>
+        </div>
+
+        <div class="message-report-modal" id="messageReportModal" style="display:none;">
+            <div class="message-report-dialog">
+                <div class="message-report-header">
+                    <h3>Report User</h3>
+                    <button type="button" class="message-report-close" id="messageReportCloseBtn">×</button>
+                </div>
+                <form id="messageReportForm" class="message-report-form">
+                    <input type="hidden" name="conversation_id" id="messageReportConversationId" value="">
+                    <input type="hidden" name="reported_user_id" id="messageReportUserId" value="">
+
+                    <label for="messageReportReason">Reason</label>
+                    <select id="messageReportReason" name="reason" required>
+                        <option value="">Select a reason</option>
+                    </select>
+
+                    <label for="messageReportDescription">Additional Details (optional)</label>
+                    <textarea id="messageReportDescription" name="description" rows="3" placeholder="Add details"></textarea>
+
+                    <div class="message-report-actions">
+                        <button type="button" class="message-report-cancel" id="messageReportCancelBtn">Cancel</button>
+                        <button type="submit" class="message-report-submit">Submit Report</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

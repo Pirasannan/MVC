@@ -104,6 +104,7 @@
 .conversations-list {
     flex: 1;
     overflow-y: auto;
+    scrollbar-gutter: stable;
     padding: 8px;
     min-height: 0;
 }
@@ -282,6 +283,31 @@
     align-items: center;
     gap: 12px;
     min-width: 0;
+}
+
+.chat-header-right {
+    display: flex;
+    align-items: center;
+}
+
+.report-flag-btn {
+    border: 1px solid #f59e0b;
+    background: #fffbeb;
+    color: #92400e;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.report-flag-btn:hover:not(:disabled) {
+    background: #fef3c7;
+}
+
+.report-flag-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .chat-user-name {
@@ -549,6 +575,104 @@
     cursor: pointer;
     color: #b91c1c;
     background: #fee2e2;
+}
+
+.message-report-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 9999;
+}
+
+.message-report-dialog {
+    width: min(460px, calc(100vw - 32px));
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid var(--msg-line);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+    padding: 16px;
+}
+
+.message-report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.message-report-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--msg-text);
+}
+
+.message-report-close {
+    border: none;
+    background: transparent;
+    color: var(--msg-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.message-report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.message-report-form label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--msg-text);
+}
+
+.message-report-form select,
+.message-report-form textarea {
+    width: 100%;
+    border: 1px solid var(--msg-line-strong);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 0.88rem;
+    outline: none;
+}
+
+.message-report-form select:focus,
+.message-report-form textarea:focus {
+    border-color: var(--msg-primary);
+}
+
+.message-report-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.message-report-cancel,
+.message-report-submit {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.message-report-cancel {
+    color: var(--msg-text);
+    background: var(--msg-line);
+}
+
+.message-report-submit {
+    color: #ffffff;
+    background: #dc2626;
+}
+
+.message-report-submit:hover {
+    background: #b91c1c;
 }
 
 .chat-conversations-sidebar.empty-conversations .conversations-list {

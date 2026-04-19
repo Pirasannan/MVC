@@ -92,7 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_table'])) {
             <strong>What this creates:</strong>
             <ul>
                 <li>Table <code>password_resets</code> — stores OTPs with expiry & used flag</li>
-                <li>OTPs expire in 15 minutes and are single-use</li>
                 <li>Safe to run multiple times (IF NOT EXISTS)</li>
             </ul>
         </div>

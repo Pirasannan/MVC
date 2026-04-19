@@ -1,61 +1,71 @@
-<?php 
-    class M_Users {
-        private $db;
+<?php
+class M_Users
+{
+    private $db;
 
         public function __construct(){
             $this->db = new Database();
         }
+
+        private function tableExists($tableName){
+            $this->db->query('SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_schema = :db AND table_name = :table LIMIT 1');
+            $this->db->bind(':db', DB_NAME);
+            $this->db->bind(':table', $tableName);
+            $result = $this->db->single();
+            return isset($result->total) && (int)$result->total > 0;
+        }
         
         public function register($data){
-            $this->db->query('INSERT INTO Users(role, name, email, password, slmc) VALUES (:role, :name, :email, :password, :slmc)');
+            $this->db->query('INSERT INTO Users(role, name, email, password, slmc, status) VALUES (:role, :name, :email, :password, :slmc, :status)');
             $this->db->bind(':role', $data['role']);
             $this->db->bind(':name',$data['name']);
             $this->db->bind(':email',$data['email']);
             $this->db->bind(':password',$data['password']);
             $this->db->bind(':slmc', $data['slmc'] ?? null);
+            $this->db->bind(':status', $data['status'] ?? 'active');
 
-            if($this->db->execute()){
-                return true;
-            }
-            else{
-                return false;
-            }
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        public function validateSlmcNumber($slmc){
-            $this->db->query('SELECT * FROM slmc WHERE slmc = :slmc');
-            $this->db->bind(':slmc',$slmc);
+    public function validateSlmcNumber($slmc)
+    {
+        $this->db->query('SELECT * FROM slmc WHERE slmc = :slmc');
+        $this->db->bind(':slmc', $slmc);
 
-            $row = $this->db->single();
+        $row = $this->db->single();
 
-            if($this->db->rowCount() > 0){
-                return true; // SLMC number exists in slmc table
-            }
-            else{
-                return false; // SLMC number does not exist in slmc table
-            }
+        if ($this->db->rowCount() > 0) {
+            return true; // SLMC number exists in slmc table
+        } else {
+            return false; // SLMC number does not exist in slmc table
         }
+    }
 
-        public function findUserBySlmc($slmc){
-            $this->db->query('SELECT * FROM Users WHERE slmc = :slmc');
-            $this->db->bind(':slmc', $slmc);
+    public function findUserBySlmc($slmc)
+    {
+        $this->db->query('SELECT * FROM Users WHERE slmc = :slmc');
+        $this->db->bind(':slmc', $slmc);
 
-            $row = $this->db->single();
+        $row = $this->db->single();
 
-            if($this->db->rowCount() > 0){
-                return true; // SLMC number already used by another user
-            }
-            else{
-                return false; // SLMC number is available
-            }
+        if ($this->db->rowCount() > 0) {
+            return true; // SLMC number already used by another user
+        } else {
+            return false; // SLMC number is available
         }
+    }
 
-        
-        public function findUserByEmail($email){
-            $this->db->query('SELECT * FROM Users WHERE email = :email');
-            $this->db->bind(':email',$email);
 
-            $row = $this->db->single();
+    public function findUserByEmail($email)
+    {
+        $this->db->query('SELECT * FROM Users WHERE email = :email');
+        $this->db->bind(':email', $email);
+
+        $row = $this->db->single();
 
             if($this->db->rowCount() > 0){
                 return true;
@@ -120,6 +130,58 @@
             $this->db->bind(':user_id', (int)$userId);
 
             return $this->db->execute();
+        }
+
+        private function ensureNotificationSeenColumn(){
+            $this->db->query("SELECT COUNT(*) AS column_count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Users' AND COLUMN_NAME = 'last_notification_seen_id'");
+            $columnCheck = $this->db->single();
+
+            if ((int)($columnCheck->column_count ?? 0) === 0) {
+                $this->db->query('ALTER TABLE Users ADD COLUMN last_notification_seen_id INT NULL DEFAULT NULL');
+                $this->db->execute();
+            }
+        }
+
+        public function getLastNotificationSeenId($userId){
+            $this->ensureNotificationSeenColumn();
+
+            $this->db->query('SELECT last_notification_seen_id FROM Users WHERE id = :user_id LIMIT 1');
+            $this->db->bind(':user_id', (int)$userId);
+            $row = $this->db->single();
+
+            if (!$row || !isset($row->last_notification_seen_id)) {
+                return null;
+            }
+
+            return $row->last_notification_seen_id !== null ? (int)$row->last_notification_seen_id : null;
+        }
+
+        public function updateLastNotificationSeenId($userId, $notificationId){
+            $this->ensureNotificationSeenColumn();
+
+            $this->db->query('UPDATE Users SET last_notification_seen_id = :notification_id WHERE id = :user_id');
+            $this->db->bind(':notification_id', (int)$notificationId);
+            $this->db->bind(':user_id', (int)$userId);
+            return $this->db->execute();
+        }
+
+        public function getActiveUsersByRole($role){
+            $this->db->query('SELECT id, name, email FROM Users WHERE LOWER(role) = :role AND LOWER(status) = :status');
+            $this->db->bind(':role', strtolower($role));
+            $this->db->bind(':status', 'active');
+            return $this->db->resultSet();
+        }
+
+        public function getAllActiveUsers(){
+            $this->db->query('SELECT id, name, email, LOWER(role) AS role FROM Users WHERE LOWER(status) = :status');
+            $this->db->bind(':status', 'active');
+            return $this->db->resultSet();
+        }
+
+        public function getUserContactById($userId){
+            $this->db->query('SELECT id, name, email, LOWER(role) AS role, LOWER(status) AS status FROM Users WHERE id = :user_id LIMIT 1');
+            $this->db->bind(':user_id', (int)$userId);
+            return $this->db->single();
         }
 
         private function ensurePatientMedicalInfoTable(){
@@ -204,11 +266,32 @@
             return false;
         }
 
-        //fetch all patients
-        public function getPatients(){
-            $this->db->query("SELECT id, name FROM Users WHERE role = 'patient' AND status = 'active'");
-            return $this->db->resultSet(); //returns as array if patient objects
+        public function logLoginEvent($userId, $email, $success, $reason, $ipAddress, $userAgent){
+            if (!$this->tableExists('activity_logs')) {
+                return false;
+            }
+
+            $action = $success ? 'login_success' : 'login_failed';
+            $description = $success ? 'Login success' : ('Login failed: ' . $reason);
+            if (!empty($email)) {
+                $description .= ' (' . $email . ')';
+            }
+
+            $this->db->query('INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent, created_at) VALUES (:user_id, :action, :description, :ip_address, :user_agent, NOW())');
+            $this->db->bind(':user_id', $userId);
+            $this->db->bind(':action', $action);
+            $this->db->bind(':description', $description);
+            $this->db->bind(':ip_address', $ipAddress);
+            $this->db->bind(':user_agent', $userAgent);
+            return $this->db->execute();
         }
+
+    //fetch all patients
+    public function getPatients()
+    {
+        $this->db->query("SELECT id, name FROM Users WHERE role = 'patient' AND status = 'active'");
+        return $this->db->resultSet(); //returns as array if patient objects
+    }
 
         // Get user by ID
         public function getUserById($userId) {
@@ -224,32 +307,35 @@
             return $row->status ?? null;
         }
 
-        // Check if user is online (based on last activity within 5 minutes)
-        public function isUserOnline($userId) {
-            // Uses updated_at as activity signal in current Users schema.
-            $this->db->query('SELECT updated_at AS last_activity FROM Users WHERE id = :user_id');
-            $this->db->bind(':user_id', $userId);
-            $result = $this->db->single();
-            
-            if ($result && isset($result->last_activity)) {
-                $lastActivity = strtotime($result->last_activity);
-                $currentTime = time();
-                // Consider online if active within last 5 minutes
-                return ($currentTime - $lastActivity) < 300;
-            }
-            return false;
-        }
+    // Check if user is online (based on last activity within 5 minutes)
+    public function isUserOnline($userId)
+    {
+        // Uses updated_at as activity signal in current Users schema.
+        $this->db->query('SELECT updated_at AS last_activity FROM Users WHERE id = :user_id');
+        $this->db->bind(':user_id', $userId);
+        $result = $this->db->single();
 
-        // Update user last activity
-        public function updateLastActivity($userId) {
-            $this->db->query('UPDATE Users SET updated_at = NOW() WHERE id = :user_id');
-            $this->db->bind(':user_id', $userId);
-            return $this->db->execute();
+        if ($result && isset($result->last_activity)) {
+            $lastActivity = strtotime($result->last_activity);
+            $currentTime = time();
+            // Consider online if active within last 5 minutes
+            return ($currentTime - $lastActivity) < 300;
         }
+        return false;
+    }
 
-        // Search users for messaging (exclude current user)
-        public function searchUsersForMessaging($searchTerm, $currentUserId) {
-            $this->db->query('
+    // Update user last activity
+    public function updateLastActivity($userId)
+    {
+        $this->db->query('UPDATE Users SET updated_at = NOW() WHERE id = :user_id');
+        $this->db->bind(':user_id', $userId);
+        return $this->db->execute();
+    }
+
+    // Search users for messaging (exclude current user)
+    public function searchUsersForMessaging($searchTerm, $currentUserId)
+    {
+        $this->db->query('
                 SELECT id AS user_id, name AS user_name, LOWER(role) AS user_role, email 
                 FROM Users 
                 WHERE (name LIKE :search OR email LIKE :search)
@@ -257,14 +343,96 @@
                 AND status = "active"
                 LIMIT 20
             ');
-            $this->db->bind(':search', '%' . $searchTerm . '%');
-            $this->db->bind(':current_user_id', $currentUserId);
-            return $this->db->resultSet();
-        }
-            
-        
+        $this->db->bind(':search', '%' . $searchTerm . '%');
+        $this->db->bind(':current_user_id', $currentUserId);
+        return $this->db->resultSet();
     }
 
+        // FORGOT PASSWORD METHODS
 
-    
-?>
+    /**
+     * Return the full user row for a given email (not just bool).
+     */
+    public function getUserByEmail($email)
+    {
+        $this->db->query('SELECT * FROM Users WHERE email = :email');
+        $this->db->bind(':email', $email);
+        return $this->db->single(); // returns object or false
+    }
+
+    /**
+     * Delete any previous OTPs for this email, then insert a new one.
+     */
+    public function saveOtp($email, $otp, $expiresAt)
+    {
+        // Remove old OTPs first
+        $this->db->query('DELETE FROM password_resets WHERE email = :email');
+        $this->db->bind(':email', $email);
+        $this->db->execute();
+
+        // Insert new OTP
+        $this->db->query('INSERT INTO password_resets (email, otp, expires_at) VALUES (:email, :otp, :expires_at)');
+        $this->db->bind(':email', $email);
+        $this->db->bind(':otp', $otp);
+        $this->db->bind(':expires_at', $expiresAt);
+        return $this->db->execute();
+    }
+
+    /**
+     * Check OTP is valid: matches email and has not been used.
+     * Time enforcement is handled on the frontend (5-min countdown auto-redirect).
+     * Returns the row on success, false otherwise.
+     */
+    public function verifyOtp($email, $otp)
+    {
+        $this->db->query(
+            'SELECT * FROM password_resets
+                 WHERE email = :email
+                   AND otp   = :otp
+                   AND used  = 0
+                 LIMIT 1'
+        );
+        $this->db->bind(':email', $email);
+        $this->db->bind(':otp',   $otp);
+
+        $row = $this->db->single();
+        return $row ? $row : false;
+    }
+
+    /**
+     * Mark the OTP as used so it cannot be replayed.
+     */
+    public function markOtpUsed($email, $otp)
+    {
+        $this->db->query(
+            'UPDATE password_resets SET used = 1
+                 WHERE email = :email AND otp = :otp'
+        );
+        $this->db->bind(':email', $email);
+        $this->db->bind(':otp', $otp);
+        return $this->db->execute();
+    }
+
+    /**
+     * Update the hashed password for a user.
+     */
+    public function updatePassword($email, $hashedPassword)
+    {
+        $this->db->query('UPDATE Users SET password = :password WHERE email = :email');
+        $this->db->bind(':password', $hashedPassword);
+        $this->db->bind(':email', $email);
+        return $this->db->execute();
+    }
+
+    public function updateUserStatus($userId, $status) {
+        $this->db->query("UPDATE users SET status = :status WHERE id = :id");
+        $this->db->bind(':status', $status);
+        $this->db->bind(':id', $userId);
+        
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}

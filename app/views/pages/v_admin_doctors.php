@@ -93,16 +93,32 @@
                         <?php
                             $rejectedDoctors = $data['rejectedDoctors'] ?? [];
                             $inactiveDoctors = $data['inactiveDoctors'] ?? [];
-                            $doctorApplications = array_merge(
-                                array_map(function ($doctor) {
-                                    $doctor->__application_status = 'suspended';
-                                    return $doctor;
-                                }, $rejectedDoctors),
-                                array_map(function ($doctor) {
-                                    $doctor->__application_status = 'inactive';
-                                    return $doctor;
-                                }, $inactiveDoctors)
-                            );
+                            $doctorApplicationsMap = [];
+
+                            $tagDoctor = function ($doctor, $status) use (&$doctorApplicationsMap) {
+                                $doctorKey = $doctor->id ?? $doctor->email ?? null;
+                                if ($doctorKey === null) {
+                                    return;
+                                }
+
+                                $existing = $doctorApplicationsMap[$doctorKey] ?? null;
+                                if ($existing && $existing->__application_status === 'inactive' && $status !== 'inactive') {
+                                    return;
+                                }
+
+                                $doctor->__application_status = $status;
+                                $doctorApplicationsMap[$doctorKey] = $doctor;
+                            };
+
+                            foreach ($rejectedDoctors as $doctor) {
+                                $tagDoctor($doctor, 'suspended');
+                            }
+
+                            foreach ($inactiveDoctors as $doctor) {
+                                $tagDoctor($doctor, 'inactive');
+                            }
+
+                            $doctorApplications = array_values($doctorApplicationsMap);
                         ?>
                         <?php if (!empty($doctorApplications)): ?>
                             <?php foreach ($doctorApplications as $doctor): ?>

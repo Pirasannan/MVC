@@ -32,32 +32,38 @@
 
 .account-links {
     display: flex;
-    justify-content: space-between; /* left & right alignment */
+    text-decoration: none;
+    justify-content: space-between;
+    /* left & right alignment */
     align-items: center;
     margin-top: 10px;
-    width: 100%; /* make sure it stretches across */
+    width: 100%;
+    /* make sure it stretches across */
 }
 
 .single_acc_link {
     display: flex;
-    justify-content: center; /* center for single content */
+    justify-content: center;
+    /* center for single content */
     align-items: center;
 }
 
 .create_acc,
 .forgot_pass,
-.alreadyhaveaccount {
+.alreadyhaveaccount,
+.resend-otp {
     font-size: 13px;
     color: #109CF1;
     text-decoration: none;
-    padding: 8px 40px;
+    padding: 8px 12px;
     line-height: 20px;
     border-radius: 6px;
-    font-size: 13px;
-    color: #109CF1;
-    text-decoration: none;
     background: transparent;
-    transition: color .12s ease, background .12s ease, transform .08s ease;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -67,10 +73,37 @@
 .forgot_pass:hover,
 .forgot_pass:focus,
 .alreadyhaveaccount:hover,
-.alreadyhaveaccount:focus {
-    color: #109CF1cc;
+.alreadyhaveaccount:focus,
+.resend-otp:hover,
+.resend-otp:focus {
+    color: #109CF1;
+    background: rgba(16, 156, 241, 0.08);
     text-decoration: none;
     transform: translateY(-1px);
     outline: none;
 }
 
+/* Specific styling for resend-otp to make it look like a secondary button */
+.resend-otp {
+    border: 1px solid #109CF1;
+    margin-top: 10px;
+    width: auto;
+}
+
+/* For links that are just text with a link inside */
+.resend-text {
+    font-size: 13px;
+    color: #666;
+    margin: 16px 0 0 0;
+    width: 100%;
+    text-align: center;
+}
+
+.resend-text .resend-otp {
+    border: none;
+    padding: 0 4px;
+    margin: 0;
+    display: inline;
+    vertical-align: baseline;
+    font-weight: 600;
+}

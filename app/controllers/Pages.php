@@ -260,8 +260,28 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
+        $pendingVerifications = $this->verificationModel->getPendingDoctorVerificationsForAdmin();
+        $unverifiedDoctors = $this->adminModel->getUnverifiedDoctors();
+        $pendingDoctorsMap = [];
+
+        foreach ($pendingVerifications as $doctor) {
+            $doctorKey = $doctor->user_id ?? $doctor->email ?? null;
+            if ($doctorKey === null) {
+                continue;
+            }
+            $pendingDoctorsMap[$doctorKey] = $doctor;
+        }
+
+        foreach ($unverifiedDoctors as $doctor) {
+            $doctorKey = $doctor->id ?? $doctor->email ?? null;
+            if ($doctorKey === null || isset($pendingDoctorsMap[$doctorKey])) {
+                continue;
+            }
+            $pendingDoctorsMap[$doctorKey] = $doctor;
+        }
+
         $data = [
-            'pendingDoctors' => $this->verificationModel->getPendingDoctorVerificationsForAdmin(),
+            'pendingDoctors' => array_values($pendingDoctorsMap),
             'verifiedDoctors' => $this->adminModel->getVerifiedDoctors(),
             'rejectedDoctors' => $this->adminModel->getRejectedDoctors(),
             'inactiveDoctors' => $this->adminModel->getInactiveDoctors()
@@ -275,8 +295,28 @@ class Pages extends Controller{
             return redirect('Pages/index');
         }
 
+        $pendingVerifications = $this->verificationModel->getPendingDoctorVerificationsForAdmin();
+        $unverifiedDoctors = $this->adminModel->getUnverifiedDoctors();
+        $pendingVerificationsMap = [];
+
+        foreach ($pendingVerifications as $doctor) {
+            $doctorKey = $doctor->user_id ?? $doctor->email ?? null;
+            if ($doctorKey === null) {
+                continue;
+            }
+            $pendingVerificationsMap[$doctorKey] = $doctor;
+        }
+
+        foreach ($unverifiedDoctors as $doctor) {
+            $doctorKey = $doctor->id ?? $doctor->email ?? null;
+            if ($doctorKey === null || isset($pendingVerificationsMap[$doctorKey])) {
+                continue;
+            }
+            $pendingVerificationsMap[$doctorKey] = $doctor;
+        }
+
         $data = [
-            'pendingVerifications' => $this->verificationModel->getPendingDoctorVerificationsForAdmin()
+            'pendingVerifications' => array_values($pendingVerificationsMap)
         ];
 
         $this->view('pages/v_admin_doctor_verification', $data);
@@ -528,29 +568,193 @@ class Pages extends Controller{
             return;
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
+        // Detect request type: JSON or form POST
+        $isJsonRequest = $this->isJsonRequest();
         
+        // Parse input based on request type
+        if ($isJsonRequest) {
+            $input = json_decode(file_get_contents('php://input'), true);
+        } else {
+            $input = $_POST;
+        }
+        
+        // Build data array
         $data = [
-            'recipient_type' => $input['recipient_type'] ?? 'all',
+            'recipient_type' => $input['recipient_type'] ?? '',
             'recipient_id' => $input['recipient_id'] ?? null,
             'title' => $input['title'] ?? '',
             'message' => $input['message'] ?? '',
             'notification_type' => $input['notification_type'] ?? 'info'
         ];
 
-        // Validate required fields
-        if (empty($data['title']) || empty($data['message'])) {
-            echo json_encode(['success' => false, 'message' => 'Title and message are required']);
+        // Validate recipient_type
+        $validRecipients = ['all', 'admin', 'doctor', 'patient'];
+        if (empty($data['recipient_type']) || !in_array($data['recipient_type'], $validRecipients)) {
+            $errorMsg = 'Invalid recipient type';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
             return;
         }
 
+        // Validate title and message
+        if (empty(trim($data['title'])) || empty(trim($data['message']))) {
+            $errorMsg = 'Title and message are required';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
+            return;
+        }
+
+        // Insert notification via model
         $result = $this->adminModel->createNotification($data);
         
         if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Notification sent successfully']);
+            $emailReport = $this->sendNotificationEmails($data);
+            if (($emailReport['failed'] ?? 0) > 0) {
+                error_log('[System Notification] Email failures: ' . ($emailReport['failed'] ?? 0));
+            }
+            if ($isJsonRequest) {
+                echo json_encode(['success' => true, 'message' => 'Notification sent successfully']);
+            } else {
+                redirect('Pages/adminNotifications?sent=1');
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to send notification']);
+            $errorMsg = 'Failed to send notification';
+            if ($isJsonRequest) {
+                echo json_encode(['success' => false, 'message' => $errorMsg]);
+            } else {
+                redirect('Pages/adminNotifications?error=' . urlencode($errorMsg));
+            }
         }
+    }
+
+    public function getLatestNotification() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $userId = (int)$_SESSION['user_id'];
+        $role = strtolower($_SESSION['user_role'] ?? '');
+
+        if ($role === '') {
+            echo json_encode(['success' => true, 'hasNew' => false]);
+            return;
+        }
+
+        $notification = $this->adminModel->getLatestNotificationForUser($role, $userId);
+        if (!$notification) {
+            echo json_encode(['success' => true, 'hasNew' => false]);
+            return;
+        }
+
+        $lastSeenId = $this->userModel->getLastNotificationSeenId($userId);
+        $notificationId = (int)($notification->id ?? 0);
+
+        if ($notificationId === 0 || ($lastSeenId !== null && $notificationId <= (int)$lastSeenId)) {
+            echo json_encode(['success' => true, 'hasNew' => false]);
+            return;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'hasNew' => true,
+            'notification' => [
+                'id' => $notificationId,
+                'title' => $notification->title ?? '',
+                'message' => $notification->message ?? '',
+                'notification_type' => $notification->notification_type ?? 'info',
+                'created_at' => $notification->created_at ?? ''
+            ]
+        ]);
+    }
+
+    public function markNotificationSeen() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $isJsonRequest = $this->isJsonRequest();
+        $input = $isJsonRequest ? json_decode(file_get_contents('php://input'), true) : $_POST;
+        $notificationId = (int)($input['notification_id'] ?? 0);
+
+        if ($notificationId <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Notification ID required']);
+            return;
+        }
+
+        $userId = (int)$_SESSION['user_id'];
+        $currentSeenId = $this->userModel->getLastNotificationSeenId($userId);
+
+        if ($currentSeenId === null || $notificationId > (int)$currentSeenId) {
+            $this->userModel->updateLastNotificationSeenId($userId, $notificationId);
+        }
+
+        echo json_encode(['success' => true]);
+    }
+
+    /**
+     * Helper method to detect if request is JSON
+     */
+    private function isJsonRequest() {
+        return !empty($_SERVER['CONTENT_TYPE']) && 
+               strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+    }
+
+    private function sendNotificationEmails($data) {
+        $recipientType = strtolower($data['recipient_type'] ?? '');
+        $recipientId = !empty($data['recipient_id']) ? (int)$data['recipient_id'] : null;
+        $recipients = [];
+
+        if ($recipientId) {
+            $user = $this->userModel->getUserContactById($recipientId);
+            if ($user && strtolower($user->status ?? '') === 'active') {
+                $recipients = [$user];
+            }
+        } elseif ($recipientType === 'all') {
+            $recipients = $this->userModel->getAllActiveUsers();
+        } elseif (in_array($recipientType, ['admin', 'doctor', 'patient'], true)) {
+            $recipients = $this->userModel->getActiveUsersByRole($recipientType);
+        }
+
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($recipients as $recipient) {
+            $email = $recipient->email ?? '';
+            $name = $recipient->name ?? 'User';
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $failed++;
+                continue;
+            }
+
+            $ok = Mailer::sendNotification($email, $name, $data['title'], $data['message']);
+            if ($ok) {
+                $sent++;
+            } else {
+                $failed++;
+            }
+        }
+
+        return [
+            'attempted' => count($recipients),
+            'sent' => $sent,
+            'failed' => $failed
+        ];
     }
 
     public function adminAllDoctors() {
@@ -628,8 +832,13 @@ class Pages extends Controller{
         }
 
         $data = [
-            'reportedMessages' => $this->adminModel->getReportedMessages()
+            'callReports' => $this->adminModel->getPendingCallReports(),
+            'userReports' => $this->adminModel->getPendingUserReports(),
+            'resolvedReports' => $this->adminModel->getResolvedReports(),
+            'flash' => $_SESSION['flash'] ?? null,
         ];
+
+        unset($_SESSION['flash']);
 
         $this->view('pages/v_admin_reports', $data);
     }
@@ -656,6 +865,31 @@ class Pages extends Controller{
         ];
 
         $this->view('pages/v_admin_resolved_reports', $data);
+    }
+
+    public function resolveReport($reportId = null) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return redirect('Pages/adminReports');
+        }
+
+        $reportId = (int)$reportId;
+        $resolution = trim($_POST['resolution'] ?? '');
+
+        if ($reportId <= 0 || $resolution === '') {
+            $_SESSION['flash'] = 'Resolution note is required.';
+            return redirect('Pages/adminReports');
+        }
+
+        $ok = $this->adminModel->resolveReport($reportId, (int)$_SESSION['user_id'], $resolution);
+        $_SESSION['flash'] = $ok
+            ? 'Report marked as resolved.'
+            : 'Could not resolve report. It may already be resolved.';
+
+        return redirect('Pages/adminReports');
     }
 
     public function adminProfileUpdate() {
@@ -722,6 +956,18 @@ class Pages extends Controller{
         ];
 
         $this->view('pages/v_admin_system_activity_log', $data);
+    }
+
+    public function adminLoginLogs() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            return redirect('Pages/index');
+        }
+
+        $data = [
+            'loginLogs' => $this->adminModel->getLoginLogs()
+        ];
+
+        $this->view('pages/v_admin_login_logs', $data);
     }
 
     public function adminRecords() {
@@ -911,7 +1157,7 @@ class Pages extends Controller{
             redirect('Pages/index');
             return;
         }
-        $this->view('pages/v_doctor_medicalrecords', []);
+        redirect('MedicalRecords/doctor');
     }
 
     Public function doctorprofile() {
@@ -1340,7 +1586,7 @@ class Pages extends Controller{
          redirect('Pages/index');
          return;
         }
-        $this->view('pages/v_patient_medicalrecords', []);
+        redirect('MedicalRecords/patient');
     }
 
     public function patientAppointments() {

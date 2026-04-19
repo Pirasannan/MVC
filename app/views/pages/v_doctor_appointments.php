@@ -57,8 +57,13 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                 <td class="cell-time"><?= date('H:i', strtotime($a->starts_at)) ?>–<?= date('H:i', strtotime($a->ends_at)) ?></td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
                 <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
+                <?php
+                  $currentDt = $a->starts_at ?? '';
+                  $rescheduleStatus = $a->reschedule_status ?? 'none';
+                  $statusLabel = ($rescheduleStatus === 'accepted') ? 'Reschedule accepted' : ($a->status ?? '');
+                ?>
                 <td>
-                  <span class="status pending"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <span class="status pending"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
                 </td>
                 <td>
                   <div class="actions">
@@ -133,8 +138,12 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                 </td>
                 <td><?= htmlspecialchars($a->patient_name) ?></td>
                 <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
+                <?php
+                  $rescheduleStatus = $a->reschedule_status ?? 'none';
+                  $statusLabel = ($rescheduleStatus === 'accepted') ? 'Reschedule accepted' : ($a->status ?? '');
+                ?>
                 <td>
-                  <span class="status approved"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <span class="status approved"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
                 </td>
                 <td>
                   <div class="actions">
@@ -148,6 +157,63 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
                       <a class="btn btn-complete" href="<?= URLROOT ?>/Appointments/setStatus/<?= $a->id ?>/completed">Complete</a>
                     <?php endif; ?>
                   </div>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <!-- ===== completed list ===== -->
+  <section class="appt-section">
+    <div class="appt-card">
+      <div class="appt-card-header">
+        <h3>Completed appointments</h3>
+        <span class="hint">Completed sessions remain visible here</span>
+      </div>
+
+      <?php if(empty($data['completed'])): ?>
+        <div class="appt-empty">No completed appointments yet.</div>
+      <?php else: ?>
+        <div class="table-wrap">
+          <table class="appt-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Patient</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th class="nowrap">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php foreach($data['completed'] as $a): ?>
+              <tr>
+                <td class="cell-date\"><?= date('Y-m-d', strtotime($a->starts_at)) ?></td>
+                <td class="cell-time">
+                  <?= date('H:i', strtotime($a->starts_at)) ?>–<?= date('H:i', strtotime($a->ends_at)) ?>
+                  <small>(15 min)</small>
+                </td>
+                <td><?= htmlspecialchars($a->patient_name) ?></td>
+                <td class="cell-reason\"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
+                <td>
+                  <span class="status completed"><span class="dot"></span>Completed</span>
+                </td>
+                <td>
+                  <button type="button"
+                          class="btn btn-light btn-report-call"
+                          title="Report call"
+                          data-appointment-id="<?= (int)$a->id ?>"
+                          onclick="openCallReportModal(this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M4 4v16"></path>
+                      <path d="M4 4h11l-1 3 1 3H4"></path>
+                    </svg>
+                  </button>
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -187,6 +253,82 @@ $doctorStatus = strtolower((string)($data['doctor_status'] ?? 'active'));
     </form>
   </div>
 </div>
+
+<!-- Call Report Modal -->
+<div id="callReportModal" class="res-modal" style="display:none;">
+  <div class="res-modal__content">
+    <h3 class="res-modal__title">Report Completed Call</h3>
+    <form id="callReportForm" method="POST" action="<?= URLROOT ?>/Appointments/submitReport">
+      <input type="hidden" name="appointment_id" id="callReportAppointmentId" value="">
+      <input type="hidden" name="report_scope" value="call">
+      <input type="hidden" name="report_context" value="post_call">
+
+      <div class="res-modal__row">
+        <label>Reason</label>
+        <select name="reason" required>
+          <option value="">Select a reason</option>
+          <option value="Abusive or offensive communication">Abusive or offensive communication</option>
+          <option value="Spam or unwanted call">Spam or unwanted call</option>
+          <option value="Technical issues (poor audio/video)">Technical issues (poor audio/video)</option>
+          <option value="Disruptive behavior during call">Disruptive behavior during call</option>
+          <option value="Call didn't follow agreed purpose">Call didn't follow agreed purpose</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="res-modal__row">
+        <label>Description (optional)</label>
+        <textarea name="description" rows="3" placeholder="Add more details"></textarea>
+      </div>
+
+      <div class="res-modal__actions">
+        <button type="submit" class="btn btn-warning">Send Report</button>
+        <button type="button" class="btn btn-light" onclick="closeCallReportModal()">Close</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.btn-report-call {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #b45309;
+}
+
+.btn-report-call svg {
+  display: block;
+}
+
+#callReportModal select,
+#callReportModal textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+}
+</style>
+
+<script>
+function openCallReportModal(triggerBtn) {
+  const appointmentId = triggerBtn?.dataset?.appointmentId || '';
+  document.getElementById('callReportAppointmentId').value = appointmentId;
+  document.getElementById('callReportModal').style.display = 'flex';
+}
+
+function closeCallReportModal() {
+  const modal = document.getElementById('callReportModal');
+  const form = document.getElementById('callReportForm');
+  form.reset();
+  modal.style.display = 'none';
+}
+</script>
 
 <!-- Modal functionality is handled by modal-manager.js -->
 

@@ -67,19 +67,26 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
                 </td>
                 <td><?= htmlspecialchars($a->doctor_name) ?></td>
                 <td class="cell-reason"><?= htmlspecialchars($a->reason ?? 'No reason provided') ?></td>
+                <?php
+                  $rescheduleStatus = $a->reschedule_status ?? 'none';
+                  $proposedTime = $a->proposed_datetime ?? null;
+                  $status = strtolower($a->status ?? '');
+                ?>
                 <td>
                   <?php
-                    $st = strtolower($a->status);
-                    $cls = in_array($st, ['approved','pending','rejected','cancelled']) ? $st : 'pending';
+                    $st = $status;
+                    $cls = in_array($st, ['approved','pending','rejected','cancelled','completed']) ? $st : 'pending';
+                    if ($st === 'completed') {
+                      $statusLabel = 'Completed';
+                    } elseif ($rescheduleStatus === 'accepted') {
+                      $statusLabel = 'Reschedule accepted';
+                    } else {
+                      $statusLabel = $a->status ?? '';
+                    }
                   ?>
-                  <span class="status <?= $cls ?>"><span class="dot"></span><?= htmlspecialchars($a->status) ?></span>
+                  <span class="status <?= $cls ?>"><span class="dot"></span><?= htmlspecialchars($statusLabel) ?></span>
                 </td>
                 <td>
-                  <?php 
-                    $rescheduleStatus = $a->reschedule_status ?? 'none';
-                    $proposedTime = $a->proposed_datetime ?? null;
-                  ?>
-                  
                   <?php if ($rescheduleStatus === 'pending_patient' && $proposedTime): ?>
                     <div class="reschedule-proposal">
                       <div class="proposal-info">
@@ -98,8 +105,21 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
                            onclick="return confirm('Decline this reschedule proposal?')">Decline</a>
                       </div>
                     </div>
-                  <?php elseif ($rescheduleStatus === 'accepted'): ?>
-                    <span class="badge badge-success">Reschedule accepted</span>
+                  <?php elseif ($status === 'approved'): ?>
+                    <a href="<?= URLROOT ?>/VideoCall/precall/<?= $a->id ?>" class="join-consultation-btn" style="display: inline-block; padding: 8px 16px; background: #4a90e2; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 500;">
+                      <i class="fas fa-video" style="margin-right: 8px;"></i> Join Consultation
+                    </a>
+                  <?php elseif ($status === 'completed'): ?>
+                    <button type="button"
+                            class="btn btn-light btn-report-call"
+                            title="Report call"
+                            data-appointment-id="<?= (int)$a->id ?>"
+                            onclick="openCallReportModal(this)">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M4 4v16"></path>
+                        <path d="M4 4h11l-1 3 1 3H4"></path>
+                      </svg>
+                    </button>
                   <?php elseif ($rescheduleStatus === 'declined'): ?>
                     <span class="badge badge-info">Reschedule declined</span>
                   <?php elseif (strtolower($a->status) === 'approved'): ?>
@@ -130,6 +150,92 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
       <?php endif; ?>
     </div>
   </section>
+
+  <div id="callReportModal" class="res-modal" style="display:none;">
+    <div class="res-modal__content">
+      <h3 class="res-modal__title">Report Completed Call</h3>
+      <form id="callReportForm" method="POST" action="<?= URLROOT ?>/Appointments/submitReport">
+        <input type="hidden" name="appointment_id" id="callReportAppointmentId" value="">
+        <input type="hidden" name="report_scope" value="call">
+        <input type="hidden" name="report_context" value="post_call">
+
+        <div class="res-modal__row">
+          <label>Reason</label>
+          <select name="reason" required>
+            <option value="">Select a reason</option>
+            <option value="Abusive or offensive communication">Abusive or offensive communication</option>
+            <option value="Spam or unwanted call">Spam or unwanted call</option>
+            <option value="Technical issues (poor audio/video)">Technical issues (poor audio/video)</option>
+            <option value="Disruptive behavior during call">Disruptive behavior during call</option>
+            <option value="Call didn't follow agreed purpose">Call didn't follow agreed purpose</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="res-modal__row">
+          <label>Description (optional)</label>
+          <textarea name="description" rows="3" placeholder="Add more details"></textarea>
+        </div>
+
+        <div class="res-modal__actions">
+          <button type="submit" class="btn btn-warning">Send Report</button>
+          <button type="button" class="btn btn-light" onclick="closeCallReportModal()">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <style>
+  #callReportModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  #callReportModal .res-modal__content {
+    width: min(560px, calc(100% - 24px));
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px;
+  }
+
+  #callReportModal .res-modal__row {
+    margin-top: 12px;
+  }
+
+  #callReportModal .res-modal__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .btn-report-call {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #b45309;
+  }
+
+  .btn-report-call svg {
+    display: block;
+  }
+
+  #callReportModal select,
+  #callReportModal textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px;
+    font: inherit;
+  }
+  </style>
 
   <!-- Book -->
   <section class="p-appt-section">
@@ -263,6 +369,19 @@ $isSuspendedPatient = ($patientStatus === 'suspended');
   });
 
 })();
+
+function openCallReportModal(triggerBtn) {
+  const appointmentId = triggerBtn?.dataset?.appointmentId || '';
+  document.getElementById('callReportAppointmentId').value = appointmentId;
+  document.getElementById('callReportModal').style.display = 'flex';
+}
+
+function closeCallReportModal() {
+  const modal = document.getElementById('callReportModal');
+  const form = document.getElementById('callReportForm');
+  form.reset();
+  modal.style.display = 'none';
+}
 </script>
 
     </div>

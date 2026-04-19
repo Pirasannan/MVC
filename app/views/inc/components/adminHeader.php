@@ -7,6 +7,8 @@
         'adminPatients' => 'Patients Management',
         'adminRecords' => 'Medical Records',
         'adminNotifications' => 'Notifications',
+        'adminReports' => 'Reports',
+        'adminResolvedReports' => 'Resolved Reports',
         'adminMessages' => 'Messages'
     ];
 

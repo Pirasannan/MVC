@@ -463,3 +463,13 @@
     letter-spacing: 2px;
     font-weight: 500;
 }
+
+/* Modal deleted state */
+.is-deleted-modal .prescription-content {
+    filter: grayscale(1) opacity(0.8);
+    user-select: none;
+}
+
+.is-deleted-modal .rx-symbol {
+    color: #64748b !important;
+}

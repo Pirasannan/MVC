@@ -1,88 +1,125 @@
-<link rel="stylesheet" href="<?php echo URLROOT; ?>/public/css/components/form/view_prescription.css?v=<?php echo filemtime(APPROOT.'/public/css/components/form/view_prescription.css'); ?>">
+<link rel="stylesheet"
+  href="<?php echo URLROOT; ?>/public/css/components/form/view_prescription.css?v=<?php echo filemtime(APPROOT . '/../public/css/components/form/view_prescription.css'); ?>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Prescription View Popup -->
 <div class="prescription-overlay" id="prescriptionPopup" style="display: none;">
-  <div class="prescription-modal">
-    <div class="modal-header">
-      <h2>E-Prescription</h2>
+  <div class="prescription-modal" id="printablePrescription">
+    <div class="modal-header no-print">
+      <h2>Prescription Preview</h2>
+      <button type="button" class="close-modal-btn" onclick="closePrescriptionModal()">&times;</button>
     </div>
 
-    <div class="modal-body">
-      <!-- Doctor / Clinic Info -->
-      <div class="clinic-header">
-        <h3>Dr. John</h3>
-        <p>MBBS, MD (General Medicine)</p>
-        <p>Tel: +94 77 123 4567 | Email: john@gmail.com</p>
+    <div class="prescription-content">
+      <!-- Prescription Letterhead -->
+      <div class="prescription-letterhead">
+        <div class="doctor-details">
+          <h1 id="modal-doctor-name">Dr. Name</h1>
+          <p id="modal-doctor-qualifications">MBBS, MD</p>
+          <p id="modal-doctor-slmc">SLMC: 00000</p>
+          <p id="modal-doctor-contact">Email: doctor@gmail.com</p>
+        </div>
       </div>
 
-      <hr class="divider">
+      <div class="prescription-divider"></div>
 
-      <!-- Patient Info -->
-      <div class="patient-info">
-        <p><strong>Patient:</strong> Sarah</p>
-        <p><strong>Age / Sex:</strong> 32 / Female</p>
-        <p><strong>Date:</strong> 2025-10-22</p>
-        <p><strong>Prescription ID:</strong> RX-10258</p>
+      <!-- Patient Information -->
+      <div class="patient-grid">
+        <div class="patient-field">
+          <span class="label">Patient:</span>
+          <span class="value" id="modal-patient-name">Patient Name</span>
+        </div>
+        <div class="patient-field text-right">
+          <span class="label">Date:</span>
+          <span class="value" id="modal-date">2024-01-01</span>
+        </div>
+        <div class="patient-field">
+        </div>
+        <div class="patient-field text-right">
+          <span class="label">Ref No:</span>
+          <span class="value" id="modal-ref-no">RX-00000</span>
+        </div>
       </div>
 
-      <div class="diagnosis">
-        <p><strong>Diagnosis:</strong> Acute Sinus Infection</p>
+      <div class="prescription-divider"></div>
+
+      <!-- RX Section -->
+      <div class="rx-section">
+        <div class="diagnosis-block">
+          <span class="label">Diagnosis:</span>
+          <span class="value" id="modal-diagnosis">Problem Description</span>
+        </div>
+
+        <div class="medication-table-wrapper">
+          <table class="medication-table">
+            <thead>
+              <tr>
+                <th>Medication</th>
+                <th>Dosage</th>
+                <th>Frequency</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="drug-name-main" id="modal-drug-name">Amoxicillin</div>
+                  <div class="drug-meta" id="modal-drug-meta">500mg Capsule | Oral</div>
+                </td>
+                <td id="modal-dosage">1 Capsule</td>
+                <td id="modal-frequency">Twice Daily (BD)</td>
+                <td id="modal-duration">7 Days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="instructions-grid">
+          <div class="instruction-item">
+            <span class="label">Special Instructions:</span>
+            <p id="modal-special-instructions">Take after meals.</p>
+          </div>
+          <div class="instruction-item">
+            <span class="label">Note to Pharmacy:</span>
+            <p id="modal-pharmacy-note">No brand substitution.</p>
+          </div>
+        </div>
       </div>
 
-      <hr class="divider">
-
-      <!-- Medication Table -->
-      <div class="medication-list">
-        <table>
-          <thead>
-            <tr>
-              <th>Drug Name</th>
-              <th>Formulation</th>
-              <th>Route</th>
-              <th>Dosage</th>
-              <th>Frequency</th>
-              <th>Duration</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Amoxicillin</td>
-              <td>500 mg Capsule</td>
-              <td>Oral</td>
-              <td>1 Capsule</td>
-              <td>BD (Twice Daily)</td>
-              <td>7 Days</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Footer Info -->
+      <div class="prescription-footer">
+        <div class="validity-info">
+          <p>Valid Until: <span id="modal-valid-until">2024-01-15</span></p>
+        </div>
+        <div class="signature-block">
+          <div class="signature-line"></div>
+          <p id="modal-doctor-footer-name">Dr. Doctor Name</p>
+        </div>
       </div>
 
-      <div class="special-instructions">
-        <p><strong>Special Instructions:</strong> Take with food. Do not skip doses.</p>
-      </div>
-
-      <div class="pharmacy-note">
-        <p><strong>Note to Pharmacy:</strong> No brand substitution permitted.</p>
-      </div>
-
-      <div class="validity">
-        <p><strong>Valid Until:</strong> 2025-11-05</p>
-      </div>
-
-      <hr class="divider">
-
-      <div class="doctor-signature">
-        <p><strong>Dr. John Doe</strong></p>
-        <p>Signature & Date</p>
+      <!-- Branding Footer -->
+      <div class="prescription-branding">
+        <p>Generated by MediLink</p>
       </div>
     </div>
 
-    <div class="modal-footer">
-      <a href="#" class="btn btn-primary">Print Prescription</a>
-      <a href="#" class="btn btn-secondary" onclick="closePrescriptionModal()">Close</a>
+    <div class="modal-footer no-print">
+
+      <button type="button" class="btn btn-primary" id="printPrescriptionBtn" onclick="printPrescription()">
+        <i class="fas fa-print"></i> Print Prescription
+      </button>
+      <button type="button" class="btn btn-secondary" onclick="closePrescriptionModal()">Close</button>
     </div>
   </div>
 </div>
 
-<!-- Modal functionality is handled by modal-manager.js -->
 
+<script>
+  function printPrescription() {
+    // We'll use the browser's native print function
+    // The CSS @media print rules in view_prescription.css will handle the formatting
+    window.print();
+  }
+</script>

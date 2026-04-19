@@ -1475,6 +1475,39 @@ class Pages extends Controller{
         $this->view('pages/messages/v_patient_messages', $data);
     }
 
+    public function getPrescriptionJSON($id) {
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Unauthorized']);
+            return;
+        }
+
+        $prescriptionModel = $this->model('Prescription');
+        $prescription = $prescriptionModel->getPrescriptionDetails($id);
+
+        if (!$prescription) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Prescription not found']);
+            return;
+        }
+
+        // Check if user is authorized to view this prescription
+        if ($_SESSION['user_role'] === 'doctor' && $prescription->doctor_id != $_SESSION['user_id']) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden']);
+            return;
+        }
+
+        if ($_SESSION['user_role'] === 'patient' && $prescription->patient_id != $_SESSION['user_id']) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden']);
+            return;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($prescription);
+    }
+
 }   
 
 ?>

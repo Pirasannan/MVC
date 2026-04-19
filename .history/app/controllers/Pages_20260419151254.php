@@ -1373,7 +1373,7 @@ class Pages extends Controller{
             }
         }
 
-        usort($upcomingAppointments, function ($left, $right) use ($nowTimestamp) {
+        usort($upcomingAppointments, function ($left, $right) {
             $leftTs = strtotime($left->starts_at ?? '');
             $rightTs = strtotime($right->starts_at ?? '');
             $leftIsFuture = $leftTs >= $nowTimestamp;

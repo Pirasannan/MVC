@@ -1,7 +1,6 @@
 <?php
 class Appointment {
     private $db;
-    private $hasStatusReasonColumn = null;
     public function __construct(){ $this->db = new Database(); }
 
     private function tableExists($tableName){
@@ -10,23 +9,6 @@ class Appointment {
         $this->db->bind(':table', $tableName);
         $result = $this->db->single();
         return isset($result->total) && (int)$result->total > 0;
-    }
-
-    private function hasStatusReasonColumn(): bool {
-        if ($this->hasStatusReasonColumn !== null) {
-            return $this->hasStatusReasonColumn;
-        }
-
-        $this->db->query("SELECT COUNT(*) AS total
-                         FROM information_schema.columns
-                         WHERE table_schema = :db
-                           AND table_name = 'appointments'
-                           AND column_name = 'status_reason'");
-        $this->db->bind(':db', DB_NAME);
-        $result = $this->db->single();
-        $this->hasStatusReasonColumn = isset($result->total) && (int)$result->total > 0;
-
-        return $this->hasStatusReasonColumn;
     }
 
     public function create($data){
@@ -49,21 +31,9 @@ class Appointment {
         if(!in_array($status, $allowed, true)) return false;
 
         $shouldStoreReason = in_array($status, ['rejected', 'cancelled'], true);
-        $useStatusReasonColumn = $this->hasStatusReasonColumn();
-
-        if ($shouldStoreReason) {
-            $reasonColumn = $useStatusReasonColumn ? 'status_reason' : 'notes';
-            $this->db->query("UPDATE appointments SET status=:s, {$reasonColumn}=:status_reason WHERE id=:id");
-            $this->db->bind(':status_reason', $statusReason !== null ? trim($statusReason) : null);
-        } else {
-            if ($useStatusReasonColumn) {
-                $this->db->query("UPDATE appointments SET status=:s, status_reason=NULL WHERE id=:id");
-            } else {
-                $this->db->query("UPDATE appointments SET status=:s WHERE id=:id");
-            }
-        }
-
+        $this->db->query("UPDATE appointments SET status=:s, status_reason=:status_reason WHERE id=:id");
         $this->db->bind(':s', $status);
+        $this->db->bind(':status_reason', $shouldStoreReason ? ($statusReason !== null ? trim($statusReason) : null) : null);
         $this->db->bind(':id', $id);
         return $this->db->execute();
     }
@@ -114,9 +84,7 @@ public function request($data){
 
 public function approve($id, ?int $doctorId = null){
     try{
-        $sql = $this->hasStatusReasonColumn()
-            ? "UPDATE appointments SET status='approved', status_reason=NULL WHERE id=:id"
-            : "UPDATE appointments SET status='approved' WHERE id=:id";
+        $sql = "UPDATE appointments SET status='approved', status_reason=NULL WHERE id=:id";
         if ($doctorId !== null) {
             $sql .= " AND doctor_id=:doctor_id";
         }
@@ -137,26 +105,14 @@ public function setStatus($id, $status, ?string $statusReason = null, ?int $doct
     if(!in_array($status, $allowed, true)) return false;
 
     $shouldStoreReason = in_array($status, ['rejected', 'cancelled'], true);
-    $useStatusReasonColumn = $this->hasStatusReasonColumn();
-
-    if ($shouldStoreReason) {
-        $reasonColumn = $useStatusReasonColumn ? 'status_reason' : 'notes';
-        $sql = "UPDATE appointments SET status=:s, {$reasonColumn}=:status_reason WHERE id=:id";
-    } else {
-        $sql = $useStatusReasonColumn
-            ? "UPDATE appointments SET status=:s, status_reason=NULL WHERE id=:id"
-            : "UPDATE appointments SET status=:s WHERE id=:id";
-    }
-
+    $sql = "UPDATE appointments SET status=:s, status_reason=:status_reason WHERE id=:id";
     if ($doctorId !== null) {
         $sql .= " AND doctor_id=:doctor_id";
     }
 
     $this->db->query($sql);
     $this->db->bind(':s', $status);
-    if ($shouldStoreReason) {
-        $this->db->bind(':status_reason', $statusReason !== null ? trim($statusReason) : null);
-    }
+    $this->db->bind(':status_reason', $shouldStoreReason ? ($statusReason !== null ? trim($statusReason) : null) : null);
     $this->db->bind(':id', $id);
     if ($doctorId !== null) {
         $this->db->bind(':doctor_id', $doctorId);

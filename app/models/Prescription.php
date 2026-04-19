@@ -50,7 +50,7 @@ class Prescription {
             SELECT p.*, d.name AS doctor_name
             FROM prescriptions p
             INNER JOIN Users d ON p.doctor_id = d.id
-            WHERE p.patient_id = :patient_id AND p.is_deleted = "not_deleted"
+            WHERE p.patient_id = :patient_id
             ORDER BY p.created_at DESC
         ');
         $this->db->bind(':patient_id', $patient_id);

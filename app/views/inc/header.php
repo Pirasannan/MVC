@@ -27,7 +27,8 @@
             window.APP_CONFIG = {
                 urlRoot: <?php echo json_encode(URLROOT); ?>,
                 isAuthenticated: <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>,
-                userId: <?php echo isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null'; ?>
+                userId: <?php echo isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 'null'; ?>,
+                userRole: <?php echo json_encode($_SESSION['user_role'] ?? ''); ?>
             };
         </script>
         <title><?php echo SITENAME; ?></title>

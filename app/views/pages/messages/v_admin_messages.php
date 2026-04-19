@@ -3,7 +3,7 @@ $current_page = 'adminMessages';
 ?>
 <link rel='stylesheet' href='<?php echo URLROOT; ?>/css/messages.css?v=<?php echo time(); ?>'>
 
-<div class="dashboard-container">        <!-- Sidebar Navigation -->
+<div class="dashboard-container admin">        <!-- Sidebar Navigation -->
     <?php require APPROOT.'/views/inc/components/adminSidebar.php'; ?>
 
     <!-- Main Content Area -->

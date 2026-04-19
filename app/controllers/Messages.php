@@ -351,15 +351,15 @@ class Messages extends Controller {
                 return $result;
             }
 
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
-            $allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
             $maxFileSize = 10485760; // 10MB
 
             $originalName = $file['name'] ?? 'attachment';
             $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
             if (!in_array($extension, $allowedExtensions, true)) {
-                $result['errors'][] = 'Only JPG, PNG, and PDF files are allowed';
+                $result['errors'][] = 'Only JPG, PNG, WEBP, and PDF files are allowed';
                 return $result;
             }
 

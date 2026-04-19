@@ -3,6 +3,8 @@ require APPROOT.'/views/inc/header.php';
 $current_page = 'doctorPrecall';
 $apt = $data['appointment'];
 $appointmentId = (int)$apt->id;
+$apt = $data['appointment'];
+$appointmentId = (int)$apt->id;
 $patientAvatarPath = trim((string)($apt->patient_profile_image ?? ''));
 $patientAvatarPath = str_replace('\\', '/', $patientAvatarPath);
 $patientAvatarPath = ltrim($patientAvatarPath, '/');
@@ -31,6 +33,9 @@ $patientAvatarUrl = $patientAvatarPath !== '' ? URLROOT . '/' . $patientAvatarPa
                      onerror="this.onerror=null;this.src='<?= htmlspecialchars($defaultAvatarUrl, ENT_QUOTES, 'UTF-8') ?>';">
             </div>
             <div class="patient-details">
+                <h3><?= htmlspecialchars($apt->patient_name) ?></h3>
+                <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
+                <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>
                 <h3><?= htmlspecialchars($apt->patient_name) ?></h3>
                 <p class="appointment-time"><?= date('D d M Y, H:i', strtotime($apt->starts_at)) ?></p>
                 <p class="appointment-type"><?= htmlspecialchars($apt->reason ?? 'Consultation') ?></p>

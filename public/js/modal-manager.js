@@ -153,6 +153,19 @@ class ModalManager {
 
     setT('modal-valid-until', data.valid_until ? new Date(data.valid_until).toLocaleDateString() : 'Indefinite');
     setT('modal-doctor-footer-name', 'Dr. ' + data.doctor_name);
+
+    // Handle deleted status in modal
+    const deletedBadge = document.getElementById('modal-deleted-badge');
+    const printBtn = document.getElementById('printPrescriptionBtn');
+    if (data.is_deleted === 'deleted') {
+      if (deletedBadge) deletedBadge.style.display = 'block';
+      if (printBtn) printBtn.style.display = 'none';
+      document.getElementById('printablePrescription').classList.add('is-deleted-modal');
+    } else {
+      if (deletedBadge) deletedBadge.style.display = 'none';
+      if (printBtn) printBtn.style.display = 'inline-flex';
+      document.getElementById('printablePrescription').classList.remove('is-deleted-modal');
+    }
   }
 
   closePrescriptionModal() {

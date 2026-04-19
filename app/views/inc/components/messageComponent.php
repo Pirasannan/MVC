@@ -8,10 +8,9 @@
 ?>
 <div
     class="message-container"
-    data-user-id="<?php echo (int)($_SESSION['user_id'] ?? 0); ?>"
-    data-user-type="<?php echo htmlspecialchars(strtolower((string)($_SESSION['user_role'] ?? ''))); ?>"
     data-messaging-disabled="<?php echo ($isSuspendedAccount || $isDeactivatedAccount) ? '1' : '0'; ?>"
->
+    data-user-id="<?php echo (int)($_SESSION['user_id'] ?? 0); ?>"
+    data-user-type="<?php echo htmlspecialchars((string)($_SESSION['user_role'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>">
     <!-- Left Sidebar - Conversations List -->
     <div class="chat-conversations-sidebar">
         <!-- Search Bar -->
@@ -67,7 +66,7 @@
 
             <!-- Message Input Area -->
             <div class="message-input-area">
-                <input type="file" id="chatAttachmentInput" class="chat-attachment-input" accept="image/jpeg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf" hidden>
+                <input type="file" id="chatAttachmentInput" class="chat-attachment-input" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" hidden>
                 <button class="attach-button" id="attachButton" type="button" title="Attach file" <?php echo ($isSuspendedAccount || $isDeactivatedAccount) ? 'disabled' : ''; ?>>Attach</button>
                 <div class="input-wrapper">
                     <textarea 

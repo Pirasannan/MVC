@@ -301,10 +301,13 @@ function createEligibleContactItem(contact) {
 
     const initials = contact.user_name ? contact.user_name.substring(0, 2).toUpperCase() : 'U';
     const role = (contact.user_role || '').toString();
+    const avatarUrl = normalizeAvatarUrl(contact.profile_image_url || contact.profile_image || '');
 
     div.innerHTML = `
         <div class="eligible-contact-main">
-            <div class="eligible-contact-avatar"><span>${initials}</span></div>
+            <div class="eligible-contact-avatar">
+                ${renderAvatarInnerHtml(avatarUrl, initials)}
+            </div>
             <div class="eligible-contact-info">
                 <div class="eligible-contact-name">${escapeHtml(contact.user_name || 'Unknown User')}</div>
                 <div class="eligible-contact-role">${escapeHtml(role)}</div>
@@ -352,12 +355,13 @@ function createConversationItem(conv) {
     });
     
     const initials = conv.user_name ? conv.user_name.substring(0, 2).toUpperCase() : 'U';
+    const avatarUrl = normalizeAvatarUrl(conv.profile_image_url || conv.profile_image || '');
     const lastMessagePreview = formatMessagePreview(conv.last_message);
     const timeAgo = conv.last_message_time ? formatTimeAgo(conv.last_message_time) : '';
     
     div.innerHTML = `
         <div class="conversation-avatar">
-            <span>${initials}</span>
+            ${renderAvatarInnerHtml(avatarUrl, initials)}
         </div>
         <div class="conversation-info">
             <div class="conversation-header">
@@ -462,11 +466,14 @@ function applyChatHeaderUser(user) {
     const safeUser = user || {};
     const userName = safeUser.name || safeUser.user_name || 'Unknown User';
     const initials = userName.substring(0, 2).toUpperCase();
+    const avatarUrl = normalizeAvatarUrl(safeUser.profile_image_url || safeUser.profile_image || '');
 
-    const avatarEl = document.getElementById('avatarInitials');
+    const avatarContainerEl = document.getElementById('chatUserAvatar');
     const nameEl = document.getElementById('chatUserName');
 
-    if (avatarEl) avatarEl.textContent = initials;
+    if (avatarContainerEl) {
+        avatarContainerEl.innerHTML = renderAvatarInnerHtml(avatarUrl, initials, 'avatarInitials');
+    }
     if (nameEl) nameEl.textContent = userName;
 
     selectedConversationUserId = safeUser.id !== undefined && safeUser.id !== null
@@ -1296,6 +1303,34 @@ function closeChatMobile() {
 function scrollToBottom() {
     const messagesDisplay = document.getElementById('messagesDisplay');
     messagesDisplay.scrollTop = messagesDisplay.scrollHeight;
+}
+
+function normalizeAvatarUrl(rawPath) {
+    const raw = String(rawPath || '').trim();
+    if (!raw) {
+        return '';
+    }
+
+    if (/^https?:\/\//i.test(raw)) {
+        return raw;
+    }
+
+    const cleaned = raw.replace(/\\/g, '/').replace(/^\/+/, '');
+    return `${URLROOT}/${cleaned}`;
+}
+
+function renderAvatarInnerHtml(avatarUrl, initials, initialsId = '') {
+    const safeInitials = escapeHtml(initials || 'U');
+    const safeUrl = avatarUrl ? escapeHtml(avatarUrl) : '';
+    const idAttr = initialsId ? ` id="${escapeHtml(initialsId)}"` : '';
+
+    if (!safeUrl) {
+        return `<span${idAttr}>${safeInitials}</span>`;
+    }
+
+    const fallbackSpan = `<span${idAttr} class="avatar-fallback" style="display:none;">${safeInitials}</span>`;
+    const image = `<img src="${safeUrl}" alt="Avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">`;
+    return `${image}${fallbackSpan}`;
 }
 
 // Utility functions

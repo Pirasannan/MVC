@@ -149,6 +149,26 @@
     flex-shrink: 0;
 }
 
+.conversation-avatar img,
+.eligible-contact-avatar img,
+.chat-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.conversation-avatar .avatar-fallback,
+.eligible-contact-avatar .avatar-fallback,
+.chat-user-avatar .avatar-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
 .conversation-info,
 .eligible-contact-info {
     min-width: 0;

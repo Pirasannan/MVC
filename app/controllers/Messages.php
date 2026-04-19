@@ -41,6 +41,7 @@ class Messages extends Controller {
         
         try {
             $conversations = $this->messageModel->getConversations($userId, $userType);
+            $this->attachProfileImagesToRows($conversations, 'user_id');
             
             echo json_encode([
                 'success' => true,
@@ -62,12 +63,15 @@ class Messages extends Controller {
             $user = $this->userModel->getUserById($userId);
             
             if ($user) {
+                $profileImagePath = $this->userModel->getUserProfileImage((int)$user->user_id);
                 echo json_encode([
                     'success' => true,
                     'user' => [
                         'id' => $user->user_id,
                         'name' => $user->user_name,
                         'type' => $user->user_role,
+                        'profile_image' => $profileImagePath,
+                        'profile_image_url' => $this->buildProfileImageUrl($profileImagePath),
                         'is_online' => $this->userModel->isUserOnline($userId)
                     ]
                 ]);
@@ -737,6 +741,7 @@ class Messages extends Controller {
         try {
             // Restrict search to users this person can message.
             $users = $this->messageModel->getEligibleContacts($userId, $userRole, trim($searchTerm));
+            $this->attachProfileImagesToRows($users, 'user_id');
             
             echo json_encode([
                 'success' => true,
@@ -769,6 +774,7 @@ class Messages extends Controller {
 
         try {
             $contacts = $this->messageModel->getEligibleContacts($userId, $userRole, $searchTerm);
+            $this->attachProfileImagesToRows($contacts, 'user_id');
 
             echo json_encode([
                 'success' => true,
@@ -951,6 +957,55 @@ class Messages extends Controller {
         }
         
         return false;
+    }
+
+    private function buildProfileImageUrl($profileImagePath) {
+        $path = trim((string)$profileImagePath);
+        if ($path === '') {
+            return '';
+        }
+
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('#/+#', '/', $path);
+        $path = ltrim($path, '/');
+
+        return $path !== '' ? URLROOT . '/' . $path : '';
+    }
+
+    private function attachProfileImagesToRows(&$rows, $idField = 'user_id') {
+        if (!is_array($rows)) {
+            return;
+        }
+
+        foreach ($rows as &$row) {
+            if (!is_object($row) && !is_array($row)) {
+                continue;
+            }
+
+            $userId = null;
+            if (is_object($row)) {
+                $userId = $row->{$idField} ?? null;
+            } elseif (is_array($row)) {
+                $userId = $row[$idField] ?? null;
+            }
+
+            $userId = (int)$userId;
+            if ($userId <= 0) {
+                continue;
+            }
+
+            $profileImagePath = $this->userModel->getUserProfileImage($userId);
+            $profileImageUrl = $this->buildProfileImageUrl($profileImagePath);
+
+            if (is_object($row)) {
+                $row->profile_image = $profileImagePath;
+                $row->profile_image_url = $profileImageUrl;
+            } else {
+                $row['profile_image'] = $profileImagePath;
+                $row['profile_image_url'] = $profileImageUrl;
+            }
+        }
+        unset($row);
     }
     
     // Index method - View messages page

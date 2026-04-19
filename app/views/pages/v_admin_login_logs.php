@@ -14,12 +14,6 @@
 
         <!-- Dashboard Content -->
         <div class="dashboard-content">
-            <!-- Back Navigation -->
-            <div class="back-navigation">
-                <a href="<?php echo URLROOT; ?>/Pages/adminDashboard" class="back-button">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
-                </a>
-            </div>
 
             <!-- Content Sections -->
             <div class="content-sections">

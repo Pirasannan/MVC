@@ -11,11 +11,12 @@
 
         <div class="dashboard-content">
             <!-- Back Navigation -->
-            <div style="margin-bottom: 20px;">
-                <a href="<?php echo URLROOT; ?>/Pages/adminPatients" class="action-button secondary" style="width: auto; display: inline-flex; align-items: center; gap: 8px;">
-                    ← Back to Patient Management
+            <div class="back-navigation">
+                <a href="<?php echo URLROOT; ?>/Pages/adminPatients" class="back-button">
+                    Back to Patient Management
                 </a>
             </div>
+            
             
             <div class="content-sections">
                 <div class="content-section full-width">
